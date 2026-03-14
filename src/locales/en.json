@@ -1,0 +1,26 @@
+{
+  "appName": "NeuroQuest",
+  "appDescription": "Transform your mental wellness journey into a gamified adventure. Conquer OCD and anxiety with NeuroQuest.",
+  "startYourJourney": "Start Your Journey",
+  "nav": {
+    "dashboard": "Dashboard",
+    "observer": "Mental Observer",
+    "exposure": "Exposure Mode",
+    "regulation": "Emotion Regulation",
+    "reprogram": "Cognitive Reprogramming",
+    "progress": "Progress"
+  },
+  "dashboard": {
+    "welcome": "Welcome back, Explorer!",
+    "xpEarned": "XP Earned",
+    "compulsionsResisted": "Compulsions Resisted",
+    "thoughtsIdentified": "Thoughts Identified",
+    "missionsCompleted": "Missions Completed",
+    "nextMissionTitle": "Your Next Personalized Mission",
+    "nextMissionDescription": "Our AI has analyzed your recent activity to create a new challenge for you."
+  },
+  "languageSwitcher": {
+    "english": "English",
+    "spanish": "Spanish"
+  }
+}

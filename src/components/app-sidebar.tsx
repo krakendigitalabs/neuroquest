@@ -26,19 +26,22 @@ import { Logo } from '@/components/logo';
 import { UserProgress } from '@/components/user-progress';
 import { CrisisButton } from '@/components/crisis-button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-
-const navItems = [
-  { href: '/dashboard', icon: <LayoutDashboard />, label: 'Dashboard' },
-  { href: '/observer', icon: <Eye />, label: 'Mental Observer' },
-  { href: '/exposure', icon: <Route />, label: 'Exposure Mode' },
-  { href: '/regulation', icon: <HeartPulse />, label: 'Emotion Regulation' },
-  { href: '/reprogram', icon: <Brain />, label: 'Cognitive Reprogramming' },
-  { href: '/progress', icon: <BarChart3 />, label: 'Progress' },
-];
+import { useTranslation } from '@/context/language-provider';
+import { Button } from './ui/button';
 
 export function AppSidebar() {
   const pathname = usePathname();
   const avatarImage = PlaceHolderImages.find((img) => img.id === 'avatar-1');
+  const { t, locale, setLocale } = useTranslation();
+
+  const navItems = [
+    { href: '/dashboard', icon: <LayoutDashboard />, label: t('nav.dashboard') },
+    { href: '/observer', icon: <Eye />, label: t('nav.observer') },
+    { href: '/exposure', icon: <Route />, label: t('nav.exposure') },
+    { href: '/regulation', icon: <HeartPulse />, label: t('nav.regulation') },
+    { href: '/reprogram', icon: <Brain />, label: t('nav.reprogram') },
+    { href: '/progress', icon: <BarChart3 />, label: t('nav.progress') },
+  ];
 
   return (
     <Sidebar>
@@ -81,6 +84,16 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter>
+        <div className="p-2 flex gap-1 group-data-[collapsible=icon]:flex-col">
+            <Button variant={locale === 'en' ? 'secondary' : 'ghost'} size="sm" className="flex-1 justify-start" onClick={() => setLocale('en')}>
+                <span className="w-6 h-6 flex items-center justify-center">EN</span>
+                <span className="group-data-[collapsible=icon]:hidden">{t('languageSwitcher.english')}</span>
+            </Button>
+            <Button variant={locale === 'es' ? 'secondary' : 'ghost'} size="sm" className="flex-1 justify-start" onClick={() => setLocale('es')}>
+                <span className="w-6 h-6 flex items-center justify-center">ES</span>
+                <span className="group-data-[collapsible=icon]:hidden">{t('languageSwitcher.spanish')}</span>
+            </Button>
+        </div>
         <SidebarSeparator />
         <div className="p-2">
           <CrisisButton />

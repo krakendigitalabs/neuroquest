@@ -1,0 +1,26 @@
+{
+  "appName": "NeuroQuest",
+  "appDescription": "Transforma tu viaje de bienestar mental en una aventura gamificada. Conquista el TOC y la ansiedad con NeuroQuest.",
+  "startYourJourney": "Comienza Tu Viaje",
+  "nav": {
+    "dashboard": "Tablero",
+    "observer": "Observador Mental",
+    "exposure": "Modo Exposición",
+    "regulation": "Regulación Emocional",
+    "reprogram": "Reprogramación Cognitiva",
+    "progress": "Progreso"
+  },
+  "dashboard": {
+    "welcome": "¡Bienvenido de nuevo, Explorador!",
+    "xpEarned": "XP Ganados",
+    "compulsionsResisted": "Compulsiones Resistidas",
+    "thoughtsIdentified": "Pensamientos Identificados",
+    "missionsCompleted": "Misiones Completadas",
+    "nextMissionTitle": "Tu Próxima Misión Personalizada",
+    "nextMissionDescription": "Nuestra IA ha analizado tu actividad reciente para crear un nuevo desafío para ti."
+  },
+  "languageSwitcher": {
+    "english": "Inglés",
+    "spanish": "Español"
+  }
+}
