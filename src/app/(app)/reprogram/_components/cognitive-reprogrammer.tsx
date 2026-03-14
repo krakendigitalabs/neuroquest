@@ -1,6 +1,6 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useFormStatus } from 'react-dom';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -8,7 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { useToast } from '@/hooks/use-toast';
 import { cognitiveReprogramming } from '@/ai/flows/cognitive-reprogramming';
 import { Wand2, AlertTriangle, CheckCircle } from 'lucide-react';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useActionState } from 'react';
 
 type State = {
   initialThought?: string;
@@ -48,7 +48,7 @@ function ReprogramButton() {
 }
 
 export function CognitiveReprogrammer() {
-  const [state, formAction] = useFormState(reprogramAction, initialState);
+  const [state, formAction] = useActionState(reprogramAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   

@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState, useEffect } from 'react';
+import { useFormStatus } from 'react-dom';
 import { Wand2 } from 'lucide-react';
 
 import { generatePersonalizedMission } from '@/ai/flows/personalized-mission-generation';
@@ -61,7 +61,7 @@ function GenerateButton() {
 
 
 export function PersonalizedMissionGenerator() {
-  const [state, formAction] = useFormState(generateMissionAction, initialState);
+  const [state, formAction] = useActionState(generateMissionAction, initialState);
   const { toast } = useToast();
 
   useEffect(() => {

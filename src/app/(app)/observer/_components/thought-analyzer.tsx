@@ -1,6 +1,6 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useFormStatus } from 'react-dom';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { analyzeThought } from '@/ai/flows/thought-analysis-and-coaching-flow';
 import { Badge } from '@/components/ui/badge';
 import { Wand2 } from 'lucide-react';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useActionState } from 'react';
 
 type State = {
   isTOCRelated?: boolean;
@@ -45,7 +45,7 @@ function AnalyzeButton() {
 }
 
 export function ThoughtAnalyzer() {
-  const [state, formAction] = useFormState(analyzeAction, initialState);
+  const [state, formAction] = useActionState(analyzeAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
