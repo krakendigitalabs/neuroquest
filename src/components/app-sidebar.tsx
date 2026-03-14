@@ -12,7 +12,6 @@ import {
   SidebarMenuButton,
   SidebarSeparator,
 } from '@/components/ui/sidebar';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   LayoutDashboard,
   Brain,
@@ -20,19 +19,30 @@ import {
   HeartPulse,
   Route,
   BarChart3,
+  LogOut,
 } from 'lucide-react';
 
 import { Logo } from '@/components/logo';
 import { UserProgress } from '@/components/user-progress';
 import { CrisisButton } from '@/components/crisis-button';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useTranslation } from '@/context/language-provider';
 import { Button } from './ui/button';
+import { useFirebase } from '@/firebase';
+import { signOut } from 'firebase/auth';
+import { useUserProfile } from '@/hooks/use-user-profile';
+import { UserAvatar } from './user-avatar';
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const avatarImage = PlaceHolderImages.find((img) => img.id === 'avatar-1');
   const { t, locale, setLocale } = useTranslation();
+  const { auth, user } = useFirebase();
+  const { userProfile, isLoading: isProfileLoading } = useUserProfile();
+
+  const handleLogout = async () => {
+    if (auth) {
+      await signOut(auth);
+    }
+  };
 
   const navItems = [
     { href: '/dashboard', icon: <LayoutDashboard />, label: t('nav.dashboard') },
@@ -52,18 +62,17 @@ export function AppSidebar() {
       <SidebarContent>
         <div className="p-2 flex flex-col gap-4">
           <div className="flex items-center gap-3">
-            <Avatar className="h-12 w-12">
-              {avatarImage && (
-                <AvatarImage src={avatarImage.imageUrl} alt="User Avatar" />
-              )}
-              <AvatarFallback>U</AvatarFallback>
-            </Avatar>
+            <UserAvatar />
             <div>
-              <p className="font-semibold">{t('sidebar.user')}</p>
-              <p className="text-xs text-muted-foreground">{t('sidebar.level')}</p>
+              <p className="font-semibold">{user?.displayName || t('sidebar.user')}</p>
+              <p className="text-xs text-muted-foreground">{isProfileLoading ? '...' : userProfile ? `Level ${userProfile.level}` : t('sidebar.level')}</p>
             </div>
           </div>
-          <UserProgress level={t('userProgress.level', { level: 1 })} currentXp={75} xpToNextLevel={150} />
+          <UserProgress 
+            level={isProfileLoading || !userProfile ? t('userProgress.level', { level: 0 }) : t('userProgress.level', { level: userProfile.level })}
+            currentXp={isProfileLoading || !userProfile ? 0 : userProfile.currentXp}
+            xpToNextLevel={isProfileLoading || !userProfile ? 100 : userProfile.xpToNextLevel} 
+          />
         </div>
         <SidebarMenu>
           {navItems.map((item) => (
@@ -84,6 +93,15 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={handleLogout}>
+              <LogOut />
+              <span>{t('sidebar.logout')}</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+        <SidebarSeparator />
         <div className="p-2 flex gap-1 group-data-[collapsible=icon]:flex-col">
             <Button variant={locale === 'en' ? 'secondary' : 'ghost'} size="sm" className="flex-1 justify-start" onClick={() => setLocale('en')}>
                 <span className="w-6 h-6 flex items-center justify-center">EN</span>
@@ -102,3 +120,5 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
+
+    

@@ -1,0 +1,62 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useFirebase } from '@/firebase';
+import { GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Logo } from '@/components/logo';
+import { useTranslation } from '@/context/language-provider';
+
+function SignInButton() {
+  const { auth } = useFirebase();
+  const { t } = useTranslation();
+
+  const handleSignIn = async () => {
+    if (!auth) return;
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithRedirect(auth, provider);
+    } catch (error) {
+      console.error("Error during sign-in:", error);
+    }
+  };
+
+  return <Button onClick={handleSignIn} className="w-full">{t('login.signInWithGoogle')}</Button>;
+}
+
+export default function LoginPage() {
+  const { user, isUserLoading } = useFirebase();
+  const router = useRouter();
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    if (!isUserLoading && user) {
+      router.push('/dashboard');
+    }
+  }, [user, isUserLoading, router]);
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-secondary/50 p-4">
+      <Card className="w-full max-w-sm">
+        <CardHeader className="text-center">
+          <div className="mb-4 flex justify-center">
+            <Logo />
+          </div>
+          <CardTitle className="text-2xl font-headline">{t('login.title')}</CardTitle>
+          <CardDescription>{t('login.description')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isUserLoading ? (
+            <div>Loading...</div>
+          ) : (
+            <SignInButton />
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+    

@@ -16,6 +16,9 @@ import Link from "next/link"
 import { Logo } from "@/components/logo"
 import { Progress } from "@/components/ui/progress"
 import { useTranslation } from "@/context/language-provider"
+import { useAdmin } from "@/hooks/use-admin";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const patients = [
   { id: 'USR-001', name: 'John Doe', condition: 'OCD', progress: 75, anxietyTrend: 'down', lastActivity: '2 hours ago', status: 'Active' },
@@ -27,6 +30,19 @@ const patients = [
 
 export default function TherapistDashboard() {
   const { t } = useTranslation();
+  const { isAdmin, isLoading } = useAdmin();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !isAdmin) {
+      router.push('/dashboard');
+    }
+  }, [isAdmin, isLoading, router]);
+
+  if (isLoading || !isAdmin) {
+    return <div>Loading...</div>; // Or a proper loading/unauthorized component
+  }
+
   return (
     <div className="flex min-h-screen w-full flex-col">
       <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
@@ -137,3 +153,5 @@ export default function TherapistDashboard() {
     </div>
   )
 }
+
+    

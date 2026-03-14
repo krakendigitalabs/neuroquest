@@ -10,30 +10,19 @@ import { Badge } from '@/components/ui/badge';
 import { Wand2 } from 'lucide-react';
 import { useRef, useEffect, useActionState } from 'react';
 import { useTranslation } from '@/context/language-provider';
+import { useFirebase } from '@/firebase';
+import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { collection, serverTimestamp } from 'firebase/firestore';
 
 type State = {
   isTOCRelated?: boolean;
   analysis?: string;
   reframingSuggestion?: string;
   error?: string;
+  thought?: string;
 };
 
 const initialState: State = {};
-
-const analyzeAction = async (prevState: State, formData: FormData): Promise<State> => {
-  const thought = formData.get('thought') as string;
-  if (!thought || thought.trim().length < 5) {
-    return { error: 'thoughtAnalyzer.validationError' };
-  }
-
-  try {
-    const result = await analyzeThought({ thought });
-    return result;
-  } catch (error) {
-    console.error(error);
-    return { error: 'thoughtAnalyzer.genericError' };
-  }
-};
 
 function AnalyzeButton() {
   const { pending } = useFormStatus();
@@ -47,10 +36,46 @@ function AnalyzeButton() {
 }
 
 export function ThoughtAnalyzer() {
-  const [state, formAction] = useActionState(analyzeAction, initialState);
+  const { firestore, user } = useFirebase();
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const { t } = useTranslation();
+
+  const analyzeAction = async (prevState: State, formData: FormData): Promise<State> => {
+    const thought = formData.get('thought') as string;
+    if (!thought || thought.trim().length < 5) {
+      return { error: 'thoughtAnalyzer.validationError' };
+    }
+  
+    if (!user || !firestore) {
+      return { error: 'thoughtAnalyzer.notAuthenticated' };
+    }
+
+    try {
+      const result = await analyzeThought({ thought });
+      
+      const thoughtRecord = {
+        userId: user.uid,
+        recordedAt: serverTimestamp(),
+        thoughtText: thought,
+        cognitiveLabel: result.isTOCRelated ? 'Pensamiento TOC' : 'General',
+        isFactNotThought: true,
+        associatedEmotion: 'Unknown', // This could be a user input
+        intensity: 5, // This could be a user input
+        isIntrusive: result.isTOCRelated,
+      };
+
+      const thoughtsCollection = collection(firestore, 'users', user.uid, 'thoughtRecords');
+      await addDocumentNonBlocking(thoughtsCollection, thoughtRecord);
+
+      return { ...result, thought };
+    } catch (error) {
+      console.error(error);
+      return { error: 'thoughtAnalyzer.genericError' };
+    }
+  };
+
+  const [state, formAction] = useActionState(analyzeAction, initialState);
 
   useEffect(() => {
     if (state.error) {
@@ -60,6 +85,10 @@ export function ThoughtAnalyzer() {
           description: t(state.error),
       });
     } else if (state.analysis) {
+      toast({
+        title: t('thoughtAnalyzer.thoughtLogged'),
+        description: t('thoughtAnalyzer.thoughtLoggedDesc'),
+      })
       formRef.current?.reset();
     }
   }, [state, toast, t]);
@@ -112,3 +141,4 @@ export function ThoughtAnalyzer() {
     </Card>
   );
 }
+    

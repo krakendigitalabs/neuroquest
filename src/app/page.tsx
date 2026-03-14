@@ -6,9 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Logo } from '@/components/logo';
 import { useTranslation } from '@/context/language-provider';
+import { useAdmin } from '@/hooks/use-admin';
+import { useUser } from '@/firebase';
 
 export default function Home() {
   const { t } = useTranslation();
+  const { user } = useUser();
+  const { isAdmin } = useAdmin();
 
   const features = [
     {
@@ -41,15 +45,17 @@ export default function Home() {
           <span className="sr-only">NeuroQuest</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link
-            href="/therapist"
-            className="text-sm font-medium hover:underline underline-offset-4"
-            prefetch={false}
-          >
-            {t('landing.therapistPortal')}
-          </Link>
+          {isAdmin && (
+            <Link
+              href="/therapist"
+              className="text-sm font-medium hover:underline underline-offset-4"
+              prefetch={false}
+            >
+              {t('landing.therapistPortal')}
+            </Link>
+          )}
           <Button asChild>
-            <Link href="/dashboard">{t('landing.launchApp')}</Link>
+            <Link href={user ? "/dashboard" : "/login"}>{t('landing.launchApp')}</Link>
           </Button>
         </nav>
       </header>
@@ -68,7 +74,7 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button size="lg" asChild>
-                    <Link href="/dashboard" className="flex items-center gap-2">
+                    <Link href={user ? "/dashboard" : "/login"} className="flex items-center gap-2">
                       {t('startYourJourney')} <ArrowRight className="h-5 w-5" />
                     </Link>
                   </Button>
@@ -118,3 +124,5 @@ export default function Home() {
     </div>
   );
 }
+
+    

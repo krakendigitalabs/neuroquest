@@ -19,6 +19,10 @@
           "type": "string",
           "description": "The public name chosen by the user for their profile."
         },
+        "photoURL": {
+          "type": "string",
+          "description": "URL of the user's profile picture."
+        },
         "level": {
           "type": "number",
           "description": "The current therapeutic level of the user in the gamified system (e.g., Novato Mental, Explorador Mental)."
@@ -501,8 +505,7 @@
   },
   "auth": {
     "providers": [
-      "password",
-      "anonymous"
+      "google.com"
     ]
   },
   "firestore": {
@@ -705,3 +708,4 @@
     "reasoning": "The Firestore data structure for NeuroQuest prioritizes secure, scalable, and debuggable access by adhering to the core design principles and mandates. The design leverages hierarchical paths for user-owned data, denormalization for authorization independence in specific scenarios, and structural segregation for clear security postures.\n\n**Authorization Independence & QAPs:**\n\n1.  **User-Owned Data:** All user-specific activity and progress data (`ThoughtRecord`, `ExposureMission`, `UserExerciseLog`, `MentalCombatEvent`, `AnxietyLog`, `UserAchievement`) is structured as subcollections under the user's profile path: `/users/{userId}/<subcollection>/{docId}`. This inherently provides strong path-based ownership, making security rules for users to access their *own* data extremely simple and efficient (`request.auth.uid == userId`). This directly supports QAPs for users, allowing them to list their own records without security filtering issues.\n\n2.  **Therapist Access to Patient Data (N:N Relationship):**\n    *   **Therapist Profile (`/therapists/{therapistId}`):** Each therapist document contains a `patientIds` array, which lists the `userId`s of all patients they monitor. This acts as the primary source of truth for a therapist's patient roster.\n    *   **User Profile (`/users/{userId}`):** The `User` document includes a denormalized `therapistIds` array. This denormalization is crucial for two reasons:\n        *   **Therapist QAPs for Listing Patients:** It enables therapists to efficiently query and list all their assigned patients (`/users`) by filtering on `therapistIds` containing their own UID. This satisfies the QAP requirement for listing. For example, `db.collection('users').where('therapistIds', 'array-contains', request.auth.uid).get()` is a secure and performant query.\n        *   **User Visibility:** Allows users to easily see which therapists are monitoring them.\n    *   **Access to Patient Subcollections:** To grant therapists access to a *specific patient's subcollection data* (e.g., a patient's `ThoughtRecord`), the security rules will perform a `get()` operation on the *therapist's own document* (`/therapists/$(request.auth.uid)`). This allows the rule to check if the `patientId` (from the data path) is present in the therapist's `patientIds` array. This is *not* a hierarchical dependency in the sense of a parent-child relationship within the patient's data, but rather a cross-collection lookup for the *accessor's* permissions. This approach respects the "
   }
 }
+    

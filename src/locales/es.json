@@ -81,6 +81,9 @@
     "analysisFailed": "Análisis Fallido",
     "validationError": "Por favor, introduce un pensamiento con al menos 5 caracteres.",
     "genericError": "No se pudo analizar el pensamiento. Inténtalo de nuevo.",
+    "notAuthenticated": "Debes iniciar sesión para analizar pensamientos.",
+    "thoughtLogged": "Pensamiento Registrado",
+    "thoughtLoggedDesc": "Tu pensamiento ha sido registrado exitosamente.",
     "aiAnalysis": "Análisis de IA",
     "ocdPattern": "Patrón de TOC/Ansiedad",
     "generalThought": "Pensamiento General",
@@ -94,7 +97,11 @@
     "recentThoughts": "Tus Pensamientos Recientes",
     "thought": "Pensamiento",
     "analysis": "Análisis",
-    "reframing": "Sugerencia de Reencuadre"
+    "reframing": "Sugerencia de Reencuadre",
+    "noThoughts": "Aún no has registrado ningún pensamiento. Usa la herramienta de arriba para comenzar.",
+    "emotion": "Emoción",
+    "intensity": "Intensidad",
+    "label": "Etiqueta"
   },
   "progress": {
     "title": "Tu Progreso",
@@ -197,9 +204,17 @@
   "sidebar": {
     "user": "Usuario",
     "level": "Novato Mental",
-    "crisisSupport": "Apoyo en Crisis"
+    "crisisSupport": "Apoyo en Crisis",
+    "logout": "Cerrar Sesión"
   },
   "userProgress": {
     "level": "Nivel {level}"
+  },
+  "login": {
+    "title": "Bienvenido a NeuroQuest",
+    "description": "Inicia sesión para comenzar tu viaje hacia el bienestar mental.",
+    "signInWithGoogle": "Iniciar sesión con Google"
   }
 }
+
+    

@@ -5,6 +5,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { LanguageProvider, useTranslation } from '@/context/language-provider';
+import { FirebaseClientProvider } from '@/firebase';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -39,10 +40,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <LanguageProvider>
-      <AppBody>
-        {children}
-      </AppBody>
-    </LanguageProvider>
+    <FirebaseClientProvider>
+      <LanguageProvider>
+        <AppBody>
+          {children}
+        </AppBody>
+      </LanguageProvider>
+    </FirebaseClientProvider>
   );
 }
+
+    

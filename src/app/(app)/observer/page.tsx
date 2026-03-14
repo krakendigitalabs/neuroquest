@@ -4,15 +4,42 @@ import { ThoughtAnalyzer } from './_components/thought-analyzer';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { History } from 'lucide-react';
 import { useTranslation } from '@/context/language-provider';
+import { useCollection } from '@/firebase';
+import { useFirebase } from '@/firebase';
+import { collection } from 'firebase/firestore';
+import { useMemo } from 'react';
+import { WithId } from '@/firebase/firestore/use-collection';
+import {ThoughtRecord} from '@/models/thought-record';
 
-const mockThoughtHistory = [
-  { thought: 'Did I leave the stove on?', analysis: "A common checking-related thought, often associated with OCD.", reframe: "This is a 'what if' thought. I can choose to let it pass without checking." },
-  { thought: 'Everyone thinks I am awkward.', analysis: "This sounds like social anxiety and mind-reading.", reframe: "I cannot know what others think. I will focus on my own actions." },
-  { thought: 'I might have contaminated the food.', analysis: "A classic contamination fear. This is likely an OCD thought.", reframe: "I have followed normal hygiene. This fear is the OCD, not reality." },
-];
+function ThoughtHistoryItem({ item }: { item: WithId<ThoughtRecord> }) {
+  const { t } = useTranslation();
+  // A real implementation would have analysis and reframe, but we'll use placeholders
+  return (
+    <Card className="bg-card">
+      <CardHeader>
+        <CardTitle className="text-lg">{t('observer.thought')}: "{item.thoughtText}"</CardTitle>
+        <CardDescription>{new Date(item.recordedAt).toLocaleString()}</CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-2">
+         <p><strong className="text-primary">{t('observer.emotion')}:</strong> {item.associatedEmotion} ({t('observer.intensity')}: {item.intensity})</p>
+         <p><strong className="text-accent">{t('observer.label')}:</strong> {item.cognitiveLabel}</p>
+      </CardContent>
+    </Card>
+  )
+}
+
 
 export default function ObserverPage() {
   const { t } = useTranslation();
+  const { firestore, user } = useFirebase();
+
+  const thoughtsQuery = useMemo(() => {
+    if (!firestore || !user) return null;
+    return collection(firestore, 'users', user.uid, 'thoughtRecords');
+  }, [firestore, user]);
+
+  const { data: thoughtHistory, isLoading } = useCollection<ThoughtRecord>(thoughtsQuery);
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
@@ -30,19 +57,15 @@ export default function ObserverPage() {
           {t('observer.recentThoughts')}
         </h2>
         <div className="space-y-4">
-          {mockThoughtHistory.map((item, index) => (
-            <Card key={index} className="bg-card">
-              <CardHeader>
-                <CardTitle className="text-lg">{t('observer.thought')}: "{item.thought}"</CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-2">
-                <p><strong className="text-primary">{t('observer.analysis')}:</strong> {item.analysis}</p>
-                <p><strong className="text-accent">{t('observer.reframing')}:</strong> {item.reframe}</p>
-              </CardContent>
-            </Card>
+          {isLoading && <p>Loading thoughts...</p>}
+          {thoughtHistory && thoughtHistory.length === 0 && <p>{t('observer.noThoughts')}</p>}
+          {thoughtHistory && thoughtHistory.map((item) => (
+            <ThoughtHistoryItem key={item.id} item={item} />
           ))}
         </div>
       </div>
     </div>
   );
 }
+
+    

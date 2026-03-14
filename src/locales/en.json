@@ -81,6 +81,9 @@
     "analysisFailed": "Analysis Failed",
     "validationError": "Please enter a thought with at least 5 characters.",
     "genericError": "Failed to analyze thought. Please try again.",
+    "notAuthenticated": "You must be logged in to analyze thoughts.",
+    "thoughtLogged": "Thought Logged",
+    "thoughtLoggedDesc": "Your thought has been successfully logged.",
     "aiAnalysis": "AI Analysis",
     "ocdPattern": "OCD/Anxiety Pattern",
     "generalThought": "General Thought",
@@ -94,7 +97,11 @@
     "recentThoughts": "Your Recent Thoughts",
     "thought": "Thought",
     "analysis": "Analysis",
-    "reframing": "Reframing Suggestion"
+    "reframing": "Reframing Suggestion",
+    "noThoughts": "You haven't logged any thoughts yet. Use the tool above to get started.",
+    "emotion": "Emotion",
+    "intensity": "Intensity",
+    "label": "Label"
   },
   "progress": {
     "title": "Your Progress",
@@ -197,9 +204,17 @@
   "sidebar": {
     "user": "User",
     "level": "Mental Novice",
-    "crisisSupport": "Crisis Support"
+    "crisisSupport": "Crisis Support",
+    "logout": "Log Out"
   },
   "userProgress": {
     "level": "Level {level}"
+  },
+  "login": {
+    "title": "Welcome to NeuroQuest",
+    "description": "Sign in to begin your journey to mental wellness.",
+    "signInWithGoogle": "Sign in with Google"
   }
 }
+
+    
