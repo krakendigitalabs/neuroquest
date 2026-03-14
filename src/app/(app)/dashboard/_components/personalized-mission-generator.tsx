@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from '@/context/language-provider';
 
 type State = {
   personalizedMission?: {
@@ -44,17 +45,18 @@ const generateMissionAction = async (prevState: State): Promise<State> => {
     return result;
   } catch (error) {
     console.error(error);
-    return { error: 'Failed to generate mission. Please try again.' };
+    return { error: 'personalizedMissionGenerator.genericError' };
   }
 };
 
 function GenerateButton() {
   const { pending } = useFormStatus();
+  const { t } = useTranslation();
 
   return (
     <Button type="submit" disabled={pending}>
       <Wand2 className="mr-2 h-4 w-4" />
-      {pending ? 'Generating...' : 'Generate New Mission'}
+      {pending ? t('personalizedMissionGenerator.generating') : t('personalizedMissionGenerator.generateNewMission')}
     </Button>
   );
 }
@@ -63,16 +65,17 @@ function GenerateButton() {
 export function PersonalizedMissionGenerator() {
   const [state, formAction] = useActionState(generateMissionAction, initialState);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (state.error) {
       toast({
           variant: "destructive",
-          title: "Generation Failed",
-          description: state.error,
+          title: t('personalizedMissionGenerator.generationFailed'),
+          description: t(state.error),
       })
     }
-  }, [state.error, toast]);
+  }, [state.error, toast, t]);
   
 
   return (
@@ -107,7 +110,7 @@ export function PersonalizedMissionGenerator() {
                     {state.cognitiveCoachingSuggestion.example && (
                         <CardContent>
                             <p className="text-sm text-muted-foreground italic">
-                                Example: "{state.cognitiveCoachingSuggestion.example}"
+                                {t('thoughtAnalyzer.example')} "{state.cognitiveCoachingSuggestion.example}"
                             </p>
                         </CardContent>
                     )}

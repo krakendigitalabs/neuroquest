@@ -9,6 +9,7 @@ import { analyzeThought } from '@/ai/flows/thought-analysis-and-coaching-flow';
 import { Badge } from '@/components/ui/badge';
 import { Wand2 } from 'lucide-react';
 import { useRef, useEffect, useActionState } from 'react';
+import { useTranslation } from '@/context/language-provider';
 
 type State = {
   isTOCRelated?: boolean;
@@ -22,7 +23,7 @@ const initialState: State = {};
 const analyzeAction = async (prevState: State, formData: FormData): Promise<State> => {
   const thought = formData.get('thought') as string;
   if (!thought || thought.trim().length < 5) {
-    return { error: 'Please enter a thought with at least 5 characters.' };
+    return { error: 'thoughtAnalyzer.validationError' };
   }
 
   try {
@@ -30,16 +31,17 @@ const analyzeAction = async (prevState: State, formData: FormData): Promise<Stat
     return result;
   } catch (error) {
     console.error(error);
-    return { error: 'Failed to analyze thought. Please try again.' };
+    return { error: 'thoughtAnalyzer.genericError' };
   }
 };
 
 function AnalyzeButton() {
   const { pending } = useFormStatus();
+  const { t } = useTranslation();
   return (
     <Button type="submit" disabled={pending}>
       <Wand2 className="mr-2 h-4 w-4" />
-      {pending ? 'Analyzing...' : 'Analyze Thought'}
+      {pending ? t('thoughtAnalyzer.analyzing') : t('thoughtAnalyzer.analyzeButton')}
     </Button>
   );
 }
@@ -48,30 +50,31 @@ export function ThoughtAnalyzer() {
   const [state, formAction] = useActionState(analyzeAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (state.error) {
       toast({
           variant: "destructive",
-          title: "Analysis Failed",
-          description: state.error,
+          title: t('thoughtAnalyzer.analysisFailed'),
+          description: t(state.error),
       });
     } else if (state.analysis) {
       formRef.current?.reset();
     }
-  }, [state, toast]);
+  }, [state, toast, t]);
 
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Thought Analysis</CardTitle>
-        <CardDescription>What's on your mind? Log it here to gain clarity.</CardDescription>
+        <CardTitle>{t('thoughtAnalyzer.title')}</CardTitle>
+        <CardDescription>{t('thoughtAnalyzer.description')}</CardDescription>
       </CardHeader>
       <form ref={formRef} action={formAction}>
         <CardContent>
           <Textarea
             name="thought"
-            placeholder="e.g., 'I might have made a mistake at work that will get me fired.'"
+            placeholder={t('thoughtAnalyzer.placeholder')}
             rows={3}
             required
             minLength={5}
@@ -87,19 +90,19 @@ export function ThoughtAnalyzer() {
             <Card className="bg-secondary/50">
                 <CardHeader>
                     <CardTitle className="flex items-center justify-between text-lg">
-                        AI Analysis
+                        {t('thoughtAnalyzer.aiAnalysis')}
                         <Badge variant={state.isTOCRelated ? 'destructive' : 'secondary'}>
-                            {state.isTOCRelated ? "OCD/Anxiety Pattern" : "General Thought"}
+                            {state.isTOCRelated ? t('thoughtAnalyzer.ocdPattern') : t('thoughtAnalyzer.generalThought')}
                         </Badge>
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div>
-                        <h4 className="font-semibold mb-1">Analysis</h4>
+                        <h4 className="font-semibold mb-1">{t('thoughtAnalyzer.analysis')}</h4>
                         <p className="text-sm text-muted-foreground">{state.analysis}</p>
                     </div>
                      <div>
-                        <h4 className="font-semibold mb-1">Reframing Suggestion</h4>
+                        <h4 className="font-semibold mb-1">{t('thoughtAnalyzer.reframingSuggestion')}</h4>
                         <p className="text-sm text-muted-foreground">{state.reframingSuggestion}</p>
                     </div>
                 </CardContent>

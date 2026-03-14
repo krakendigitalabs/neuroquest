@@ -1,51 +1,13 @@
+'use client';
+
 import { Target, Lock, CheckCircle, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { useTranslation } from '@/context/language-provider';
 
-const missions = {
-  available: [
-    {
-      title: 'Touch a "Contaminated" Object',
-      description: 'Touch an object you consider mildly contaminated (like a doorknob) and don\'t wash your hands for 5 minutes.',
-      type: 'Exposición',
-      difficulty: 'Fácil',
-      xp: 50,
-      completed: false
-    },
-    {
-      title: 'Leave Home Without Checking',
-      description: 'Leave your house for a short walk (5-10 minutes) without performing your usual checking rituals for the door or stove.',
-      type: 'Exposición',
-      difficulty: 'Media',
-      xp: 80,
-      completed: false
-    }
-  ],
-  completed: [
-    {
-      title: 'Resist a Minor Compulsion',
-      description: 'Acknowledge an urge to perform a minor compulsion and consciously decide not to do it.',
-      type: 'Observador Mental',
-      difficulty: 'Fácil',
-      xp: 30,
-      completed: true
-    }
-  ],
-  locked: [
-    {
-      title: 'Delayed Hand Washing',
-      description: 'After using the restroom, wait 15 minutes before washing your hands.',
-      type: 'Exposición',
-      difficulty: 'Difícil',
-      xp: 120,
-      completed: false
-    }
-  ]
-};
-
-const MissionCard = ({ mission }: { mission: typeof missions.available[0] | typeof missions.completed[0] | typeof missions.locked[0] }) => (
+const MissionCard = ({ mission }: { mission: { title: string, description: string, type: string, difficulty: string, xp: number, completed: boolean } }) => (
   <Card className={`transition-all ${mission.completed ? 'bg-secondary/30' : 'hover:shadow-lg hover:-translate-y-1'}`}>
     <CardHeader>
       <CardTitle className="flex items-start justify-between">
@@ -64,7 +26,7 @@ const MissionCard = ({ mission }: { mission: typeof missions.available[0] | type
   </Card>
 );
 
-const LockedMissionCard = ({ mission }: { mission: typeof missions.locked[0] }) => (
+const LockedMissionCard = ({ mission }: { mission: { title: string, description: string, type: string, difficulty: string, xp: number } }) => (
   <Card className="bg-muted/50 border-dashed">
     <CardHeader>
       <CardTitle className="flex items-start justify-between text-muted-foreground">
@@ -84,48 +46,95 @@ const LockedMissionCard = ({ mission }: { mission: typeof missions.locked[0] }) 
 );
 
 export default function ExposurePage() {
+  const { t } = useTranslation();
+
+  const missions = {
+    available: [
+      {
+        title: t('exposure.mission1Title'),
+        description: t('exposure.mission1Description'),
+        type: t('exposure.missionType'),
+        difficulty: t('exposure.difficultyEasy'),
+        xp: 50,
+        completed: false
+      },
+      {
+        title: t('exposure.mission2Title'),
+        description: t('exposure.mission2Description'),
+        type: t('exposure.missionType'),
+        difficulty: t('exposure.difficultyMedium'),
+        xp: 80,
+        completed: false
+      }
+    ],
+    completed: [
+      {
+        title: t('exposure.missionCompleted1Title'),
+        description: t('exposure.missionCompleted1Description'),
+        type: t('exposure.observerType'),
+        difficulty: t('exposure.difficultyEasy'),
+        xp: 30,
+        completed: true
+      }
+    ],
+    locked: [
+      {
+        title: t('exposure.missionLocked1Title'),
+        description: t('exposure.missionLocked1Description'),
+        type: t('exposure.missionType'),
+        difficulty: t('exposure.difficultyHard'),
+        xp: 120,
+      }
+    ]
+  };
+
+  const completedCount = missions.completed.length;
+  const availableCount = missions.available.length;
+  const totalMissions = completedCount + availableCount;
+  const progressValue = totalMissions > 0 ? (completedCount / totalMissions) * 100 : 0;
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight font-headline">Exposure Mode (ERP)</h1>
+        <h1 className="text-3xl font-bold tracking-tight font-headline">{t('exposure.title')}</h1>
         <Button>
-          <Plus className="mr-2 h-4 w-4" /> Custom Mission
+          <Plus className="mr-2 h-4 w-4" /> {t('exposure.customMission')}
         </Button>
       </div>
       <p className="text-muted-foreground">
-        Engage in progressively challenging Exposure and Response Prevention (ERP) missions. This is a core part of overcoming OCD and anxiety.
+        {t('exposure.description')}
       </p>
 
       <div className="my-6">
         <Card>
           <CardHeader>
-            <CardTitle>Your ERP Progress</CardTitle>
+            <CardTitle>{t('exposure.progressTitle')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Progress value={33} className="h-3" />
-            <p className="text-sm text-muted-foreground mt-2">You've completed 1 out of 3 available missions.</p>
+            <Progress value={progressValue} className="h-3" />
+            <p className="text-sm text-muted-foreground mt-2">{t('exposure.progressDescription', { completed: completedCount, total: totalMissions })}</p>
           </CardContent>
         </Card>
       </div>
 
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight font-headline mb-4">Available Missions</h2>
+          <h2 className="text-2xl font-bold tracking-tight font-headline mb-4">{t('exposure.availableMissions')}</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {missions.available.map((mission, index) => <MissionCard key={index} mission={mission} />)}
           </div>
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold tracking-tight font-headline mb-4">Completed Missions</h2>
+          <h2 className="text-2xl font-bold tracking-tight font-headline mb-4">{t('exposure.completedMissions')}</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {missions.completed.map((mission, index) => <MissionCard key={index} mission={mission} />)}
           </div>
         </div>
         
         <div>
-          <h2 className="text-2xl font-bold tracking-tight font-headline mb-4">Locked Missions</h2>
-           <p className="text-muted-foreground text-sm mb-4">Complete more missions to unlock these challenges.</p>
+          <h2 className="text-2xl font-bold tracking-tight font-headline mb-4">{t('exposure.lockedMissions')}</h2>
+           <p className="text-muted-foreground text-sm mb-4">{t('exposure.lockedDescription')}</p>
           <div className="grid gap-4 md:grid-cols-2">
             {missions.locked.map((mission, index) => <LockedMissionCard key={index} mission={mission} />)}
           </div>

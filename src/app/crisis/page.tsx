@@ -1,26 +1,31 @@
+'use client';
+
 import { AlertTriangle, Phone } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-
-const resources = [
-  { name: 'National Suicide Prevention Lifeline', phone: '988', description: 'Available 24/7 for free and confidential support.' },
-  { name: 'Crisis Text Line', phone: 'Text HOME to 741741', description: 'Free, 24/7 crisis support via text message.' },
-  { name: 'The Trevor Project', phone: '1-866-488-7386', description: 'For LGBTQ young people in crisis.' },
-  { name: 'NAMI Helpline', phone: '1-800-950-NAMI (6264)', description: 'National Alliance on Mental Illness for information and referrals.' },
-];
+import { useTranslation } from '@/context/language-provider';
 
 export default function CrisisPage() {
+  const { t } = useTranslation();
+
+  const resources = [
+    { name: 'National Suicide Prevention Lifeline', phone: '988', description: t('crisis.resource1Desc') },
+    { name: 'Crisis Text Line', phone: 'Text HOME to 741741', description: t('crisis.resource2Desc') },
+    { name: 'The Trevor Project', phone: '1-866-488-7386', description: t('crisis.resource3Desc') },
+    { name: 'NAMI Helpline', phone: '1-800-950-NAMI (6264)', description: t('crisis.resource4Desc') },
+  ];
+  
   return (
     <div className="flex flex-col min-h-screen bg-destructive/10">
       <header className="px-4 lg:px-6 h-16 flex items-center bg-background/80 backdrop-blur-sm border-b">
         <h1 className="text-xl font-bold flex items-center gap-2 text-destructive">
           <AlertTriangle />
-          Crisis Support
+          {t('crisis.title')}
         </h1>
         <div className="ml-auto">
           <Button asChild variant="outline">
-            <Link href="/dashboard">Back to App</Link>
+            <Link href="/dashboard">{t('crisis.backToApp')}</Link>
           </Button>
         </div>
       </header>
@@ -28,9 +33,9 @@ export default function CrisisPage() {
         <div className="max-w-4xl mx-auto">
           <Card className="border-destructive bg-background">
             <CardHeader>
-              <CardTitle className="text-3xl font-headline">You Are Not Alone</CardTitle>
+              <CardTitle className="text-3xl font-headline">{t('crisis.notAlone')}</CardTitle>
               <CardDescription className="text-lg">
-                If you are in crisis or immediate danger, please use the resources below or call 911. Your safety is the top priority.
+                {t('crisis.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -52,7 +57,7 @@ export default function CrisisPage() {
           </Card>
 
            <div className="text-center mt-8 text-muted-foreground">
-             <p>NeuroQuest is a tool for support and skill-building, not a substitute for professional medical advice, diagnosis, or treatment. </p>
+             <p>{t('crisis.disclaimer')}</p>
            </div>
         </div>
       </main>

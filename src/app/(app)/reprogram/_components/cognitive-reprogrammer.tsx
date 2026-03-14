@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cognitiveReprogramming } from '@/ai/flows/cognitive-reprogramming';
 import { Wand2, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useRef, useEffect, useActionState } from 'react';
+import { useTranslation } from '@/context/language-provider';
 
 type State = {
   initialThought?: string;
@@ -25,7 +26,7 @@ const initialState: State = {};
 const reprogramAction = async (prevState: State, formData: FormData): Promise<State> => {
   const thought = formData.get('thought') as string;
   if (!thought || thought.trim().length < 5) {
-    return { error: 'Please enter a thought with at least 5 characters.' };
+    return { error: 'cognitiveReprogrammer.validationError' };
   }
 
   try {
@@ -33,16 +34,17 @@ const reprogramAction = async (prevState: State, formData: FormData): Promise<St
     return result;
   } catch (error) {
     console.error(error);
-    return { error: 'Failed to reprogram thought. Please try again.' };
+    return { error: 'cognitiveReprogrammer.genericError' };
   }
 };
 
 function ReprogramButton() {
   const { pending } = useFormStatus();
+  const { t } = useTranslation();
   return (
     <Button type="submit" disabled={pending}>
       <Wand2 className="mr-2 h-4 w-4" />
-      {pending ? 'Processing...' : 'Start Reprogramming'}
+      {pending ? t('cognitiveReprogrammer.processing') : t('cognitiveReprogrammer.reprogramButton')}
     </Button>
   );
 }
@@ -51,30 +53,31 @@ export function CognitiveReprogrammer() {
   const [state, formAction] = useActionState(reprogramAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
+  const { t } = useTranslation();
   
   useEffect(() => {
     if (state.error) {
       toast({
           variant: "destructive",
-          title: "Processing Failed",
-          description: state.error,
+          title: t('cognitiveReprogrammer.processingFailed'),
+          description: t(state.error),
       });
     } else if (state.initialThought) {
       formRef.current?.reset();
     }
-  }, [state, toast]);
+  }, [state, toast, t]);
 
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Reprogramming Tool</CardTitle>
-        <CardDescription>Enter a thought you want to challenge.</CardDescription>
+        <CardTitle>{t('cognitiveReprogrammer.title')}</CardTitle>
+        <CardDescription>{t('cognitiveReprogrammer.description')}</CardDescription>
       </CardHeader>
       <form ref={formRef} action={formAction}>
         <CardContent>
           <Textarea
             name="thought"
-            placeholder="e.g., 'If I don't check the stove, the house will explode.'"
+            placeholder={t('cognitiveReprogrammer.placeholder')}
             rows={3}
             required
             minLength={5}
@@ -92,7 +95,7 @@ export function CognitiveReprogrammer() {
               <AccordionTrigger>
                 <div className="flex items-center gap-2">
                     <AlertTriangle className="text-destructive h-5 w-5" />
-                    Initial Thought
+                    {t('cognitiveReprogrammer.initialThought')}
                 </div>
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground italic">
@@ -100,14 +103,14 @@ export function CognitiveReprogrammer() {
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2">
-              <AccordionTrigger>Probability Assessment</AccordionTrigger>
+              <AccordionTrigger>{t('cognitiveReprogrammer.probabilityAssessment')}</AccordionTrigger>
               <AccordionContent>
-                <p><strong>Identified Distortion:</strong> {state.cognitiveDistortion}</p>
+                <p><strong>{t('cognitiveReprogrammer.identifiedDistortion')}</strong> {state.cognitiveDistortion}</p>
                 <p className="mt-2 text-muted-foreground">{state.probabilityAssessment}</p>
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-3">
-              <AccordionTrigger>Challenge Questions</AccordionTrigger>
+              <AccordionTrigger>{t('cognitiveReprogrammer.challengeQuestions')}</AccordionTrigger>
               <AccordionContent>
                 <ul className="list-disc list-inside space-y-2">
                   {state.challengeQuestions?.map((q, i) => <li key={i}>{q}</li>)}
@@ -118,7 +121,7 @@ export function CognitiveReprogrammer() {
               <AccordionTrigger>
                 <div className="flex items-center gap-2">
                     <CheckCircle className="text-green-600 h-5 w-5" />
-                    Reprogrammed Thought
+                    {t('cognitiveReprogrammer.reprogrammedThought')}
                 </div>
               </AccordionTrigger>
               <AccordionContent className="font-semibold">

@@ -1,30 +1,35 @@
+'use client';
+
 import Link from 'next/link';
 import { BrainCircuit, ShieldCheck, Target, Award, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Logo } from '@/components/logo';
+import { useTranslation } from '@/context/language-provider';
 
 export default function Home() {
+  const { t } = useTranslation();
+
   const features = [
     {
       icon: <BrainCircuit className="h-8 w-8 text-primary" />,
-      title: 'Therapeutic Modules',
-      description: 'Engage with exercises for thought logging, exposure therapy, and emotional regulation.',
+      title: t('landing.feature1Title'),
+      description: t('landing.feature1Description'),
     },
     {
       icon: <Award className="h-8 w-8 text-primary" />,
-      title: 'Gamified Progression',
-      description: 'Earn XP, level up, and unlock achievements as you build mental resilience.',
+      title: t('landing.feature2Title'),
+      description: t('landing.feature2Description'),
     },
     {
       icon: <Target className="h-8 w-8 text-primary" />,
-      title: 'AI Personalization',
-      description: 'Receive personalized missions and coaching based on your unique patterns.',
+      title: t('landing.feature3Title'),
+      description: t('landing.feature3Description'),
     },
     {
       icon: <ShieldCheck className="h-8 w-8 text-primary" />,
-      title: 'Therapist Dashboard',
-      description: 'Allow professionals to monitor progress and provide guided support.',
+      title: t('landing.feature4Title'),
+      description: t('landing.feature4Description'),
     },
   ];
 
@@ -41,10 +46,10 @@ export default function Home() {
             className="text-sm font-medium hover:underline underline-offset-4"
             prefetch={false}
           >
-            Therapist Portal
+            {t('landing.therapistPortal')}
           </Link>
           <Button asChild>
-            <Link href="/dashboard">Launch App</Link>
+            <Link href="/dashboard">{t('landing.launchApp')}</Link>
           </Button>
         </nav>
       </header>
@@ -55,16 +60,16 @@ export default function Home() {
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
                   <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
-                    Transform Your Mind, Conquer Your Quest
+                    {t('landing.headline')}
                   </h1>
                   <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                    NeuroQuest is a gamified mental wellness platform designed to help you manage intrusive thoughts, anxiety, and compulsions through proven therapeutic techniques.
+                    {t('landing.subheadline')}
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button size="lg" asChild>
                     <Link href="/dashboard" className="flex items-center gap-2">
-                      Start Your Journey <ArrowRight className="h-5 w-5" />
+                      {t('startYourJourney')} <ArrowRight className="h-5 w-5" />
                     </Link>
                   </Button>
                 </div>
@@ -81,10 +86,10 @@ export default function Home() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-secondary px-3 py-1 text-sm">Key Features</div>
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">A New Approach to Mental Wellness</h2>
+                <div className="inline-block rounded-lg bg-secondary px-3 py-1 text-sm">{t('landing.keyFeatures')}</div>
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">{t('landing.approachTitle')}</h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Our platform integrates principles from CBT, ERP, and neuroscience into a structured, engaging, and supportive experience.
+                  {t('landing.approachDescription')}
                 </p>
               </div>
             </div>
@@ -105,9 +110,9 @@ export default function Home() {
         </section>
       </main>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-muted-foreground">&copy; 2024 NeuroQuest. All rights reserved.</p>
+        <p className="text-xs text-muted-foreground">{t('landing.footerRights')}</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <p className="text-xs text-muted-foreground">This system does not replace clinical therapy.</p>
+          <p className="text-xs text-muted-foreground">{t('landing.footerDisclaimer')}</p>
         </nav>
       </footer>
     </div>

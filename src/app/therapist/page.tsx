@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Table,
   TableBody,
@@ -13,6 +15,7 @@ import { MoreHorizontal } from "lucide-react"
 import Link from "next/link"
 import { Logo } from "@/components/logo"
 import { Progress } from "@/components/ui/progress"
+import { useTranslation } from "@/context/language-provider"
 
 const patients = [
   { id: 'USR-001', name: 'John Doe', condition: 'OCD', progress: 75, anxietyTrend: 'down', lastActivity: '2 hours ago', status: 'Active' },
@@ -23,6 +26,7 @@ const patients = [
 ]
 
 export default function TherapistDashboard() {
+  const { t } = useTranslation();
   return (
     <div className="flex min-h-screen w-full flex-col">
       <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
@@ -32,25 +36,25 @@ export default function TherapistDashboard() {
             href="#"
             className="text-foreground transition-colors hover:text-foreground"
           >
-            Dashboard
+            {t('therapist.dashboard')}
           </Link>
           <Link
             href="#"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
-            Patients
+            {t('therapist.patients')}
           </Link>
           <Link
             href="#"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
-            Analytics
+            {t('therapist.analytics')}
           </Link>
         </nav>
         <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
             <div className="ml-auto flex-1 sm:flex-initial">
                 <Link href="/">
-                    <Button variant="outline">Back to Main Site</Button>
+                    <Button variant="outline">{t('therapist.backToSite')}</Button>
                 </Link>
             </div>
         </div>
@@ -59,47 +63,47 @@ export default function TherapistDashboard() {
         <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Patients</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('therapist.totalPatients')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{patients.length}</div>
-              <p className="text-xs text-muted-foreground">+2 from last month</p>
+              <p className="text-xs text-muted-foreground">{t('therapist.totalPatientsChange', { value: 2 })}</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active This Week</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('therapist.activeThisWeek')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{patients.filter(p => p.lastActivity.includes('hour') || p.lastActivity.includes('day')).length}</div>
-              <p className="text-xs text-muted-foreground">High engagement rate</p>
+              <p className="text-xs text-muted-foreground">{t('therapist.activeThisWeekDesc')}</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Needs Attention</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('therapist.needsAttention')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-destructive">{patients.filter(p => p.status === 'Needs Attention').length}</div>
-              <p className="text-xs text-muted-foreground">Patients with rising anxiety</p>
+              <p className="text-xs text-muted-foreground">{t('therapist.needsAttentionDesc')}</p>
             </CardContent>
           </Card>
         </div>
         <Card>
           <CardHeader>
-            <CardTitle>Patients</CardTitle>
-            <CardDescription>Manage your patients and view their progress.</CardDescription>
+            <CardTitle>{t('therapist.patients')}</CardTitle>
+            <CardDescription>{t('therapist.managePatients')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Condition</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Progress</TableHead>
-                  <TableHead>Last Activity</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead>{t('therapist.name')}</TableHead>
+                  <TableHead>{t('therapist.condition')}</TableHead>
+                  <TableHead>{t('therapist.status')}</TableHead>
+                  <TableHead>{t('therapist.progress')}</TableHead>
+                  <TableHead>{t('therapist.lastActivity')}</TableHead>
+                  <TableHead>{t('therapist.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -108,7 +112,7 @@ export default function TherapistDashboard() {
                     <TableCell className="font-medium">{patient.name}</TableCell>
                     <TableCell>{patient.condition}</TableCell>
                     <TableCell>
-                      <Badge variant={patient.status === 'Active' ? 'secondary' : 'destructive'}>{patient.status}</Badge>
+                      <Badge variant={patient.status === 'Active' ? 'secondary' : 'destructive'}>{t(patient.status === 'Active' ? 'therapist.statusActive' : 'therapist.statusNeedsAttention')}</Badge>
                     </TableCell>
                     <TableCell>
                         <div className="flex items-center gap-2">
@@ -120,7 +124,7 @@ export default function TherapistDashboard() {
                     <TableCell>
                       <Button aria-haspopup="true" size="icon" variant="ghost">
                         <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Toggle menu</span>
+                        <span className="sr-only">{t('therapist.toggleMenu')}</span>
                       </Button>
                     </TableCell>
                   </TableRow>

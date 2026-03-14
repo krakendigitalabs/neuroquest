@@ -1,6 +1,9 @@
+'use client';
+
 import { ThoughtAnalyzer } from './_components/thought-analyzer';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { History } from 'lucide-react';
+import { useTranslation } from '@/context/language-provider';
 
 const mockThoughtHistory = [
   { thought: 'Did I leave the stove on?', analysis: "A common checking-related thought, often associated with OCD.", reframe: "This is a 'what if' thought. I can choose to let it pass without checking." },
@@ -9,13 +12,14 @@ const mockThoughtHistory = [
 ];
 
 export default function ObserverPage() {
+  const { t } = useTranslation();
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight font-headline">Mental Observer</h1>
+        <h1 className="text-3xl font-bold tracking-tight font-headline">{t('observer.title')}</h1>
       </div>
       <p className="text-muted-foreground">
-        Log your intrusive or distressing thoughts below. Our AI will help you analyze and reframe them from a CBT/ERP perspective.
+        {t('observer.description')}
       </p>
 
       <ThoughtAnalyzer />
@@ -23,17 +27,17 @@ export default function ObserverPage() {
       <div className="mt-8">
         <h2 className="text-2xl font-bold tracking-tight font-headline flex items-center gap-2 mb-4">
           <History className="h-6 w-6" />
-          Your Recent Thoughts
+          {t('observer.recentThoughts')}
         </h2>
         <div className="space-y-4">
           {mockThoughtHistory.map((item, index) => (
             <Card key={index} className="bg-card">
               <CardHeader>
-                <CardTitle className="text-lg">Thought: "{item.thought}"</CardTitle>
+                <CardTitle className="text-lg">{t('observer.thought')}: "{item.thought}"</CardTitle>
               </CardHeader>
               <CardContent className="grid gap-2">
-                <p><strong className="text-primary">Analysis:</strong> {item.analysis}</p>
-                <p><strong className="text-accent">Reframing Suggestion:</strong> {item.reframe}</p>
+                <p><strong className="text-primary">{t('observer.analysis')}:</strong> {item.analysis}</p>
+                <p><strong className="text-accent">{t('observer.reframing')}:</strong> {item.reframe}</p>
               </CardContent>
             </Card>
           ))}

@@ -59,11 +59,11 @@ export function AppSidebar() {
               <AvatarFallback>U</AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-semibold">User</p>
-              <p className="text-xs text-muted-foreground">Novato Mental</p>
+              <p className="font-semibold">{t('sidebar.user')}</p>
+              <p className="text-xs text-muted-foreground">{t('sidebar.level')}</p>
             </div>
           </div>
-          <UserProgress level="Level 1" currentXp={75} xpToNextLevel={150} />
+          <UserProgress level={t('userProgress.level', { level: 1 })} currentXp={75} xpToNextLevel={150} />
         </div>
         <SidebarMenu>
           {navItems.map((item) => (

@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { useTranslation } from '@/context/language-provider';
 
 type BreathingExerciseProps = {
   title: string;
@@ -12,6 +13,7 @@ type BreathingExerciseProps = {
 };
 
 export function BreathingExercise({ title, description, icon, steps }: BreathingExerciseProps) {
+  const { t } = useTranslation();
   const [isActive, setIsActive] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [countdown, setCountdown] = useState(0);
@@ -90,14 +92,14 @@ export function BreathingExercise({ title, description, icon, steps }: Breathing
           </>
         ) : (
           <div className="text-center text-muted-foreground">
-            <p>Press start to begin the exercise.</p>
-            <p className="text-sm">Total cycle: {totalDuration} seconds.</p>
+            <p>{t('breathingExercise.startPrompt')}</p>
+            <p className="text-sm">{t('breathingExercise.totalCycle', { duration: totalDuration })}</p>
           </div>
         )}
       </CardContent>
       <CardFooter>
         <Button onClick={handleToggle} className="w-full">
-          {isActive ? 'Stop Exercise' : 'Start Exercise'}
+          {isActive ? t('breathingExercise.stop') : t('breathingExercise.start')}
         </Button>
       </CardFooter>
     </Card>
