@@ -1,0 +1,707 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the NeuroQuest application, including their profile, gamified progress, and associated therapeutic data.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address, used for login and identification.",
+          "format": "email"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The public name chosen by the user for their profile."
+        },
+        "level": {
+          "type": "number",
+          "description": "The current therapeutic level of the user in the gamified system (e.g., Novato Mental, Explorador Mental)."
+        },
+        "currentXp": {
+          "type": "number",
+          "description": "The current experience points accumulated by the user within their current level."
+        },
+        "xpToNextLevel": {
+          "type": "number",
+          "description": "The total experience points required for the user to advance to the next therapeutic level."
+        },
+        "therapistIds": {
+          "type": "array",
+          "description": "References to Therapists who are monitoring this user. (Relationship: User N:N Therapist)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "isAdmin": {
+          "type": "boolean",
+          "description": "Indicates if the user has administrative privileges for the platform (e.g., krakendigitalabs@gmail.com)."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the user account was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "displayName",
+        "level",
+        "currentXp",
+        "xpToNextLevel",
+        "isAdmin",
+        "createdAt"
+      ]
+    },
+    "Therapist": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Therapist",
+      "type": "object",
+      "description": "Represents a professional therapist using the NeuroQuest platform to monitor and support patients.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Therapist entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "The therapist's email address, used for login and identification.",
+          "format": "email"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The name of the therapist displayed in the application."
+        },
+        "specialization": {
+          "type": "string",
+          "description": "The primary area of psychological specialization for the therapist (e.g., CBT, ERP for OCD)."
+        },
+        "patientIds": {
+          "type": "array",
+          "description": "References to Users (patients) that this therapist is monitoring. (Relationship: Therapist N:N User)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the therapist account was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "displayName",
+        "specialization",
+        "createdAt"
+      ]
+    },
+    "ThoughtRecord": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ThoughtRecord",
+      "type": "object",
+      "description": "Records an instance of a user identifying and logging an intrusive thought as part of the 'Observador Mental' module.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ThoughtRecord entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who recorded the thought. (Relationship: User 1:N ThoughtRecord)"
+        },
+        "recordedAt": {
+          "type": "string",
+          "description": "Timestamp when the thought was recorded by the user.",
+          "format": "date-time"
+        },
+        "thoughtText": {
+          "type": "string",
+          "description": "The actual intrusive thought or mental event identified by the user."
+        },
+        "cognitiveLabel": {
+          "type": "string",
+          "description": "The cognitive label applied to the thought by the user (e.g., 'Pensamiento TOC', 'Catastrofización', 'Rumiación')."
+        },
+        "isFactNotThought": {
+          "type": "boolean",
+          "description": "Indicates if the user identified the entry as a thought, not a fact."
+        },
+        "associatedEmotion": {
+          "type": "string",
+          "description": "The emotion associated with the intrusive thought (e.g., 'Ansiedad', 'Miedo', 'Tristeza')."
+        },
+        "intensity": {
+          "type": "number",
+          "description": "The intensity of the thought/emotion on a scale (e.g., 1-10)."
+        },
+        "isIntrusive": {
+          "type": "boolean",
+          "description": "Boolean indicating if the thought was identified as intrusive."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "recordedAt",
+        "thoughtText",
+        "cognitiveLabel",
+        "isFactNotThought",
+        "associatedEmotion",
+        "intensity",
+        "isIntrusive"
+      ]
+    },
+    "ExposureMission": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ExposureMission",
+      "type": "object",
+      "description": "Defines an Exposure and Response Prevention (ERP) mission assigned to a user, a core element of the 'Modo Exposición'.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ExposureMission entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User for whom this mission is intended. (Relationship: User 1:N ExposureMission)"
+        },
+        "title": {
+          "type": "string",
+          "description": "A concise title for the exposure mission (e.g., 'Tocar objeto sucio', 'No revisar la puerta')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the exposure mission and its objectives."
+        },
+        "difficultyLevel": {
+          "type": "number",
+          "description": "The difficulty level of the mission (e.g., 1 for easy, increasing progressively)."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the mission (e.g., 'pending', 'active', 'completed', 'failed')."
+        },
+        "xpReward": {
+          "type": "number",
+          "description": "The experience points awarded upon successful completion of the mission."
+        },
+        "completionDate": {
+          "type": "string",
+          "description": "Timestamp when the mission was successfully completed.",
+          "format": "date-time"
+        },
+        "assignedBy": {
+          "type": "string",
+          "description": "Indicates who or what assigned the mission (e.g., 'AI', 'Therapist', 'System')."
+        },
+        "therapistId": {
+          "type": "string",
+          "description": "Optional reference to the Therapist who assigned this mission, if applicable. (Relationship: Therapist 1:N ExposureMission)"
+        },
+        "targetBehavior": {
+          "type": "string",
+          "description": "The specific behavior the user needs to engage in or resist during the exposure (e.g., 'Touch a doorknob', 'Do not check the stove')."
+        },
+        "resistanceTarget": {
+          "type": "string",
+          "description": "A specific quantifiable target for resistance or duration (e.g., 'not wash hands for 5 minutes', 'resist checking 1 time')."
+        },
+        "isAiGenerated": {
+          "type": "boolean",
+          "description": "Indicates if this mission was dynamically generated by the AI based on user patterns."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "title",
+        "description",
+        "difficultyLevel",
+        "status",
+        "xpReward",
+        "assignedBy",
+        "targetBehavior",
+        "resistanceTarget",
+        "isAiGenerated"
+      ]
+    },
+    "ExerciseTemplate": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ExerciseTemplate",
+      "type": "object",
+      "description": "Defines a reusable template for a general therapeutic exercise (e.g., breathing, grounding, cognitive reprogramming).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ExerciseTemplate entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the exercise (e.g., 'Respiración 4-6', 'Ejercicio 5-4-3-2-1')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of what the exercise entails."
+        },
+        "type": {
+          "type": "string",
+          "description": "The category of the exercise (e.g., 'Breathing', 'Grounding', 'CognitiveReprogramming', 'Relaxation')."
+        },
+        "instructions": {
+          "type": "string",
+          "description": "Detailed step-by-step instructions for performing the exercise."
+        },
+        "durationMinutes": {
+          "type": "number",
+          "description": "The recommended duration of the exercise in minutes."
+        },
+        "xpReward": {
+          "type": "number",
+          "description": "The experience points awarded for completing this exercise."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "type",
+        "instructions",
+        "durationMinutes",
+        "xpReward"
+      ]
+    },
+    "UserExerciseLog": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserExerciseLog",
+      "type": "object",
+      "description": "Tracks a specific instance of a user completing a general therapeutic exercise based on an ExerciseTemplate.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserExerciseLog entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who completed the exercise. (Relationship: User 1:N UserExerciseLog)"
+        },
+        "exerciseTemplateId": {
+          "type": "string",
+          "description": "Reference to the ExerciseTemplate that was completed. (Relationship: ExerciseTemplate 1:N UserExerciseLog)"
+        },
+        "completedAt": {
+          "type": "string",
+          "description": "Timestamp when the user completed the exercise.",
+          "format": "date-time"
+        },
+        "xpEarned": {
+          "type": "number",
+          "description": "The actual experience points earned by the user for this completion."
+        },
+        "userNotes": {
+          "type": "string",
+          "description": "Optional notes or reflections entered by the user after completing the exercise."
+        },
+        "actualDurationMinutes": {
+          "type": "number",
+          "description": "The actual duration in minutes the user spent on the exercise."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "exerciseTemplateId",
+        "completedAt",
+        "xpEarned",
+        "actualDurationMinutes"
+      ]
+    },
+    "MentalCombatEvent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MentalCombatEvent",
+      "type": "object",
+      "description": "Records an instance of a user engaging in the gamified 'mental combat' against intrusive thoughts or compulsions.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the MentalCombatEvent entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who experienced the mental combat event. (Relationship: User 1:N MentalCombatEvent)"
+        },
+        "eventOccurredAt": {
+          "type": "string",
+          "description": "Timestamp when the mental combat event occurred.",
+          "format": "date-time"
+        },
+        "intruderName": {
+          "type": "string",
+          "description": "The name of the 'intruder' or personification of the challenging thought (e.g., 'El Intruso', 'La Duda')."
+        },
+        "thoughtPresented": {
+          "type": "string",
+          "description": "The specific intrusive thought or doubt presented during the combat event."
+        },
+        "userAction": {
+          "type": "string",
+          "description": "The action chosen by the user in response to the thought (e.g., 'Ignorar', 'Etiquetar como TOC', 'Respirar 60 segundos')."
+        },
+        "outcome": {
+          "type": "string",
+          "description": "The result of the mental combat (e.g., 'Victory', 'Defeat', 'Neutral')."
+        },
+        "xpChange": {
+          "type": "number",
+          "description": "The change in experience points resulting from this event (positive for victory, negative for defeat)."
+        },
+        "resistedCompulsion": {
+          "type": "boolean",
+          "description": "Indicates if the user successfully resisted a compulsion during this event."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "eventOccurredAt",
+        "intruderName",
+        "thoughtPresented",
+        "userAction",
+        "outcome",
+        "xpChange",
+        "resistedCompulsion"
+      ]
+    },
+    "AnxietyLog": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AnxietyLog",
+      "type": "object",
+      "description": "Allows users to log their anxiety levels, triggers, and coping strategies, contributing to overall progress tracking.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the AnxietyLog entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who logged the anxiety event. (Relationship: User 1:N AnxietyLog)"
+        },
+        "loggedAt": {
+          "type": "string",
+          "description": "Timestamp when the anxiety level was logged.",
+          "format": "date-time"
+        },
+        "anxietyLevel": {
+          "type": "number",
+          "description": "The self-reported anxiety level on a numerical scale (e.g., 1-10)."
+        },
+        "triggerDescription": {
+          "type": "string",
+          "description": "Optional description of what triggered the anxiety."
+        },
+        "copingStrategyUsed": {
+          "type": "string",
+          "description": "Optional description of the coping strategy employed (e.g., 'Breathing 4-6', 'Grounding 5-4-3-2-1', 'Ignored thought')."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional additional notes from the user about the anxiety event."
+        },
+        "isCrisisIntervention": {
+          "type": "boolean",
+          "description": "Indicates if this log entry is associated with the user accessing crisis resources or reporting high severity."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "loggedAt",
+        "anxietyLevel",
+        "isCrisisIntervention"
+      ]
+    },
+    "Achievement": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Achievement",
+      "type": "object",
+      "description": "Defines a gamified achievement, badge, or insignia that users can earn within the application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Achievement entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the achievement (e.g., 'Primer acto de libertad', 'Medalla de autoconsciencia')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of what the achievement represents."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of achievement (e.g., 'Badge', 'Medal', 'Title')."
+        },
+        "criteria": {
+          "type": "string",
+          "description": "A description of the conditions or actions required for a user to earn this achievement."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Optional URL to an image asset representing the achievement icon.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "type",
+        "criteria"
+      ]
+    },
+    "UserAchievement": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserAchievement",
+      "type": "object",
+      "description": "Records an instance of a specific user having earned a particular achievement.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserAchievement entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who earned the achievement. (Relationship: User 1:N UserAchievement)"
+        },
+        "achievementId": {
+          "type": "string",
+          "description": "Reference to the Achievement definition that was earned. (Relationship: Achievement 1:N UserAchievement)"
+        },
+        "achievedAt": {
+          "type": "string",
+          "description": "Timestamp when the achievement was earned by the user.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "achievementId",
+        "achievedAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores individual user profiles, gamified progress, and includes a denormalized 'therapistIds' array to enable therapists to list their assigned patients. The 'isAdmin' field in the schema should be disregarded for global authorization, which is handled by the '/roles_admin/{adminId}' collection."
+        }
+      },
+      {
+        "path": "/therapists/{therapistId}",
+        "definition": {
+          "entityName": "Therapist",
+          "schema": {
+            "$ref": "#/backend/entities/Therapist"
+          },
+          "description": "Stores therapist profiles, including 'patientIds' array to manage their assigned patients. This array is critical for securing therapist access to patient data and for synchronization with 'User.therapistIds'.",
+          "params": [
+            {
+              "name": "therapistId",
+              "description": "The unique identifier of the therapist, corresponding to their Firebase Authentication UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{adminId}",
+        "definition": {
+          "entityName": "AdminRole",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "A dedicated collection for Database Access Control (DBAC) to grant administrative privileges. The existence of a document with the user's UID as 'adminId' signifies administrator status. This adheres to 'Existence over Content' for global roles.",
+          "params": [
+            {
+              "name": "adminId",
+              "description": "The unique identifier (UID) of the user who has administrative privileges."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/thoughtRecords/{recordId}",
+        "definition": {
+          "entityName": "ThoughtRecord",
+          "schema": {
+            "$ref": "#/backend/entities/ThoughtRecord"
+          },
+          "description": "Stores individual intrusive thought records for a specific user. Ownership is path-based, ensuring user data privacy. Therapists can access these records if they are monitoring the 'userId'.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who owns this thought record."
+            },
+            {
+              "name": "recordId",
+              "description": "The unique identifier for the thought record."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/exposureMissions/{missionId}",
+        "definition": {
+          "entityName": "ExposureMission",
+          "schema": {
+            "$ref": "#/backend/entities/ExposureMission"
+          },
+          "description": "Stores Exposure and Response Prevention (ERP) missions assigned to a specific user. Ownership is path-based. Therapists can assign and monitor missions for patients they oversee.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user to whom this exposure mission is assigned."
+            },
+            {
+              "name": "missionId",
+              "description": "The unique identifier for the exposure mission."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/exerciseTemplates/{templateId}",
+        "definition": {
+          "entityName": "ExerciseTemplate",
+          "schema": {
+            "$ref": "#/backend/entities/ExerciseTemplate"
+          },
+          "description": "Contains globally available templates for therapeutic exercises. This collection is read-only for all authenticated users and managed by administrators, ensuring a consistent and centralized source of exercises.",
+          "params": [
+            {
+              "name": "templateId",
+              "description": "The unique identifier for the exercise template."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/exerciseLogs/{logId}",
+        "definition": {
+          "entityName": "UserExerciseLog",
+          "schema": {
+            "$ref": "#/backend/entities/UserExerciseLog"
+          },
+          "description": "Logs instances of a specific user completing a therapeutic exercise. This data is private to the user but viewable by their assigned therapists.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who completed the exercise."
+            },
+            {
+              "name": "logId",
+              "description": "The unique identifier for the exercise log entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/mentalCombatEvents/{eventId}",
+        "definition": {
+          "entityName": "MentalCombatEvent",
+          "schema": {
+            "$ref": "#/backend/entities/MentalCombatEvent"
+          },
+          "description": "Records gamified mental combat events for a specific user, detailing interactions with intrusive thoughts. This data is private to the user but viewable by their assigned therapists.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who experienced the mental combat event."
+            },
+            {
+              "name": "eventId",
+              "description": "The unique identifier for the mental combat event."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/anxietyLogs/{logId}",
+        "definition": {
+          "entityName": "AnxietyLog",
+          "schema": {
+            "$ref": "#/backend/entities/AnxietyLog"
+          },
+          "description": "Allows users to log their anxiety levels and triggers. This personal data is owned by the user but accessible to their assigned therapists for monitoring.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who logged the anxiety event."
+            },
+            {
+              "name": "logId",
+              "description": "The unique identifier for the anxiety log entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/achievements/{achievementId}",
+        "definition": {
+          "entityName": "Achievement",
+          "schema": {
+            "$ref": "#/backend/entities/Achievement"
+          },
+          "description": "Defines globally available achievements, badges, and their criteria. This collection is read-only for all authenticated users and managed by administrators.",
+          "params": [
+            {
+              "name": "achievementId",
+              "description": "The unique identifier for the achievement."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/userAchievements/{userAchievementId}",
+        "definition": {
+          "entityName": "UserAchievement",
+          "schema": {
+            "$ref": "#/backend/entities/UserAchievement"
+          },
+          "description": "Records which achievements a specific user has earned. This data is owned by the user and is read-only for the user, with creation/updates handled by the system or administrators. Viewable by assigned therapists.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who earned the achievement."
+            },
+            {
+              "name": "userAchievementId",
+              "description": "The unique identifier for this instance of a user earning an achievement."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure for NeuroQuest prioritizes secure, scalable, and debuggable access by adhering to the core design principles and mandates. The design leverages hierarchical paths for user-owned data, denormalization for authorization independence in specific scenarios, and structural segregation for clear security postures.\n\n**Authorization Independence & QAPs:**\n\n1.  **User-Owned Data:** All user-specific activity and progress data (`ThoughtRecord`, `ExposureMission`, `UserExerciseLog`, `MentalCombatEvent`, `AnxietyLog`, `UserAchievement`) is structured as subcollections under the user's profile path: `/users/{userId}/<subcollection>/{docId}`. This inherently provides strong path-based ownership, making security rules for users to access their *own* data extremely simple and efficient (`request.auth.uid == userId`). This directly supports QAPs for users, allowing them to list their own records without security filtering issues.\n\n2.  **Therapist Access to Patient Data (N:N Relationship):**\n    *   **Therapist Profile (`/therapists/{therapistId}`):** Each therapist document contains a `patientIds` array, which lists the `userId`s of all patients they monitor. This acts as the primary source of truth for a therapist's patient roster.\n    *   **User Profile (`/users/{userId}`):** The `User` document includes a denormalized `therapistIds` array. This denormalization is crucial for two reasons:\n        *   **Therapist QAPs for Listing Patients:** It enables therapists to efficiently query and list all their assigned patients (`/users`) by filtering on `therapistIds` containing their own UID. This satisfies the QAP requirement for listing. For example, `db.collection('users').where('therapistIds', 'array-contains', request.auth.uid).get()` is a secure and performant query.\n        *   **User Visibility:** Allows users to easily see which therapists are monitoring them.\n    *   **Access to Patient Subcollections:** To grant therapists access to a *specific patient's subcollection data* (e.g., a patient's `ThoughtRecord`), the security rules will perform a `get()` operation on the *therapist's own document* (`/therapists/$(request.auth.uid)`). This allows the rule to check if the `patientId` (from the data path) is present in the therapist's `patientIds` array. This is *not* a hierarchical dependency in the sense of a parent-child relationship within the patient's data, but rather a cross-collection lookup for the *accessor's* permissions. This approach respects the "
+  }
+}
