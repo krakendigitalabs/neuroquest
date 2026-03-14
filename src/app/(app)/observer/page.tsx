@@ -7,18 +7,33 @@ import { useTranslation } from '@/context/language-provider';
 import { useCollection } from '@/firebase';
 import { useFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { WithId } from '@/firebase/firestore/use-collection';
 import {ThoughtRecord} from '@/models/thought-record';
 
 function ThoughtHistoryItem({ item }: { item: WithId<ThoughtRecord> }) {
-  const { t } = useTranslation();
-  // A real implementation would have analysis and reframe, but we'll use placeholders
+  const { t, locale } = useTranslation();
+  const [formattedDate, setFormattedDate] = useState('');
+
+  useEffect(() => {
+    if (item.recordedAt) {
+      // Firestore Timestamps have a toDate() method.
+      const date = (item.recordedAt as any).toDate ? (item.recordedAt as any).toDate() : new Date(item.recordedAt as any);
+      setFormattedDate(date.toLocaleString(locale, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }));
+    }
+  }, [item.recordedAt, locale]);
+
   return (
     <Card className="bg-card">
       <CardHeader>
         <CardTitle className="text-lg">{t('observer.thought')}: "{item.thoughtText}"</CardTitle>
-        <CardDescription>{new Date(item.recordedAt).toLocaleString()}</CardDescription>
+        <CardDescription>{formattedDate || ' '}</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-2">
          <p><strong className="text-primary">{t('observer.emotion')}:</strong> {item.associatedEmotion} ({t('observer.intensity')}: {item.intensity})</p>
@@ -67,5 +82,3 @@ export default function ObserverPage() {
     </div>
   );
 }
-
-    
