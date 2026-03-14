@@ -1,6 +1,6 @@
 'use client';
 
-import { useFormState } from 'react-dom';
+import { useFormState, useFormStatus } from 'react-dom';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { analyzeThought } from '@/ai/flows/thought-analysis-and-coaching-flow';
 import { Badge } from '@/components/ui/badge';
 import { Wand2 } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useRef, useEffect } from 'react';
 
 type State = {
   isTOCRelated?: boolean;
@@ -34,31 +34,32 @@ const analyzeAction = async (prevState: State, formData: FormData): Promise<Stat
   }
 };
 
+function AnalyzeButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" disabled={pending}>
+      <Wand2 className="mr-2 h-4 w-4" />
+      {pending ? 'Analyzing...' : 'Analyze Thought'}
+    </Button>
+  );
+}
+
 export function ThoughtAnalyzer() {
   const [state, formAction] = useFormState(analyzeAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsAnalyzing(true);
-    const formData = new FormData(event.currentTarget);
-    // @ts-ignore
-    await formAction(formData);
-    setIsAnalyzing(false);
-    formRef.current?.reset();
-  };
-
-  if (state.error && !isAnalyzing) {
-    toast({
-        variant: "destructive",
-        title: "Analysis Failed",
-        description: state.error,
-    });
-    // Clear the error after showing toast
-    state.error = undefined;
-  }
+  useEffect(() => {
+    if (state.error) {
+      toast({
+          variant: "destructive",
+          title: "Analysis Failed",
+          description: state.error,
+      });
+    } else if (state.analysis) {
+      formRef.current?.reset();
+    }
+  }, [state, toast]);
 
   return (
     <Card className="w-full">
@@ -66,7 +67,7 @@ export function ThoughtAnalyzer() {
         <CardTitle>Thought Analysis</CardTitle>
         <CardDescription>What's on your mind? Log it here to gain clarity.</CardDescription>
       </CardHeader>
-      <form ref={formRef} onSubmit={handleSubmit}>
+      <form ref={formRef} action={formAction}>
         <CardContent>
           <Textarea
             name="thought"
@@ -77,14 +78,11 @@ export function ThoughtAnalyzer() {
           />
         </CardContent>
         <CardFooter>
-          <Button type="submit" disabled={isAnalyzing}>
-            <Wand2 className="mr-2 h-4 w-4" />
-            {isAnalyzing ? 'Analyzing...' : 'Analyze Thought'}
-          </Button>
+          <AnalyzeButton />
         </CardFooter>
       </form>
       
-      {(state.analysis || state.reframingSuggestion) && (
+      {state.analysis && !state.error && (
         <div className="p-6 pt-0">
             <Card className="bg-secondary/50">
                 <CardHeader>

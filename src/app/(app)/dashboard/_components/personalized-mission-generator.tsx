@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useFormState } from 'react-dom';
+import { useEffect } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 import { Wand2 } from 'lucide-react';
 
 import { generatePersonalizedMission } from '@/ai/flows/personalized-mission-generation';
@@ -48,37 +48,40 @@ const generateMissionAction = async (prevState: State): Promise<State> => {
   }
 };
 
+function GenerateButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button type="submit" disabled={pending}>
+      <Wand2 className="mr-2 h-4 w-4" />
+      {pending ? 'Generating...' : 'Generate New Mission'}
+    </Button>
+  );
+}
+
 
 export function PersonalizedMissionGenerator() {
   const [state, formAction] = useFormState(generateMissionAction, initialState);
   const { toast } = useToast();
-  const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleGenerateClick = async () => {
-    setIsGenerating(true);
-    // @ts-ignore
-    await formAction();
-    setIsGenerating(false);
-  };
+  useEffect(() => {
+    if (state.error) {
+      toast({
+          variant: "destructive",
+          title: "Generation Failed",
+          description: state.error,
+      })
+    }
+  }, [state.error, toast]);
   
-  if (state.error) {
-    toast({
-        variant: "destructive",
-        title: "Generation Failed",
-        description: state.error,
-    })
-  }
 
   return (
     <div>
       <form action={formAction}>
-        <Button onClick={handleGenerateClick} disabled={isGenerating}>
-          <Wand2 className="mr-2 h-4 w-4" />
-          {isGenerating ? 'Generating...' : 'Generate New Mission'}
-        </Button>
+        <GenerateButton />
       </form>
       
-      {(state.personalizedMission || state.cognitiveCoachingSuggestion) && (
+      {(state.personalizedMission || state.cognitiveCoachingSuggestion) && !state.error && (
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
             {state.personalizedMission && (
                 <Card className="bg-secondary/50">

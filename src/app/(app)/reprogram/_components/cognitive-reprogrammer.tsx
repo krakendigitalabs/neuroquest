@@ -1,6 +1,6 @@
 'use client';
 
-import { useFormState } from 'react-dom';
+import { useFormState, useFormStatus } from 'react-dom';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -8,7 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { useToast } from '@/hooks/use-toast';
 import { cognitiveReprogramming } from '@/ai/flows/cognitive-reprogramming';
 import { Wand2, AlertTriangle, CheckCircle } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useRef, useEffect } from 'react';
 
 type State = {
   initialThought?: string;
@@ -37,31 +37,32 @@ const reprogramAction = async (prevState: State, formData: FormData): Promise<St
   }
 };
 
+function ReprogramButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" disabled={pending}>
+      <Wand2 className="mr-2 h-4 w-4" />
+      {pending ? 'Processing...' : 'Start Reprogramming'}
+    </Button>
+  );
+}
+
 export function CognitiveReprogrammer() {
   const [state, formAction] = useFormState(reprogramAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
   
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsProcessing(true);
-    const formData = new FormData(event.currentTarget);
-    // @ts-ignore
-    await formAction(formData);
-    setIsProcessing(false);
-    formRef.current?.reset();
-  };
-
-  if (state.error && !isProcessing) {
-    toast({
-        variant: "destructive",
-        title: "Processing Failed",
-        description: state.error,
-    });
-    // Clear the error after showing toast
-    state.error = undefined;
-  }
+  useEffect(() => {
+    if (state.error) {
+      toast({
+          variant: "destructive",
+          title: "Processing Failed",
+          description: state.error,
+      });
+    } else if (state.initialThought) {
+      formRef.current?.reset();
+    }
+  }, [state, toast]);
 
   return (
     <Card className="w-full">
@@ -69,7 +70,7 @@ export function CognitiveReprogrammer() {
         <CardTitle>Reprogramming Tool</CardTitle>
         <CardDescription>Enter a thought you want to challenge.</CardDescription>
       </CardHeader>
-      <form ref={formRef} onSubmit={handleSubmit}>
+      <form ref={formRef} action={formAction}>
         <CardContent>
           <Textarea
             name="thought"
@@ -80,14 +81,11 @@ export function CognitiveReprogrammer() {
           />
         </CardContent>
         <CardFooter>
-          <Button type="submit" disabled={isProcessing}>
-            <Wand2 className="mr-2 h-4 w-4" />
-            {isProcessing ? 'Processing...' : 'Start Reprogramming'}
-          </Button>
+          <ReprogramButton />
         </CardFooter>
       </form>
       
-      {state.initialThought && (
+      {state.initialThought && !state.error &&(
         <CardContent>
           <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
             <AccordionItem value="item-1">
