@@ -2,13 +2,13 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { User } from 'firebase/auth';
 
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { useFirebase } from '@/firebase';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
-import { User } from 'firebase/auth';
 
 function UserProfileInitializer({ user }: { user: User }) {
   const { firestore } = useFirebase();
@@ -16,7 +16,7 @@ function UserProfileInitializer({ user }: { user: User }) {
   useEffect(() => {
     const createUserProfile = async () => {
       if (!user || !firestore) return;
-      
+
       const userRef = doc(firestore, 'users', user.uid);
       const userDoc = await getDoc(userRef);
 
@@ -24,12 +24,13 @@ function UserProfileInitializer({ user }: { user: User }) {
         const newUserProfile = {
           id: user.uid,
           email: user.email || '',
-          displayName: user.displayName || 'Anonymous User',
+          displayName: user.isAnonymous ? 'Guest' : (user.displayName || 'Anonymous User'),
           photoURL: user.photoURL || '',
           level: 1,
           currentXp: 0,
           xpToNextLevel: 100,
           isAdmin: user.email === 'krakendigitalabs@gmail.com',
+          isAnonymous: user.isAnonymous,
           createdAt: serverTimestamp(),
           therapistIds: [],
         };
@@ -73,5 +74,3 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     </SidebarProvider>
   );
 }
-
-    

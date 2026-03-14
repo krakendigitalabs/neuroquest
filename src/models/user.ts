@@ -9,8 +9,7 @@ export interface UserProfile {
   currentXp: number;
   xpToNextLevel: number;
   isAdmin: boolean;
+  isAnonymous: boolean;
   createdAt: FieldValue;
   therapistIds: string[];
 }
-
-    

@@ -64,7 +64,7 @@ export function AppSidebar() {
           <div className="flex items-center gap-3">
             <UserAvatar />
             <div>
-              <p className="font-semibold">{user?.displayName || t('sidebar.user')}</p>
+              <p className="font-semibold">{isProfileLoading ? '...' : (userProfile?.displayName || user?.displayName || t('sidebar.user'))}</p>
               <p className="text-xs text-muted-foreground">{isProfileLoading ? '...' : userProfile ? `Level ${userProfile.level}` : t('sidebar.level')}</p>
             </div>
           </div>
@@ -120,5 +120,3 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
-
-    

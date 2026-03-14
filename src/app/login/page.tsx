@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/firebase';
-import { GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithRedirect, signInAnonymously } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Logo } from '@/components/logo';
@@ -24,6 +24,26 @@ function SignInButton() {
   };
 
   return <Button onClick={handleSignIn} className="w-full">{t('login.signInWithGoogle')}</Button>;
+}
+
+function GuestSignInButton() {
+    const { auth } = useFirebase();
+    const { t } = useTranslation();
+
+    const handleGuestSignIn = async () => {
+        if (!auth) return;
+        try {
+            await signInAnonymously(auth);
+        } catch (error) {
+            console.error("Error during anonymous sign-in:", error);
+        }
+    };
+
+    return (
+        <Button onClick={handleGuestSignIn} variant="secondary" className="w-full">
+            {t('login.continueAsGuest')}
+        </Button>
+    );
 }
 
 export default function LoginPage() {
@@ -47,16 +67,17 @@ export default function LoginPage() {
           <CardTitle className="text-2xl font-headline">{t('login.title')}</CardTitle>
           <CardDescription>{t('login.description')}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-col gap-4">
           {isUserLoading ? (
             <div>Loading...</div>
           ) : (
-            <SignInButton />
+            <>
+              <SignInButton />
+              <GuestSignInButton />
+            </>
           )}
         </CardContent>
       </Card>
     </div>
   );
 }
-
-    

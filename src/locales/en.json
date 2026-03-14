@@ -213,8 +213,7 @@
   "login": {
     "title": "Welcome to NeuroQuest",
     "description": "Sign in to begin your journey to mental wellness.",
-    "signInWithGoogle": "Sign in with Google"
+    "signInWithGoogle": "Sign in with Google",
+    "continueAsGuest": "Continue as Guest"
   }
 }
-
-    
