@@ -8,7 +8,8 @@
     "exposure": "Exposure Mode",
     "regulation": "Emotion Regulation",
     "reprogram": "Cognitive Reprogramming",
-    "progress": "Progress"
+    "progress": "Progress",
+    "grounding": "Grounding"
   },
   "dashboard": {
     "welcome": "Welcome back, Explorer!",
@@ -149,15 +150,7 @@
     "fourSixBreathingTitle": "4-6 Breathing",
     "fourSixBreathingDescription": "Lengthen your exhale to activate the parasympathetic nervous system.",
     "fourSixStep1": "Inhale for 4s",
-    "fourSixStep2": "Exhale for 6s",
-    "groundingTitle": "5-4-3-2-1 Grounding Exercise",
-    "groundingDescription": "Use this technique when you feel overwhelmed or detached. It helps bring you back to the present moment.",
-    "acknowledge": "Acknowledge:",
-    "see": "5 things you can see: Look around and name five objects. Notice their color, shape, and texture.",
-    "feel": "4 things you can feel: Notice the sensation of your clothes, the chair you're sitting on, or an object in your hands.",
-    "hear": "3 things you can hear: Listen for three sounds, both near and far. The hum of a fan, birds outside, your own breathing.",
-    "smell": "2 things you can smell: What scents are in the air? Your coffee, a flower, the soap on your hands.",
-    "taste": "1 thing you can taste: Notice the taste in your mouth. Take a sip of water or focus on the lingering taste of your last meal."
+    "fourSixStep2": "Exhale for 6s"
   },
   "breathingExercise": {
     "startPrompt": "Press start to begin the exercise.",
@@ -256,5 +249,98 @@
     "exposición": "Exposure",
     "regulación_emocional": "Emotional Regulation",
     "reprogramación_cognitiva": "Cognitive Reprogramming"
+  },
+  "grounding": {
+    "title": "Grounding Exercises",
+    "description": "A collection of grounding techniques to help you anchor yourself in the present moment during times of distress.",
+    "mild": {
+      "title": "For Mild Crisis",
+      "ex1": {
+        "title": "5-4-3-2-1 Technique",
+        "desc": "Name 5 things you can see, 4 you can touch, 3 you can hear, 2 you can smell, and 1 you can taste. This brings you into the present moment."
+      },
+      "ex2": {
+        "title": "Mindful Breathing",
+        "desc": "Focus on the sensation of your breath entering and leaving your body. Don't change it, just observe it for a minute or two."
+      },
+      "ex3": {
+        "title": "Hold a Comfort Object",
+        "desc": "Pick up an object and focus on its texture, weight, and temperature. A smooth stone, a soft fabric, or a stress ball works well."
+      },
+      "ex4": {
+        "title": "Describe Your Environment",
+        "desc": "Look around and describe your surroundings in detail, either silently to yourself or out loud. What colors and shapes do you see?"
+      },
+      "ex5": {
+        "title": "Listen to a Song",
+        "desc": "Put on a piece of music and really listen to it. Try to identify different instruments, the rhythm, and the melody."
+      },
+      "ex6": {
+        "title": "Stretch Your Body",
+        "desc": "Gently stretch your arms, legs, and neck. Pay attention to the feeling of your muscles lengthening and releasing tension."
+      }
+    },
+    "moderate": {
+      "title": "For Moderate Crisis",
+      "ex1": {
+        "title": "Temperature Change",
+        "desc": "Hold a piece of ice in your hand or splash your face with cold water. The sudden temperature shift can jolt your system back to the present."
+      },
+      "ex2": {
+        "title": "Strong Scent",
+        "desc": "Inhale a strong, pleasant scent like peppermint oil, coffee grounds, or a citrus peel. The intense aroma can cut through overwhelming thoughts."
+      },
+      "ex3": {
+        "title": "Body Scan",
+        "desc": "Mentally scan your body from your toes to your head, noticing any sensations of tension, warmth, or coolness without judgment."
+      },
+      "ex4": {
+        "title": "Push Against a Wall",
+        "desc": "Stand and firmly push your hands against a wall for 15-30 seconds. Focus on the feeling of resistance and the strength in your muscles."
+      },
+      "ex5": {
+        "title": "The Categories Game",
+        "desc": "Pick a category (like 'fruits', 'countries', or 'animals') and name as many items in that category as you can. This engages your thinking brain."
+      },
+      "ex6": {
+        "title": "Eat Something Mindfully",
+        "desc": "Take a small piece of food, like a raisin or a nut, and eat it very slowly. Notice its texture, taste, and the sensation of chewing."
+      },
+      "ex7": {
+        "title": "Grip and Release",
+        "desc": "Clench your fists as tightly as you can for 5 seconds, then release the tension. Repeat this with different muscle groups (feet, shoulders)."
+      }
+    },
+    "severe": {
+      "title": "For Severe Crisis",
+      "ex1": {
+        "title": "Intense Temperature (TIPP Skill)",
+        "desc": "Holding your breath, dip your face into a bowl of cold water for 15-30 seconds. This activates the mammalian dive reflex to rapidly calm your system."
+      },
+      "ex2": {
+        "title": "Intense Exercise",
+        "desc": "Engage in a short burst of intense physical activity, like doing 15 jumping jacks, running in place, or shadow boxing. This helps burn off excess adrenaline."
+      },
+      "ex3": {
+        "title": "Sour or Spicy Taste",
+        "desc": "Bite into a lemon wedge or eat something with a strong, spicy flavor. The intense sensation provides a powerful sensory anchor."
+      },
+      "ex4": {
+        "title": "Grounding Through Feet",
+        "desc": "Stand barefoot and focus all your attention on the soles of your feet. Feel the texture of the floor and imagine roots growing from your feet into the earth."
+      },
+      "ex5": {
+        "title": "Recite Something Verbally",
+        "desc": "Say a familiar poem, a phone number, a song's lyrics, or just the alphabet out loud. The act of speaking and recalling engages your brain differently."
+      },
+      "ex6": {
+        "title": "Anchor Phrase",
+        "desc": "Repeat a simple, factual phrase to yourself, such as 'My name is [Your Name]. I am in [Your City]. It is [Day of the week].' This reorients you to reality."
+      },
+      "ex7": {
+        "title": "Paired Muscle Relaxation",
+        "desc": "Tense a muscle group (like your hands) while you breathe in, and then relax it completely as you breathe out. Move through different muscle groups."
+      }
+    }
   }
 }

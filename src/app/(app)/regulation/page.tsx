@@ -1,7 +1,6 @@
 'use client';
 
-import { Zap, Wind, Waves } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Wind, Waves } from 'lucide-react';
 import { BreathingExercise } from './_components/breathing-exercise';
 import { useTranslation } from '@/context/language-provider';
 
@@ -30,30 +29,6 @@ export default function RegulationPage() {
           icon={<Waves className="h-8 w-8 text-primary" />}
           steps={[t('regulation.fourSixStep1'), t('regulation.fourSixStep2')]}
         />
-      </div>
-
-      <div className="mt-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-3">
-              <Zap className="h-6 w-6 text-primary" />
-              <span>{t('regulation.groundingTitle')}</span>
-            </CardTitle>
-            <CardDescription>
-              {t('regulation.groundingDescription')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p>{t('regulation.acknowledge')}</p>
-            <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-              <li><strong>{t('regulation.see')}</strong></li>
-              <li><strong>{t('regulation.feel')}</strong></li>
-              <li><strong>{t('regulation.hear')}</strong></li>
-              <li><strong>{t('regulation.smell')}</strong></li>
-              <li><strong>{t('regulation.taste')}</strong></li>
-            </ul>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

@@ -8,7 +8,8 @@
     "exposure": "Modo Exposición",
     "regulation": "Regulación Emocional",
     "reprogram": "Reprogramación Cognitiva",
-    "progress": "Progreso"
+    "progress": "Progreso",
+    "grounding": "Anclaje"
   },
   "dashboard": {
     "welcome": "¡Bienvenido de nuevo, Explorador!",
@@ -149,15 +150,7 @@
     "fourSixBreathingTitle": "Respiración 4-6",
     "fourSixBreathingDescription": "Alarga tu exhalación para activar el sistema nervioso parasimpático.",
     "fourSixStep1": "Inhala por 4s",
-    "fourSixStep2": "Exhala por 6s",
-    "groundingTitle": "Ejercicio de Anclaje 5-4-3-2-1",
-    "groundingDescription": "Usa esta técnica cuando te sientas abrumado o desconectado. Ayuda a traerte de vuelta al momento presente.",
-    "acknowledge": "Reconoce:",
-    "see": "5 cosas que puedes ver: Mira a tu alrededor y nombra cinco objetos. Nota su color, forma y textura.",
-    "feel": "4 cosas que puedes sentir: Nota la sensación de tu ropa, la silla en la que estás sentado o un objeto en tus manos.",
-    "hear": "3 cosas que puedes escuchar: Escucha tres sonidos, tanto cercanos como lejanos. El zumbido de un ventilador, pájaros afuera, tu propia respiración.",
-    "smell": "2 cosas que puedes oler: ¿Qué olores hay en el aire? Tu café, una flor, el jabón en tus manos.",
-    "taste": "1 cosa que puedes saborear: Nota el sabor en tu boca. Toma un sorbo de agua o concéntrate en el sabor persistente de tu última comida."
+    "fourSixStep2": "Exhala por 6s"
   },
   "breathingExercise": {
     "startPrompt": "Presiona iniciar para comenzar el ejercicio.",
@@ -256,5 +249,98 @@
     "exposición": "Exposición",
     "regulación_emocional": "Regulación Emocional",
     "reprogramación_cognitiva": "Reprogramación Cognitiva"
+  },
+  "grounding": {
+    "title": "Ejercicios de Anclaje",
+    "description": "Una colección de técnicas de anclaje para ayudarte a conectarte con el momento presente durante momentos de angustia.",
+    "mild": {
+      "title": "Para Crisis Leve",
+      "ex1": {
+        "title": "Técnica 5-4-3-2-1",
+        "desc": "Nombra 5 cosas que puedas ver, 4 que puedas tocar, 3 que puedas oír, 2 que puedas oler y 1 que puedas saborear. Esto te trae al momento presente."
+      },
+      "ex2": {
+        "title": "Respiración Consciente",
+        "desc": "Concéntrate en la sensación de tu aliento entrando y saliendo de tu cuerpo. No lo cambies, solo obsérvalo durante uno o dos minutos."
+      },
+      "ex3": {
+        "title": "Sostén un Objeto de Confort",
+        "desc": "Toma un objeto y concéntrate en su textura, peso y temperatura. Una piedra lisa, una tela suave o una pelota antiestrés funcionan bien."
+      },
+      "ex4": {
+        "title": "Describe tu Entorno",
+        "desc": "Mira a tu alrededor y describe tu entorno en detalle, ya sea en silencio para ti mismo o en voz alta. ¿Qué colores y formas ves?"
+      },
+      "ex5": {
+        "title": "Escucha una Canción",
+        "desc": "Pon una pieza musical y escúchala de verdad. Intenta identificar diferentes instrumentos, el ritmo y la melodía."
+      },
+      "ex6": {
+        "title": "Estira tu Cuerpo",
+        "desc": "Estira suavemente tus brazos, piernas y cuello. Presta atención a la sensación de tus músculos alargándose y liberando tensión."
+      }
+    },
+    "moderate": {
+      "title": "Para Crisis Moderada",
+      "ex1": {
+        "title": "Cambio de Temperatura",
+        "desc": "Sostén un trozo de hielo en la mano o salpícate la cara con agua fría. El cambio brusco de temperatura puede devolver tu sistema al presente."
+      },
+      "ex2": {
+        "title": "Aroma Fuerte",
+        "desc": "Inhala un aroma fuerte y agradable como aceite de menta, granos de café o la cáscara de un cítrico. El aroma intenso puede atravesar los pensamientos abrumadores."
+      },
+      "ex3": {
+        "title": "Escaneo Corporal",
+        "desc": "Escanea mentalmente tu cuerpo desde los dedos de los pies hasta la cabeza, notando cualquier sensación de tensión, calor o frialdad sin juzgar."
+      },
+      "ex4": {
+        "title": "Empuja Contra una Pared",
+        "desc": "Párate y empuja firmemente tus manos contra una pared durante 15-30 segundos. Concéntrate en la sensación de resistencia y la fuerza en tus músculos."
+      },
+      "ex5": {
+        "title": "El Juego de las Categorías",
+        "desc": "Elige una categoría (como 'frutas', 'países' o 'animales') y nombra tantos elementos de esa categoría como puedas. Esto activa tu cerebro pensante."
+      },
+      "ex6": {
+        "title": "Come Algo Conscientemente",
+        "desc": "Toma un pequeño trozo de comida, como una pasa o una nuez, y cómelo muy lentamente. Nota su textura, sabor y la sensación al masticar."
+      },
+      "ex7": {
+        "title": "Aprieta y Suelta",
+        "desc": "Aprieta los puños tan fuerte como puedas durante 5 segundos, luego libera la tensión. Repite esto con diferentes grupos musculares (pies, hombros)."
+      }
+    },
+    "severe": {
+      "title": "Para Crisis Severa",
+      "ex1": {
+        "title": "Temperatura Intensa (Habilidad TIPP)",
+        "desc": "Conteniendo la respiración, sumerge tu cara en un recipiente con agua fría durante 15-30 segundos. Esto activa el reflejo de inmersión de los mamíferos para calmar rápidamente tu sistema."
+      },
+      "ex2": {
+        "title": "Ejercicio Intenso",
+        "desc": "Realiza una breve ráfaga de actividad física intensa, como hacer 15 saltos de tijera, correr en el sitio o boxeo de sombra. Esto ayuda a quemar el exceso de adrenalina."
+      },
+      "ex3": {
+        "title": "Sabor Ácido o Picante",
+        "desc": "Muerde un trozo de limón o come algo con un sabor fuerte y picante. La sensación intensa proporciona un poderoso anclaje sensorial."
+      },
+      "ex4": {
+        "title": "Anclaje a Través de los Pies",
+        "desc": "Párate descalzo y enfoca toda tu atención en las plantas de tus pies. Siente la textura del suelo e imagina que de tus pies crecen raíces hacia la tierra."
+      },
+      "ex5": {
+        "title": "Recita Algo Verbalmente",
+        "desc": "Di un poema familiar, un número de teléfono, la letra de una canción o simplemente el alfabeto en voz alta. El acto de hablar y recordar activa tu cerebro de manera diferente."
+      },
+      "ex6": {
+        "title": "Frase de Anclaje",
+        "desc": "Repite una frase simple y factual para ti mismo, como 'Mi nombre es [Tu Nombre]. Estoy en [Tu Ciudad]. Es [Día de la semana]'. Esto te reorienta a la realidad."
+      },
+      "ex7": {
+        "title": "Relajación Muscular Emparejada",
+        "desc": "Tensa un grupo muscular (como tus manos) mientras inhalas, y luego relájalo por completo mientras exhalas. Pasa por diferentes grupos musculares."
+      }
+    }
   }
 }

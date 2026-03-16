@@ -20,6 +20,7 @@ import {
   Route,
   BarChart3,
   LogOut,
+  Zap,
 } from 'lucide-react';
 
 import { Logo } from '@/components/logo';
@@ -49,6 +50,7 @@ export function AppSidebar() {
     { href: '/observer', icon: <Eye />, label: t('nav.observer') },
     { href: '/exposure', icon: <Route />, label: t('nav.exposure') },
     { href: '/regulation', icon: <HeartPulse />, label: t('nav.regulation') },
+    { href: '/grounding', icon: <Zap />, label: t('nav.grounding') },
     { href: '/reprogram', icon: <Brain />, label: t('nav.reprogram') },
     { href: '/progress', icon: <BarChart3 />, label: t('nav.progress') },
   ];
