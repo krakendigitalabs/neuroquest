@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768
@@ -7,12 +9,14 @@ export function useIsMobile() {
 
   React.useEffect(() => {
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
-    
-    const handleResize = () => {
-      setIsMobile(mql.matches)
+
+    // Set the initial value on the client side after mount
+    setIsMobile(mql.matches)
+
+    const handleResize = (event: MediaQueryListEvent) => {
+      setIsMobile(event.matches)
     }
 
-    handleResize()
     mql.addEventListener("change", handleResize)
 
     return () => {
