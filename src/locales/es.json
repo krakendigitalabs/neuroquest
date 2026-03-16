@@ -221,6 +221,10 @@
     "title": "Bienvenido a NeuroQuest",
     "description": "Inicia sesión para comenzar tu viaje hacia el bienestar mental.",
     "signInWithGoogle": "Iniciar sesión con Google",
-    "continueAsGuest": "Continuar como Invitado"
+    "continueAsGuest": "Continuar como Invitado",
+    "signInErrorTitle": "Falló el Inicio de Sesión",
+    "signInErrorDescription": "No se pudo iniciar sesión con Google. Por favor, revisa si los pop-ups están bloqueados o inténtalo de nuevo más tarde.",
+    "guestSignInErrorTitle": "Falló el Inicio de Sesión de Invitado",
+    "guestSignInErrorDescription": "No se pudo iniciar sesión como invitado. Por favor, inténtalo de nuevo más tarde."
   }
 }

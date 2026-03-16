@@ -8,18 +8,25 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Logo } from '@/components/logo';
 import { useTranslation } from '@/context/language-provider';
+import { useToast } from '@/hooks/use-toast';
 
 function SignInButton() {
   const { auth } = useFirebase();
   const { t } = useTranslation();
+  const { toast } = useToast();
 
   const handleSignIn = async () => {
     if (!auth) return;
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error during sign-in:", error);
+      toast({
+        variant: "destructive",
+        title: t('login.signInErrorTitle'),
+        description: error.message || t('login.signInErrorDescription'),
+      })
     }
   };
 
@@ -29,13 +36,19 @@ function SignInButton() {
 function GuestSignInButton() {
     const { auth } = useFirebase();
     const { t } = useTranslation();
+    const { toast } = useToast();
 
     const handleGuestSignIn = async () => {
         if (!auth) return;
         try {
             await signInAnonymously(auth);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error during anonymous sign-in:", error);
+            toast({
+              variant: "destructive",
+              title: t('login.guestSignInErrorTitle'),
+              description: error.message || t('login.guestSignInErrorDescription'),
+            })
         }
     };
 

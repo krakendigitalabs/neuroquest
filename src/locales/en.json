@@ -221,6 +221,10 @@
     "title": "Welcome to NeuroQuest",
     "description": "Sign in to begin your journey to mental wellness.",
     "signInWithGoogle": "Sign in with Google",
-    "continueAsGuest": "Continue as Guest"
+    "continueAsGuest": "Continue as Guest",
+    "signInErrorTitle": "Sign-In Failed",
+    "signInErrorDescription": "Could not sign in with Google. Please check if pop-ups are blocked or try again later.",
+    "guestSignInErrorTitle": "Guest Sign-In Failed",
+    "guestSignInErrorDescription": "Could not sign in as a guest. Please try again later."
   }
 }
