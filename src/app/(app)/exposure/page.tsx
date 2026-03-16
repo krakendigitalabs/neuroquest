@@ -1,96 +1,120 @@
 'use client';
 
-import { Target, Lock, CheckCircle, Plus } from 'lucide-react';
+import { Target, CheckCircle, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useTranslation } from '@/context/language-provider';
+import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
+import { collection, doc, runTransaction, serverTimestamp } from 'firebase/firestore';
+import type { ExposureMission } from '@/models/exposure-mission';
+import { WithId } from '@/firebase/firestore/use-collection';
+import { useToast } from '@/hooks/use-toast';
 
-const MissionCard = ({ mission }: { mission: { title: string, description: string, type: string, difficulty: string, xp: number, completed: boolean } }) => (
-  <Card className={`transition-all ${mission.completed ? 'bg-secondary/30' : 'hover:shadow-lg hover:-translate-y-1'}`}>
-    <CardHeader>
-      <CardTitle className="flex items-start justify-between">
-        <span className="text-lg">{mission.title}</span>
-        {mission.completed ? <CheckCircle className="h-6 w-6 text-green-500" /> : <Target className="h-6 w-6 text-primary" />}
-      </CardTitle>
-      <CardDescription>{mission.description}</CardDescription>
-    </CardHeader>
-    <CardFooter className="flex justify-between items-center">
-      <div className="flex gap-2">
-        <Badge variant="secondary">{mission.type}</Badge>
-        <Badge variant="outline">{mission.difficulty}</Badge>
-      </div>
-      <Badge variant="default" className="bg-primary">{`+${mission.xp} XP`}</Badge>
-    </CardFooter>
-  </Card>
-);
+const MissionCard = ({ mission, onComplete }: { mission: WithId<ExposureMission>, onComplete: (missionId: string, xp: number) => void }) => {
+  const { t } = useTranslation();
 
-const LockedMissionCard = ({ mission }: { mission: { title: string, description: string, type: string, difficulty: string, xp: number } }) => (
-  <Card className="bg-muted/50 border-dashed">
-    <CardHeader>
-      <CardTitle className="flex items-start justify-between text-muted-foreground">
-        <span className="text-lg">{mission.title}</span>
-        <Lock className="h-6 w-6" />
-      </CardTitle>
-      <CardDescription>{mission.description}</CardDescription>
-    </CardHeader>
-    <CardFooter className="flex justify-between items-center">
-      <div className="flex gap-2">
-        <Badge variant="outline">{mission.type}</Badge>
-        <Badge variant="outline">{mission.difficulty}</Badge>
-      </div>
-       <Badge variant="secondary">{`+${mission.xp} XP`}</Badge>
-    </CardFooter>
-  </Card>
-);
+  const getDifficulty = (level: number) => {
+    if (level <= 3) return t('exposure.difficultyEasy');
+    if (level <= 7) return t('exposure.difficultyMedium');
+    return t('exposure.difficultyHard');
+  }
+
+  return (
+    <Card className={`transition-all ${mission.status === 'completed' ? 'bg-secondary/30' : 'hover:shadow-lg hover:-translate-y-1'}`}>
+      <CardHeader>
+        <CardTitle className="flex items-start justify-between">
+          <span className="text-lg">{mission.title}</span>
+          {mission.status === 'completed' ? <CheckCircle className="h-6 w-6 text-green-500" /> : <Target className="h-6 w-6 text-primary" />}
+        </CardTitle>
+        <CardDescription>{mission.description}</CardDescription>
+      </CardHeader>
+      <CardFooter className="flex justify-between items-center">
+        <div className="flex gap-2">
+          <Badge variant="secondary">{mission.missionType || t('exposure.missionType')}</Badge>
+          <Badge variant="outline">{getDifficulty(mission.difficultyLevel)}</Badge>
+        </div>
+        <div className="flex items-center gap-4">
+          <Badge variant="default" className="bg-primary">{`+${mission.xpReward} XP`}</Badge>
+          {mission.status !== 'completed' && (
+              <Button size="sm" onClick={() => onComplete(mission.id, mission.xpReward)}>
+                {t('exposure.completeMission')}
+              </Button>
+            )}
+        </div>
+      </CardFooter>
+    </Card>
+  );
+};
+
 
 export default function ExposurePage() {
   const { t } = useTranslation();
+  const { firestore, user } = useFirebase();
+  const { toast } = useToast();
 
-  const missions = {
-    available: [
-      {
-        title: t('exposure.mission1Title'),
-        description: t('exposure.mission1Description'),
-        type: t('exposure.missionType'),
-        difficulty: t('exposure.difficultyEasy'),
-        xp: 50,
-        completed: false
-      },
-      {
-        title: t('exposure.mission2Title'),
-        description: t('exposure.mission2Description'),
-        type: t('exposure.missionType'),
-        difficulty: t('exposure.difficultyMedium'),
-        xp: 80,
-        completed: false
-      }
-    ],
-    completed: [
-      {
-        title: t('exposure.missionCompleted1Title'),
-        description: t('exposure.missionCompleted1Description'),
-        type: t('exposure.observerType'),
-        difficulty: t('exposure.difficultyEasy'),
-        xp: 30,
-        completed: true
-      }
-    ],
-    locked: [
-      {
-        title: t('exposure.missionLocked1Title'),
-        description: t('exposure.missionLocked1Description'),
-        type: t('exposure.missionType'),
-        difficulty: t('exposure.difficultyHard'),
-        xp: 120,
-      }
-    ]
+  const missionsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return collection(firestore, 'users', user.uid, 'exposureMissions');
+  }, [firestore, user]);
+
+  const { data: missions, isLoading } = useCollection<ExposureMission>(missionsQuery);
+
+  const handleCompleteMission = async (missionId: string, xp: number) => {
+    if (!firestore || !user) return;
+    const missionRef = doc(firestore, 'users', user.uid, 'exposureMissions', missionId);
+    const userRef = doc(firestore, 'users', user.uid);
+
+    try {
+      await runTransaction(firestore, async (transaction) => {
+        const userDoc = await transaction.get(userRef);
+        if (!userDoc.exists()) {
+          throw "User document does not exist!";
+        }
+
+        transaction.update(missionRef, { 
+          status: 'completed',
+          completionDate: serverTimestamp()
+        });
+        
+        const profile = userDoc.data();
+        const currentXp = profile.currentXp || 0;
+        const xpToNextLevel = profile.xpToNextLevel || 100;
+        let newXp = currentXp + xp;
+        let newLevel = profile.level || 1;
+        let newXpToNextLevel = xpToNextLevel;
+
+        if (newXp >= xpToNextLevel) {
+          newLevel += 1;
+          newXp -= xpToNextLevel;
+          newXpToNextLevel = Math.floor(xpToNextLevel * 1.5);
+        }
+
+        transaction.update(userRef, {
+            currentXp: newXp,
+            level: newLevel,
+            xpToNextLevel: newXpToNextLevel
+        });
+      });
+      toast({
+        title: t('exposure.missionCompletedToast'),
+        description: t('exposure.missionCompletedToastDesc', { xp }),
+      });
+    } catch (e) {
+      console.error("Transaction failed: ", e);
+      toast({
+        variant: "destructive",
+        title: t('exposure.missionCompletionFailed'),
+      });
+    }
   };
 
-  const completedCount = missions.completed.length;
-  const availableCount = missions.available.length;
-  const totalMissions = completedCount + availableCount;
+  const availableMissions = missions?.filter(m => m.status === 'active' || m.status === 'pending') ?? [];
+  const completedMissions = missions?.filter(m => m.status === 'completed') ?? [];
+
+  const completedCount = completedMissions.length;
+  const totalMissions = (missions || []).length;
   const progressValue = totalMissions > 0 ? (completedCount / totalMissions) * 100 : 0;
 
   return (
@@ -121,24 +145,18 @@ export default function ExposurePage() {
         <div>
           <h2 className="text-2xl font-bold tracking-tight font-headline mb-4">{t('exposure.availableMissions')}</h2>
           <div className="grid gap-4 md:grid-cols-2">
-            {missions.available.map((mission, index) => <MissionCard key={index} mission={mission} />)}
+            {isLoading && <p>Loading...</p>}
+            {availableMissions.map((mission) => <MissionCard key={mission.id} mission={mission} onComplete={handleCompleteMission} />)}
           </div>
         </div>
 
         <div>
           <h2 className="text-2xl font-bold tracking-tight font-headline mb-4">{t('exposure.completedMissions')}</h2>
           <div className="grid gap-4 md:grid-cols-2">
-            {missions.completed.map((mission, index) => <MissionCard key={index} mission={mission} />)}
+            {completedMissions.map((mission) => <MissionCard key={mission.id} mission={mission} onComplete={handleCompleteMission} />)}
           </div>
         </div>
         
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight font-headline mb-4">{t('exposure.lockedMissions')}</h2>
-           <p className="text-muted-foreground text-sm mb-4">{t('exposure.lockedDescription')}</p>
-          <div className="grid gap-4 md:grid-cols-2">
-            {missions.locked.map((mission, index) => <LockedMissionCard key={index} mission={mission} />)}
-          </div>
-        </div>
       </div>
     </div>
   );

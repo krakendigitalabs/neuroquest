@@ -46,7 +46,10 @@
     "generating": "Generating...",
     "generateNewMission": "Generate New Mission",
     "generationFailed": "Generation Failed",
-    "genericError": "Failed to generate mission. Please try again."
+    "genericError": "Failed to generate mission. Please try again.",
+    "acceptMission": "Accept Mission",
+    "missionAccepted": "Mission Accepted!",
+    "missionAcceptedDesc": "Your new mission is available in Exposure Mode."
   },
   "exposure": {
     "title": "Exposure Mode (ERP)",
@@ -70,7 +73,11 @@
     "missionCompleted1Title": "Resist a Minor Compulsion",
     "missionCompleted1Description": "Acknowledge an urge to perform a minor compulsion and consciously decide not to do it.",
     "missionLocked1Title": "Delayed Hand Washing",
-    "missionLocked1Description": "After using the restroom, wait 15 minutes before washing your hands."
+    "missionLocked1Description": "After using the restroom, wait 15 minutes before washing your hands.",
+    "completeMission": "Complete Mission",
+    "missionCompletedToast": "Mission Completed!",
+    "missionCompletedToastDesc": "You earned {xp} XP!",
+    "missionCompletionFailed": "Failed to complete mission"
   },
   "thoughtAnalyzer": {
     "title": "Thought Analysis",

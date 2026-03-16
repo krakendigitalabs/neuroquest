@@ -1,8 +1,8 @@
 'use client';
 
-import { useActionState, useEffect } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { Wand2 } from 'lucide-react';
+import { Wand2, PlusCircle } from 'lucide-react';
 
 import { generatePersonalizedMission } from '@/ai/flows/personalized-mission-generation';
 import { Button } from '@/components/ui/button';
@@ -10,15 +10,21 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { useTranslation } from '@/context/language-provider';
+import { useCollection, useFirebase, useMemoFirebase, addDocumentNonBlocking } from '@/firebase';
+import { collection, serverTimestamp } from 'firebase/firestore';
+import { useUserProfile } from '@/hooks/use-user-profile';
+import type { ThoughtRecord } from '@/models/thought-record';
+
+type PersonalizedMission = {
+  title: string;
+  description: string;
+  type: string;
+  difficulty: string;
+  xpReward: number;
+};
 
 type State = {
-  personalizedMission?: {
-    title: string;
-    description: string;
-    type: string;
-    difficulty: string;
-    xpReward: number;
-  };
+  personalizedMission?: PersonalizedMission,
   cognitiveCoachingSuggestion?: {
     title: string;
     suggestion: string;
@@ -29,19 +35,20 @@ type State = {
 
 const initialState: State = {};
 
-const generateMissionAction = async (prevState: State): Promise<State> => {
+const generateMissionAction = async (prevState: State, formData: FormData): Promise<State> => {
+  const { thoughtRecords, userLevel } = JSON.parse(formData.get('context') as string);
   try {
-    // In a real app, you would fetch these from a database
-    const mockInput = {
-      thoughtRecords: [
-        { thought: "I might have hit someone with my car.", label: "TOC", timestamp: new Date().toISOString() },
-        { thought: "Did I lock the door?", label: "Anxiety", timestamp: new Date().toISOString() },
-      ],
-      anxietyLogs: [{ level: 7, trigger: "Driving", timestamp: new Date().toISOString() }],
-      compulsionRecords: [{ behavior: "Checked the door 5 times", resisted: false, timestamp: new Date().toISOString() }],
-      userLevel: "Explorador Mental",
+     const missionInput = {
+      thoughtRecords: thoughtRecords.map((r: any) => ({
+        thought: r.thoughtText,
+        label: r.cognitiveLabel,
+        timestamp: r.recordedAt?.toDate ? r.recordedAt.toDate().toISOString() : new Date().toISOString(),
+      })),
+      anxietyLogs: [], // Not implemented yet in the app
+      compulsionRecords: [], // Not implemented yet in the app
+      userLevel: `Level ${userLevel}`,
     };
-    const result = await generatePersonalizedMission(mockInput);
+    const result = await generatePersonalizedMission(missionInput);
     return result;
   } catch (error) {
     console.error(error);
@@ -66,6 +73,16 @@ export function PersonalizedMissionGenerator() {
   const [state, formAction] = useActionState(generateMissionAction, initialState);
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { firestore, user } = useFirebase();
+  const { userProfile } = useUserProfile();
+  const [missionAccepted, setMissionAccepted] = useState(false);
+
+  const thoughtsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return collection(firestore, 'users', user.uid, 'thoughtRecords');
+  }, [firestore, user]);
+
+  const { data: thoughtHistory } = useCollection<ThoughtRecord>(thoughtsQuery);
 
   useEffect(() => {
     if (state.error) {
@@ -76,15 +93,58 @@ export function PersonalizedMissionGenerator() {
       })
     }
   }, [state.error, toast, t]);
+
+  useEffect(() => {
+    // Reset accepted state when a new mission is generated
+    if (state.personalizedMission) {
+      setMissionAccepted(false);
+    }
+  }, [state.personalizedMission]);
+
+  const handleAcceptMission = async () => {
+    if (!firestore || !user || !state.personalizedMission) return;
+
+    const { title, description, type, difficulty, xpReward } = state.personalizedMission;
+
+    const missionToSave = {
+        title,
+        description,
+        missionType: type,
+        difficultyLevel: difficulty === 'Fácil' ? 3 : difficulty === 'Media' ? 6 : 9,
+        xpReward,
+        userId: user.uid,
+        status: 'active',
+        assignedBy: 'AI',
+        isAiGenerated: true,
+        targetBehavior: "AI Generated", // Placeholder as AI doesn't provide it yet
+        resistanceTarget: "AI Generated", // Placeholder as AI doesn't provide it yet
+        createdAt: serverTimestamp()
+    };
+
+    const missionsCollection = collection(firestore, 'users', user.uid, 'exposureMissions');
+    await addDocumentNonBlocking(missionsCollection, missionToSave);
+
+    toast({
+      title: t('personalizedMissionGenerator.missionAccepted'),
+      description: t('personalizedMissionGenerator.missionAcceptedDesc'),
+    });
+
+    setMissionAccepted(true);
+  };
   
+  const formInputContext = JSON.stringify({
+    thoughtRecords: thoughtHistory || [],
+    userLevel: userProfile?.level || 1,
+  });
 
   return (
     <div>
       <form action={formAction}>
+        <input type="hidden" name="context" value={formInputContext} />
         <GenerateButton />
       </form>
       
-      {(state.personalizedMission || state.cognitiveCoachingSuggestion) && !state.error && (
+      {state.personalizedMission && !state.error && !missionAccepted && (
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
             {state.personalizedMission && (
                 <Card className="bg-secondary/50">
@@ -95,9 +155,15 @@ export function PersonalizedMissionGenerator() {
                         </CardTitle>
                         <CardDescription>{state.personalizedMission.description}</CardDescription>
                     </CardHeader>
-                    <CardFooter className="flex gap-2">
-                        <Badge variant="secondary">{state.personalizedMission.type}</Badge>
-                        <Badge variant="outline">{state.personalizedMission.difficulty}</Badge>
+                    <CardFooter className="flex justify-between items-center">
+                        <div className="flex gap-2">
+                            <Badge variant="secondary">{state.personalizedMission.type}</Badge>
+                            <Badge variant="outline">{state.personalizedMission.difficulty}</Badge>
+                        </div>
+                        <Button onClick={handleAcceptMission}>
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            {t('personalizedMissionGenerator.acceptMission')}
+                        </Button>
                     </CardFooter>
                 </Card>
             )}

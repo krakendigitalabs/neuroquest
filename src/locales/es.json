@@ -46,7 +46,10 @@
     "generating": "Generando...",
     "generateNewMission": "Generar Nueva Misión",
     "generationFailed": "Falló la Generación",
-    "genericError": "No se pudo generar la misión. Inténtalo de nuevo."
+    "genericError": "No se pudo generar la misión. Inténtalo de nuevo.",
+    "acceptMission": "Aceptar Misión",
+    "missionAccepted": "¡Misión Aceptada!",
+    "missionAcceptedDesc": "Tu nueva misión está disponible en el Modo Exposición."
   },
   "exposure": {
     "title": "Modo Exposición (ERP)",
@@ -70,7 +73,11 @@
     "missionCompleted1Title": "Resistir una Compulsión Menor",
     "missionCompleted1Description": "Reconoce el impulso de realizar una compulsión menor y decide conscientemente no hacerlo.",
     "missionLocked1Title": "Lavado de Manos Retrasado",
-    "missionLocked1Description": "Después de usar el baño, espera 15 minutos antes de lavarte las manos."
+    "missionLocked1Description": "Después de usar el baño, espera 15 minutos antes de lavarte las manos.",
+    "completeMission": "Completar Misión",
+    "missionCompletedToast": "¡Misión Completada!",
+    "missionCompletedToastDesc": "¡Has ganado {xp} XP!",
+    "missionCompletionFailed": "No se pudo completar la misión"
   },
   "thoughtAnalyzer": {
     "title": "Análisis de Pensamientos",
