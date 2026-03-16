@@ -65,7 +65,7 @@ export function AppSidebar() {
             <UserAvatar />
             <div>
               <p className="font-semibold">{isProfileLoading ? '...' : (userProfile?.displayName || user?.displayName || t('sidebar.user'))}</p>
-              <p className="text-xs text-muted-foreground">{isProfileLoading ? '...' : userProfile ? `Level ${userProfile.level}` : t('sidebar.level')}</p>
+              <p className="text-xs text-muted-foreground">{isProfileLoading ? '...' : userProfile ? t('userProgress.level', { level: userProfile.level }) : t('sidebar.level')}</p>
             </div>
           </div>
           <UserProgress 

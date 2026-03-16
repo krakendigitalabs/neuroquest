@@ -28,6 +28,20 @@ function ThoughtHistoryItem({ item }: { item: WithId<ThoughtRecord> }) {
     }
   }, [item.recordedAt, locale]);
 
+  const getLabel = (label: string) => {
+    if (!label) return '';
+    const key = `observer.labels.${label.toLowerCase().replace(/ /g, '_')}`;
+    const translation = t(key);
+    return translation === key ? label : translation;
+  }
+
+  const getEmotion = (emotion: string) => {
+    if (!emotion) return '';
+    const key = `observer.emotions.${emotion.toLowerCase()}`;
+    const translation = t(key);
+    return translation === key ? emotion : translation;
+  }
+
   return (
     <Card className="bg-card">
       <CardHeader>
@@ -35,8 +49,8 @@ function ThoughtHistoryItem({ item }: { item: WithId<ThoughtRecord> }) {
         <CardDescription>{formattedDate || ' '}</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-2">
-         <p><strong className="text-primary">{t('observer.emotion')}:</strong> {item.associatedEmotion} ({t('observer.intensity')}: {item.intensity})</p>
-         <p><strong className="text-accent">{t('observer.label')}:</strong> {item.cognitiveLabel}</p>
+         <p><strong className="text-primary">{t('observer.emotion')}:</strong> {getEmotion(item.associatedEmotion)} ({t('observer.intensity')}: {item.intensity})</p>
+         <p><strong className="text-accent">{t('observer.label')}:</strong> {getLabel(item.cognitiveLabel)}</p>
       </CardContent>
     </Card>
   )
@@ -71,7 +85,7 @@ export default function ObserverPage() {
           {t('observer.recentThoughts')}
         </h2>
         <div className="space-y-4">
-          {isLoading && <p>Loading thoughts...</p>}
+          {isLoading && <p>{t('observer.loadingThoughts')}</p>}
           {thoughtHistory && thoughtHistory.length === 0 && <p>{t('observer.noThoughts')}</p>}
           {thoughtHistory && thoughtHistory.map((item) => (
             <ThoughtHistoryItem key={item.id} item={item} />

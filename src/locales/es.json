@@ -94,9 +94,9 @@
     "aiAnalysis": "Análisis de IA",
     "ocdPattern": "Patrón de TOC/Ansiedad",
     "generalThought": "Pensamiento General",
-    "analysis": "Análisis",
     "reframingSuggestion": "Sugerencia de Reencuadre",
-    "example": "Ejemplo:"
+    "example": "Ejemplo:",
+    "analysis": "Análisis"
   },
   "observer": {
     "title": "Observador Mental",
@@ -108,7 +108,17 @@
     "noThoughts": "Aún no has registrado ningún pensamiento. Usa la herramienta de arriba para comenzar.",
     "emotion": "Emoción",
     "intensity": "Intensidad",
-    "label": "Etiqueta"
+    "label": "Etiqueta",
+    "loadingThoughts": "Cargando pensamientos...",
+    "emotions": {
+      "unknown": "Desconocida"
+    },
+    "labels": {
+      "pensamiento_toc": "Pensamiento TOC",
+      "general": "General",
+      "toc_thought": "Pensamiento TOC",
+      "general_thought": "Pensamiento General"
+    }
   },
   "progress": {
     "title": "Tu Progreso",
@@ -206,7 +216,16 @@
     "actions": "Acciones",
     "toggleMenu": "Alternar menú",
     "statusActive": "Activo",
-    "statusNeedsAttention": "Necesita Atención"
+    "statusNeedsAttention": "Necesita Atención",
+    "conditions": {
+      "ocd": "TOC",
+      "anxiety": "Ansiedad",
+      "panic_disorder": "Trastorno de Pánico"
+    },
+    "statuses": {
+      "active": "Activo",
+      "needs_attention": "Necesita Atención"
+    }
   },
   "sidebar": {
     "user": "Usuario",
@@ -226,5 +245,16 @@
     "signInErrorDescription": "No se pudo iniciar sesión con Google. Por favor, revisa si los pop-ups están bloqueados o inténtalo de nuevo más tarde.",
     "guestSignInErrorTitle": "Falló el Inicio de Sesión de Invitado",
     "guestSignInErrorDescription": "No se pudo iniciar sesión como invitado. Por favor, inténtalo de nuevo más tarde."
+  },
+  "layout": {
+    "loading": "Cargando...",
+    "redirecting": "Redirigiendo al inicio de sesión..."
+  },
+  "loading": "Cargando...",
+  "missionTypes": {
+    "observador_mental": "Observador Mental",
+    "exposición": "Exposición",
+    "regulación_emocional": "Regulación Emocional",
+    "reprogramación_cognitiva": "Reprogramación Cognitiva"
   }
 }

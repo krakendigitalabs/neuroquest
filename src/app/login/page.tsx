@@ -82,7 +82,7 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           {isUserLoading ? (
-            <div>Loading...</div>
+            <div>{t('loading')}</div>
           ) : (
             <>
               <SignInButton />

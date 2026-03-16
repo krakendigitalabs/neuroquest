@@ -94,9 +94,9 @@
     "aiAnalysis": "AI Analysis",
     "ocdPattern": "OCD/Anxiety Pattern",
     "generalThought": "General Thought",
-    "analysis": "Analysis",
     "reframingSuggestion": "Reframing Suggestion",
-    "example": "Example:"
+    "example": "Example:",
+    "analysis": "Analysis"
   },
   "observer": {
     "title": "Mental Observer",
@@ -108,7 +108,17 @@
     "noThoughts": "You haven't logged any thoughts yet. Use the tool above to get started.",
     "emotion": "Emotion",
     "intensity": "Intensity",
-    "label": "Label"
+    "label": "Label",
+    "loadingThoughts": "Loading thoughts...",
+    "emotions": {
+      "unknown": "Unknown"
+    },
+    "labels": {
+      "pensamiento_toc": "OCD Thought",
+      "general": "General",
+      "toc_thought": "OCD Thought",
+      "general_thought": "General Thought"
+    }
   },
   "progress": {
     "title": "Your Progress",
@@ -206,7 +216,16 @@
     "actions": "Actions",
     "toggleMenu": "Toggle menu",
     "statusActive": "Active",
-    "statusNeedsAttention": "Needs Attention"
+    "statusNeedsAttention": "Needs Attention",
+    "conditions": {
+      "ocd": "OCD",
+      "anxiety": "Anxiety",
+      "panic_disorder": "Panic Disorder"
+    },
+    "statuses": {
+      "active": "Active",
+      "needs_attention": "Needs Attention"
+    }
   },
   "sidebar": {
     "user": "User",
@@ -226,5 +245,16 @@
     "signInErrorDescription": "Could not sign in with Google. Please check if pop-ups are blocked or try again later.",
     "guestSignInErrorTitle": "Guest Sign-In Failed",
     "guestSignInErrorDescription": "Could not sign in as a guest. Please try again later."
+  },
+  "layout": {
+    "loading": "Loading...",
+    "redirecting": "Redirecting to login..."
+  },
+  "loading": "Loading...",
+  "missionTypes": {
+    "observador_mental": "Mental Observer",
+    "exposición": "Exposure",
+    "regulación_emocional": "Emotional Regulation",
+    "reprogramación_cognitiva": "Cognitive Reprogramming"
   }
 }

@@ -58,9 +58,9 @@ export function ThoughtAnalyzer() {
         userId: user.uid,
         recordedAt: serverTimestamp(),
         thoughtText: thought,
-        cognitiveLabel: result.isTOCRelated ? 'Pensamiento TOC' : 'General',
+        cognitiveLabel: result.isTOCRelated ? 'toc_thought' : 'general_thought',
         isFactNotThought: true,
-        associatedEmotion: 'Unknown', // This could be a user input
+        associatedEmotion: 'unknown', // This could be a user input
         intensity: 5, // This could be a user input
         isIntrusive: result.isTOCRelated,
       };

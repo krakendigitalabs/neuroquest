@@ -21,6 +21,8 @@ const MissionCard = ({ mission, onComplete }: { mission: WithId<ExposureMission>
     return t('exposure.difficultyHard');
   }
 
+  const missionTypeKey = (mission.missionType || '').toLowerCase().replace(/ /g, '_');
+
   return (
     <Card className={`transition-all ${mission.status === 'completed' ? 'bg-secondary/30' : 'hover:shadow-lg hover:-translate-y-1'}`}>
       <CardHeader>
@@ -32,7 +34,7 @@ const MissionCard = ({ mission, onComplete }: { mission: WithId<ExposureMission>
       </CardHeader>
       <CardFooter className="flex justify-between items-center">
         <div className="flex gap-2">
-          <Badge variant="secondary">{mission.missionType || t('exposure.missionType')}</Badge>
+          <Badge variant="secondary">{t(`missionTypes.${missionTypeKey}`)}</Badge>
           <Badge variant="outline">{getDifficulty(mission.difficultyLevel)}</Badge>
         </div>
         <div className="flex items-center gap-4">
@@ -145,7 +147,7 @@ export default function ExposurePage() {
         <div>
           <h2 className="text-2xl font-bold tracking-tight font-headline mb-4">{t('exposure.availableMissions')}</h2>
           <div className="grid gap-4 md:grid-cols-2">
-            {isLoading && <p>Loading...</p>}
+            {isLoading && <p>{t('loading')}</p>}
             {availableMissions.map((mission) => <MissionCard key={mission.id} mission={mission} onComplete={handleCompleteMission} />)}
           </div>
         </div>

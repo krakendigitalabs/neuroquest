@@ -9,6 +9,7 @@ import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { useFirebase } from '@/firebase';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { useTranslation } from '@/context/language-provider';
 
 function UserProfileInitializer({ user }: { user: User }) {
   const { firestore } = useFirebase();
@@ -48,6 +49,7 @@ function UserProfileInitializer({ user }: { user: User }) {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, isUserLoading } = useFirebase();
   const router = useRouter();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -56,13 +58,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }, [user, isUserLoading, router]);
 
   if (isUserLoading) {
-    // You can return a loading spinner here
-    return <div>Loading...</div>;
+    return <div>{t('layout.loading')}</div>;
   }
   
   if (!user) {
-    // This will be briefly visible before the redirect, or you can return a spinner
-    return <div>Redirecting to login...</div>;
+    return <div>{t('layout.redirecting')}</div>;
   }
 
 

@@ -40,7 +40,7 @@ export default function TherapistDashboard() {
   }, [isAdmin, isLoading, router]);
 
   if (isLoading || !isAdmin) {
-    return <div>Loading...</div>; // Or a proper loading/unauthorized component
+    return <div>{t('loading')}</div>; // Or a proper loading/unauthorized component
   }
 
   return (
@@ -126,9 +126,9 @@ export default function TherapistDashboard() {
                 {patients.map((patient) => (
                   <TableRow key={patient.id}>
                     <TableCell className="font-medium">{patient.name}</TableCell>
-                    <TableCell>{patient.condition}</TableCell>
+                    <TableCell>{t(`therapist.conditions.${patient.condition.toLowerCase().replace(/ /g, '_')}`)}</TableCell>
                     <TableCell>
-                      <Badge variant={patient.status === 'Active' ? 'secondary' : 'destructive'}>{t(patient.status === 'Active' ? 'therapist.statusActive' : 'therapist.statusNeedsAttention')}</Badge>
+                      <Badge variant={patient.status === 'Active' ? 'secondary' : 'destructive'}>{t(`therapist.statuses.${patient.status.toLowerCase().replace(/ /g, '_')}`)}</Badge>
                     </TableCell>
                     <TableCell>
                         <div className="flex items-center gap-2">
@@ -153,5 +153,3 @@ export default function TherapistDashboard() {
     </div>
   )
 }
-
-    
