@@ -4,10 +4,9 @@ import { ThoughtAnalyzer } from './_components/thought-analyzer';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { History } from 'lucide-react';
 import { useTranslation } from '@/context/language-provider';
-import { useCollection } from '@/firebase';
-import { useFirebase } from '@/firebase';
+import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
-import { useMemo, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { WithId } from '@/firebase/firestore/use-collection';
 import {ThoughtRecord} from '@/models/thought-record';
 
@@ -17,7 +16,7 @@ function ThoughtHistoryItem({ item }: { item: WithId<ThoughtRecord> }) {
 
   useEffect(() => {
     if (item.recordedAt) {
-      // Firestore Timestamps have a toDate() method.
+      // This effect runs only on the client, after hydration, preventing mismatch.
       const date = (item.recordedAt as any).toDate ? (item.recordedAt as any).toDate() : new Date(item.recordedAt as any);
       setFormattedDate(date.toLocaleString(locale, {
         year: 'numeric',
@@ -48,7 +47,7 @@ export default function ObserverPage() {
   const { t } = useTranslation();
   const { firestore, user } = useFirebase();
 
-  const thoughtsQuery = useMemo(() => {
+  const thoughtsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
     return collection(firestore, 'users', user.uid, 'thoughtRecords');
   }, [firestore, user]);
