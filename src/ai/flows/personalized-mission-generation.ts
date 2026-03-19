@@ -129,7 +129,9 @@ const personalizedMissionGenerationFlow = ai.defineFlow(
     outputSchema: PersonalizedMissionGenerationOutputSchema,
   },
   async (input) => {
-    const {output} = await prompt(input);
-    return output!;
-  }
-);
+    const { output } = await prompt({
+      ...input,
+      thoughtRecords: JSON.stringify(input.thoughtRecords ?? [], null, 2),
+      anxietyLogs: JSON.stringify(input.anxietyLogs ?? [], null, 2),
+      compulsionRecords: JSON.stringify(input.compulsionRecords ?? [], null, 2),
+    });
