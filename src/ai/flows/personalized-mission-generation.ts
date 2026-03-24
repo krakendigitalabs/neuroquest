@@ -135,3 +135,7 @@ const personalizedMissionGenerationFlow = ai.defineFlow(
       anxietyLogs: JSON.stringify(input.anxietyLogs ?? [], null, 2),
       compulsionRecords: JSON.stringify(input.compulsionRecords ?? [], null, 2),
     });
+
+    return output;
+  }
+);
