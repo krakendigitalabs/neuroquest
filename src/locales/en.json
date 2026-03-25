@@ -1,3 +1,4 @@
+
 {
   "appName": "NeuroQuest",
   "appDescription": "Transform your mental wellness journey into a gamified adventure. Conquer OCD and anxiety with NeuroQuest.",
@@ -9,7 +10,10 @@
     "regulation": "Emotion Regulation",
     "reprogram": "Cognitive Reprogramming",
     "progress": "Progress",
-    "grounding": "Grounding"
+    "grounding": "Grounding",
+    "challenges": "Challenges",
+    "medication": "Medical Support",
+    "checkIn": "Mental Check-In"
   },
   "dashboard": {
     "welcome": "Welcome back, Explorer!",
@@ -78,7 +82,9 @@
     "completeMission": "Complete Mission",
     "missionCompletedToast": "Mission Completed!",
     "missionCompletedToastDesc": "You earned {xp} XP!",
-    "missionCompletionFailed": "Failed to complete mission"
+    "missionCompletionFailed": "Failed to complete mission",
+    "noAvailableMissions": "No available missions. Try generating a new one on the dashboard!",
+    "noCompletedMissions": "You haven't completed any missions yet."
   },
   "thoughtAnalyzer": {
     "title": "Thought Analysis",
@@ -183,11 +189,27 @@
     "backToApp": "Back to App",
     "notAlone": "You Are Not Alone",
     "description": "If you are in crisis or immediate danger, please use the resources below or call 911. Your safety is the top priority.",
-    "resource1Desc": "Available 24/7 for free and confidential support.",
-    "resource2Desc": "Free, 24/7 crisis support via text message.",
-    "resource3Desc": "For LGBTQ young people in crisis.",
-    "resource4Desc": "National Alliance on Mental Illness for information and referrals.",
-    "disclaimer": "NeuroQuest is a tool for support and skill-building, not a substitute for professional medical advice, diagnosis, or treatment."
+    "disclaimer": "NeuroQuest is a tool for support and skill-building, not a substitute for professional medical advice, diagnosis, or treatment.",
+    "medellin": {
+      "title": "Emergency Numbers – Medellín",
+      "mainEmergency": {
+        "title": "Serious Emergency → 123",
+        "desc": "Main line and fastest general option (police, ambulances, firefighters, etc.)"
+      },
+      "mentalCrisis": {
+        "title": "Urgent Mental Crisis → 123 or psychiatric clinic",
+        "desc": "For a severe mental crisis (risk of suicide, aggression, psychosis), call 123 immediately. You can also go to the emergency room of any hospital (they will refer you to psychiatry)."
+      },
+      "medicalEmergency": "Medical Emergency → 125 or 123",
+      "firefighters": "Medellín Firefighters → 119",
+      "police": "National Police → 112",
+      "otherLinesTitle": "Other important lines:",
+      "redCross": "Red Cross → 132",
+      "civilDefense": "Civil Defense → 144",
+      "gaula": "GAULA (extortion/kidnapping) → 165",
+      "womensHelpline": "Violence against women → 155",
+      "disasterRelief": "Disaster Relief → 111"
+    }
   },
   "therapist": {
     "dashboard": "Dashboard",
@@ -340,6 +362,191 @@
       "ex7": {
         "title": "Paired Muscle Relaxation",
         "desc": "Tense a muscle group (like your hands) while you breathe in, and then relax it completely as you breathe out. Move through different muscle groups."
+      }
+    }
+  },
+  "challenges": {
+    "title": "Cognitive Distortion Challenge",
+    "description": "Test your ability to identify common cognitive distortions. Read the thought and select the distortion that best fits.",
+    "startChallenge": "Start Challenge",
+    "nextQuestion": "Next Question",
+    "showResults": "Show Results",
+    "yourScore": "Your Score: {score}/{total}",
+    "reviewAnswers": "Review Your Answers",
+    "restartChallenge": "Restart Challenge",
+    "correct": "Correct",
+    "incorrect": "Incorrect",
+    "yourAnswer": "Your answer",
+    "correctAnswer": "Correct answer",
+    "questionLabel": "Question {current} of {total}",
+    "questions": [
+      {
+        "thought": "I got a 'B' on the test. I'm a complete failure.",
+        "options": ["mindReading", "blackAndWhiteThinking", "personalization"],
+        "answer": 1,
+        "explanation": "This is Black-and-White Thinking because it sees a situation in only two categories (total success or complete failure) instead of on a spectrum."
+      },
+      {
+        "thought": "My boss didn't say hello this morning. They must be mad at me.",
+        "options": ["catastrophizing", "mindReading", "labeling"],
+        "answer": 1,
+        "explanation": "This is Mind Reading, a form of Jumping to Conclusions, because you're assuming you know what someone else is thinking without sufficient evidence."
+      },
+      {
+        "thought": "I felt anxious during the presentation, so I'm sure everyone thought I was incompetent.",
+        "options": ["emotionalReasoning", "shouldStatements", "overgeneralization"],
+        "answer": 0,
+        "explanation": "This is Emotional Reasoning, where you assume that because you feel a certain way, it must be true. 'I feel it, therefore it must be true.'"
+      },
+      {
+        "thought": "If I fail this one project, my entire career will be ruined.",
+        "options": ["minimization", "catastrophizing", "blaming"],
+        "answer": 1,
+        "explanation": "This is Catastrophizing (or Magnification), where you expect the worst-case scenario to happen, blowing things out of proportion."
+      },
+      {
+        "thought": "I made one mistake. Now I'll never get it right.",
+        "options": ["overgeneralization", "fallacyOfFairness", "mentalFilter"],
+        "answer": 0,
+        "explanation": "This is Overgeneralization. You're taking a single negative event and turning it into a never-ending pattern of defeat."
+      }
+    ],
+    "distortions": {
+      "mindReading": "Mind Reading",
+      "blackAndWhiteThinking": "Black-and-White Thinking",
+      "personalization": "Personalization",
+      "catastrophizing": "Catastrophizing",
+      "labeling": "Labeling",
+      "emotionalReasoning": "Emotional Reasoning",
+      "shouldStatements": "Should Statements",
+      "overgeneralization": "Overgeneralization",
+      "minimization": "Minimization",
+      "blaming": "Blaming",
+      "fallacyOfFairness": "The Fallacy of Fairness",
+      "mentalFilter": "Mental Filter"
+    }
+  },
+  "medication": {
+    "title": "Medical Decision Support",
+    "description": "Clinical guidelines for pharmacological treatment based on diagnosis and severity. For professional use only.",
+    "warningTitle": "Professional Use Only - Not a Substitute for Medical Evaluation",
+    "warningDescription": "This system does not replace a professional medical evaluation. Doses must be defined and prescribed by a qualified physician. Do not self-medicate.",
+    "evaluationFactorsTitle": "Key Evaluation Factors",
+    "safetyRulesTitle": "Critical Safety Rules",
+    "suggestedMedications": "Suggested Medications",
+    "firstLine": "First-Line Treatment",
+    "management": "Management",
+    "note": "Note",
+    "alert": "Alert",
+    "disorders": {
+      "depresión": "Depression",
+      "ansiedad": "Anxiety",
+      "trastorno_bipolar": "Bipolar Disorder"
+    },
+    "severity": {
+      "leve": "Mild",
+      "moderado": "Moderate",
+      "grave": "Severe"
+    },
+    "factors": {
+      "0": "Specific diagnosis",
+      "1": "Severity (mild, moderate, severe)",
+      "2": "Age",
+      "3": "Weight",
+      "4": "Clinical history",
+      "5": "Comorbidities",
+      "6": "Drug interactions",
+      "7": "Previous response to treatments"
+    },
+    "rules": {
+      "0": "Do not self-medicate.",
+      "1": "Do not define doses automatically; use referential ranges according to clinical guidelines and validated by a physician.",
+      "2": "Requires professional medical validation to start, adjust, or suspend any treatment.",
+      "3": "Alert for suicide risk when starting antidepressants, especially in young people.",
+      "4": "Prioritize emergency care in case of crisis, risk of self-harm or harm to others."
+    }
+  },
+  "checkIn": {
+    "title": "Mental Check-In",
+    "subtitle": "Evaluate your emotional state and receive a personalized mission to improve your mental well-being.",
+    "subtitle_marketing": "Discover how your mind is today and what to do to improve it step by step.",
+    "importantTitle": "Important",
+    "importantText": "This tool does not replace a medical or psychological diagnosis. It is a guide for self-assessment and orientation.",
+    "submitButton": "See my result",
+    "resultTitle": "Your Result",
+    "restartButton": "Re-evaluate",
+    "totalScore": "Total Score",
+    "category": "Result",
+    "assignedMission": "Assigned Mission",
+    "dailyMission": "Personalized Daily Mission",
+    "alertTitle": "Important Alert",
+    "alertText": "Your response suggests significant discomfort or possible emotional risk. Seek professional support as soon as possible and contact a trusted person right now.",
+    "disclaimerTitle": "Guideline",
+    "disclaimerText": "This tool provides general guidance based on self-reported symptoms. It does not substitute for a professional medical, psychiatric, or psychological diagnosis.",
+    "validationError": "Please answer all questions before submitting.",
+    "questions": [
+      { "id": 1, "text": "Do you feel nervous, anxious, or on edge for no clear reason?" },
+      { "id": 2, "text": "Have you lost interest or pleasure in activities you used to enjoy?" },
+      { "id": 3, "text": "Do you have trouble sleeping or do you sleep too much?" },
+      { "id": 4, "text": "Do you feel tired or lacking energy most of the time?" },
+      { "id": 5, "text": "Do you find it hard to concentrate or make simple decisions?" },
+      { "id": 6, "text": "Do you feel sad, empty, or hopeless?" },
+      { "id": 7, "text": "Are you easily irritated or do you overreact?" },
+      { "id": 8, "text": "Do you avoid social situations or important activities?" },
+      { "id": 9, "text": "Do you have recurring negative thoughts about yourself?" },
+      { "id": 10, "text": "Have you had thoughts of harming yourself or giving up?" }
+    ],
+    "options": [
+      { "value": 0, "label": "Never" },
+      { "value": 1, "label": "Rarely" },
+      { "value": 2, "label": "Sometimes" },
+      { "value": 3, "label": "Frequently" },
+      { "value": 4, "label": "Almost always" }
+    ],
+    "results": {
+      "healthy": {
+        "category": "Healthy State",
+        "mission": "Mental Optimization",
+        "description": "Routines, habits, and personal growth.",
+        "tasks": [
+          "5-minute breathing exercise",
+          "Gratitude journal",
+          "Consistent sleep routine",
+          "Daily mini-focus challenge"
+        ]
+      },
+      "mild": {
+        "category": "Mild Stress",
+        "mission": "Emotional Regulation",
+        "description": "Breathing, mindfulness, and grounding.",
+        "tasks": [
+          "4-4-6 breathing for 5 minutes",
+          "5-4-3-2-1 grounding exercise",
+          "Walk for 10 to 20 minutes",
+          "Reduce digital overload for 1 hour"
+        ]
+      },
+      "moderate": {
+        "category": "Moderate Anxiety / Depression",
+        "mission": "Mental Reprogramming",
+        "description": "CBT, gradual exposure, and emotional regulation.",
+        "tasks": [
+          "Log a negative automatic thought",
+          "Reframe a limiting belief",
+          "Gradual exposure to an avoided situation",
+          "10-minute emotional journaling"
+        ]
+      },
+      "severe": {
+        "category": "Severe Level",
+        "mission": "Intervention + Professional Support",
+        "description": "Close monitoring, professional support, and specialized evaluation.",
+        "tasks": [
+          "Talk to a trusted person today",
+          "Seek professional guidance",
+          "Reduce isolation",
+          "Create a basic emotional safety plan"
+        ]
       }
     }
   }
