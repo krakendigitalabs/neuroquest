@@ -505,6 +505,101 @@
         "achievementId",
         "achievedAt"
       ]
+    },
+    "MentalCheckup": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Mental Checkup Record",
+      "type": "object",
+      "description": "Stores a complete record of a user's mental check-in assessment.",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "patientName": {
+          "type": "string"
+        },
+        "age": {
+          "type": "number"
+        },
+        "score": {
+          "type": "number"
+        },
+        "maxScore": {
+          "type": "number"
+        },
+        "level": {
+          "type": "string"
+        },
+        "resultTitle": {
+          "type": "string"
+        },
+        "mission": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "answers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "questionId": {
+                "type": "number"
+              },
+              "question": {
+                "type": "string"
+              },
+              "value": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "recommendations": {
+          "type": "object"
+        },
+        "activatedModules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "riskFlags": {
+          "type": "object",
+          "properties": {
+            "selfHarmRisk": {
+              "type": "boolean"
+            },
+            "needsProfessionalSupport": {
+              "type": "boolean"
+            }
+          }
+        },
+        "professionalNote": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "userId",
+        "createdAt",
+        "patientName",
+        "score",
+        "maxScore",
+        "level",
+        "resultTitle",
+        "mission",
+        "summary",
+        "answers",
+        "recommendations",
+        "activatedModules",
+        "riskFlags",
+        "professionalNote"
+      ]
     }
   },
   "auth": {
@@ -704,6 +799,26 @@
             {
               "name": "userAchievementId",
               "description": "The unique identifier for this instance of a user earning an achievement."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/mental_checkups/{checkupId}",
+        "definition": {
+          "entityName": "MentalCheckup",
+          "schema": {
+            "$ref": "#/backend/entities/MentalCheckup"
+          },
+          "description": "Stores a log of a user's mental check-in assessment results. This data is private to the user but viewable by their assigned therapists.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who completed the checkup."
+            },
+            {
+              "name": "checkupId",
+              "description": "The unique identifier for the checkup."
             }
           ]
         }

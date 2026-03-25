@@ -1,3 +1,4 @@
+
 {
   "appName": "NeuroQuest",
   "appDescription": "Transforma tu viaje de bienestar mental en una aventura gamificada. Conquista el TOC y la ansiedad con NeuroQuest.",
@@ -9,7 +10,10 @@
     "regulation": "Regulación Emocional",
     "reprogram": "Reprogramación Cognitiva",
     "progress": "Progreso",
-    "grounding": "Anclaje"
+    "grounding": "Anclaje",
+    "challenges": "Desafíos",
+    "medication": "Apoyo Médico",
+    "checkIn": "Chequeo Mental"
   },
   "dashboard": {
     "welcome": "¡Bienvenido de nuevo, Explorador!",
@@ -78,7 +82,9 @@
     "completeMission": "Completar Misión",
     "missionCompletedToast": "¡Misión Completada!",
     "missionCompletedToastDesc": "¡Has ganado {xp} XP!",
-    "missionCompletionFailed": "No se pudo completar la misión"
+    "missionCompletionFailed": "No se pudo completar la misión",
+    "noAvailableMissions": "No hay misiones disponibles. ¡Intenta generar una nueva en el tablero!",
+    "noCompletedMissions": "Aún no has completado ninguna misión."
   },
   "thoughtAnalyzer": {
     "title": "Análisis de Pensamientos",
@@ -183,11 +189,27 @@
     "backToApp": "Volver a la App",
     "notAlone": "No Estás Solo",
     "description": "Si estás en crisis o en peligro inmediato, por favor usa los recursos a continuación o llama al 911. Tu seguridad es la máxima prioridad.",
-    "resource1Desc": "Disponible 24/7 para apoyo gratuito y confidencial.",
-    "resource2Desc": "Apoyo en crisis gratuito 24/7 a través de mensaje de texto.",
-    "resource3Desc": "Para jóvenes LGBTQ en crisis.",
-    "resource4Desc": "Alianza Nacional de Enfermedades Mentales para información y referencias.",
-    "disclaimer": "NeuroQuest es una herramienta de apoyo y desarrollo de habilidades, no un sustituto del consejo, diagnóstico o tratamiento médico profesional."
+    "disclaimer": "NeuroQuest es una herramienta de apoyo y desarrollo de habilidades, no un sustituto del consejo, diagnóstico o tratamiento médico profesional.",
+    "medellin": {
+      "title": "Números de Emergencia – Medellín",
+      "mainEmergency": {
+        "title": "Emergencia grave → 123",
+        "desc": "Línea principal y opción más rápida general (policía, ambulancias, bomberos, etc.)"
+      },
+      "mentalCrisis": {
+        "title": "Crisis mental urgente → 123 o clínica psiquiátrica",
+        "desc": "Si es crisis mental fuerte (riesgo de suicidio, agresividad, psicosis) llama 123 inmediatamente. También puedes ir a urgencias de cualquier hospital (remiten a psiquiatría)."
+      },
+      "medicalEmergency": "Urgencia médica → 125 o 123",
+      "firefighters": "Bomberos Medellín → 119",
+      "police": "Policía Nacional → 112",
+      "otherLinesTitle": "Otras líneas importantes:",
+      "redCross": "Cruz Roja → 132",
+      "civilDefense": "Defensa Civil → 144",
+      "gaula": "GAULA (extorsión/secuestro) → 165",
+      "womensHelpline": "Violencia contra la mujer → 155",
+      "disasterRelief": "Atención de desastres → 111"
+    }
   },
   "therapist": {
     "dashboard": "Tablero",
@@ -340,6 +362,191 @@
       "ex7": {
         "title": "Relajación Muscular Emparejada",
         "desc": "Tensa un grupo muscular (como tus manos) mientras inhalas, y luego relájalo por completo mientras exhalas. Pasa por diferentes grupos musculares."
+      }
+    }
+  },
+  "challenges": {
+    "title": "Desafío de Distorsiones Cognitivas",
+    "description": "Pon a prueba tu habilidad para identificar distorsiones cognitivas comunes. Lee el pensamiento y selecciona la distorsión que mejor se ajuste.",
+    "startChallenge": "Comenzar Desafío",
+    "nextQuestion": "Siguiente Pregunta",
+    "showResults": "Mostrar Resultados",
+    "yourScore": "Tu Puntuación: {score} de {total}",
+    "reviewAnswers": "Revisar Respuestas",
+    "restartChallenge": "Reiniciar Desafío",
+    "correct": "Correcto",
+    "incorrect": "Incorrecto",
+    "yourAnswer": "Tu respuesta",
+    "correctAnswer": "Respuesta correcta",
+    "questionLabel": "Pregunta {current} de {total}",
+    "questions": [
+      {
+        "thought": "Saqué una 'B' en el examen. Soy un completo fracaso.",
+        "options": ["mindReading", "blackAndWhiteThinking", "personalization"],
+        "answer": 1,
+        "explanation": "Esto es Pensamiento de Todo o Nada porque ve una situación en solo dos categorías (éxito total o fracaso completo) en lugar de en un espectro."
+      },
+      {
+        "thought": "Mi jefe no me saludó esta mañana. Debe estar enojado conmigo.",
+        "options": ["catastrophizing", "mindReading", "labeling"],
+        "answer": 1,
+        "explanation": "Esto es Lectura de Mente, una forma de Saltar a Conclusiones, porque asumes que sabes lo que otra persona está pensando sin evidencia suficiente."
+      },
+      {
+        "thought": "Me sentí ansioso durante la presentación, así que seguro que todos pensaron que era un incompetente.",
+        "options": ["emotionalReasoning", "shouldStatements", "overgeneralization"],
+        "answer": 0,
+        "explanation": "Esto es Razonamiento Emocional, donde asumes que porque te sientes de cierta manera, debe ser verdad. 'Lo siento, por lo tanto, debe ser cierto.'"
+      },
+      {
+        "thought": "Si fallo en este proyecto, toda mi carrera estará arruinada.",
+        "options": ["minimization", "catastrophizing", "blaming"],
+        "answer": 1,
+        "explanation": "Esto es Catastrofización (o Magnificación), donde esperas que ocurra el peor escenario posible, exagerando las cosas."
+      },
+      {
+        "thought": "Cometí un error. Ahora nunca lo haré bien.",
+        "options": ["overgeneralization", "fallacyOfFairness", "mentalFilter"],
+        "answer": 0,
+        "explanation": "Esto es Sobregeneralización. Estás tomando un único evento negativo y convirtiéndolo en un patrón de derrota interminable."
+      }
+    ],
+    "distortions": {
+      "mindReading": "Lectura de Mente",
+      "blackAndWhiteThinking": "Pensamiento de Todo o Nada",
+      "personalization": "Personalización",
+      "catastrophizing": "Catastrofización",
+      "labeling": "Etiquetado",
+      "emotionalReasoning": "Razonamiento Emocional",
+      "shouldStatements": "Los 'Debería'",
+      "overgeneralization": "Sobregeneralización",
+      "minimization": "Minimización",
+      "blaming": "Culpabilización",
+      "fallacyOfFairness": "La Falacia de la Justicia",
+      "mentalFilter": "Filtro Mental"
+    }
+  },
+  "medication": {
+    "title": "Apoyo a la Decisión Médica",
+    "description": "Guías clínicas para el tratamiento farmacológico según el diagnóstico y la severidad. Para uso profesional únicamente.",
+    "warningTitle": "Uso Profesional Exclusivo - No Reemplaza la Evaluación Médica",
+    "warningDescription": "Este sistema no reemplaza una evaluación médica profesional. Las dosis deben ser definidas y prescritas por un médico calificado. No automedicarse.",
+    "evaluationFactorsTitle": "Factores Clave de Evaluación",
+    "safetyRulesTitle": "Reglas de Seguridad Críticas",
+    "suggestedMedications": "Fármacos Sugeridos",
+    "firstLine": "Primera Línea de Tratamiento",
+    "management": "Manejo",
+    "note": "Nota",
+    "alert": "Alerta",
+    "disorders": {
+      "depresión": "Depresión",
+      "ansiedad": "Ansiedad",
+      "trastorno_bipolar": "Trastorno Bipolar"
+    },
+    "severity": {
+      "leve": "Leve",
+      "moderado": "Moderado",
+      "grave": "Grave"
+    },
+    "factors": {
+      "0": "Diagnóstico específico",
+      "1": "Severidad (leve, moderado, grave)",
+      "2": "Edad",
+      "3": "Peso",
+      "4": "Historia clínica",
+      "5": "Comorbilidades",
+      "6": "Interacciones medicamentosas",
+      "7": "Respuesta previa a tratamientos"
+    },
+    "rules": {
+      "0": "No automedicar.",
+      "1": "No definir dosis automáticamente; usar rangos referenciales según guías clínicas y validados por un médico.",
+      "2": "Requiere validación médica profesional para iniciar, ajustar o suspender cualquier tratamiento.",
+      "3": "Alertar sobre riesgo suicida al iniciar antidepresivos, especialmente en jóvenes.",
+      "4": "Priorizar urgencias si hay crisis, riesgo de auto o heteroagresión."
+    }
+  },
+    "checkIn": {
+    "title": "Chequeo Mental",
+    "subtitle": "Evalúa tu estado emocional y recibe una misión personalizada para mejorar tu bienestar mental.",
+    "subtitle_marketing": "Descubre cómo está tu mente hoy y qué hacer para mejorarla paso a paso.",
+    "importantTitle": "Importante",
+    "importantText": "Esta herramienta no reemplaza un diagnóstico médico ni psicológico. Es una guía de autoevaluación y orientación.",
+    "submitButton": "Ver mi resultado",
+    "resultTitle": "Tu Resultado",
+    "restartButton": "Volver a evaluar",
+    "totalScore": "Puntaje total",
+    "category": "Resultado",
+    "assignedMission": "Misión Asignada",
+    "dailyMission": "Misión Diaria Personalizada",
+    "alertTitle": "Alerta Importante",
+    "alertText": "Tu respuesta sugiere malestar significativo o posible riesgo emocional. Busca apoyo profesional lo antes posible y contacta a una persona de confianza ahora mismo.",
+    "disclaimerTitle": "Orientación",
+    "disclaimerText": "Esta herramienta ofrece orientación general basada en síntomas autoinformados. No sustituye un diagnóstico médico, psiquiátrico o psicológico profesional.",
+    "validationError": "Por favor, responde todas las preguntas antes de continuar.",
+    "questions": [
+      { "id": 1, "text": "¿Te sientes nervioso, ansioso o en tensión sin razón clara?" },
+      { "id": 2, "text": "¿Has perdido interés o placer en actividades que antes disfrutabas?" },
+      { "id": 3, "text": "¿Tienes dificultad para dormir o duermes demasiado?" },
+      { "id": 4, "text": "¿Te sientes cansado o sin energía la mayor parte del tiempo?" },
+      { "id": 5, "text": "¿Te cuesta concentrarte o tomar decisiones simples?" },
+      { "id": 6, "text": "¿Te sientes triste, vacío o sin esperanza?" },
+      { "id": 7, "text": "¿Te irritas fácilmente o reaccionas de forma exagerada?" },
+      { "id": 8, "text": "¿Evitas situaciones sociales o actividades importantes?" },
+      { "id": 9, "text": "¿Sientes pensamientos negativos recurrentes sobre ti mismo?" },
+      { "id": 10, "text": "¿Has tenido pensamientos de hacerte daño o rendirte?" }
+    ],
+    "options": [
+      { "value": 0, "label": "Nunca" },
+      { "value": 1, "label": "Rara vez" },
+      { "value": 2, "label": "A veces" },
+      { "value": 3, "label": "Frecuente" },
+      { "value": 4, "label": "Casi siempre" }
+    ],
+    "results": {
+      "healthy": {
+        "category": "Estado saludable",
+        "mission": "Optimización mental",
+        "description": "Rutinas, hábitos y crecimiento personal.",
+        "tasks": [
+          "Ejercicio de respiración 5 minutos",
+          "Diario de gratitud",
+          "Rutina de sueño consistente",
+          "Mini reto de enfoque diario"
+        ]
+      },
+      "mild": {
+        "category": "Estrés leve",
+        "mission": "Regulación emocional",
+        "description": "Respiración, mindfulness y grounding.",
+        "tasks": [
+          "Respiración 4-4-6 por 5 minutos",
+          "Ejercicio grounding 5-4-3-2-1",
+          "Caminar 10 a 20 minutos",
+          "Reducir sobrecarga digital por 1 hora"
+        ]
+      },
+      "moderate": {
+        "category": "Ansiedad / depresión moderada",
+        "mission": "Reprogramación mental",
+        "description": "CBT, exposición gradual y regulación emocional.",
+        "tasks": [
+          "Registrar pensamiento automático negativo",
+          "Reformular una creencia limitante",
+          "Exposición gradual a una situación evitada",
+          "Journaling emocional de 10 minutos"
+        ]
+      },
+      "severe": {
+        "category": "Nivel severo",
+        "mission": "Intervención + apoyo profesional",
+        "description": "Seguimiento cercano, apoyo profesional y evaluación especializada.",
+        "tasks": [
+          "Hablar con una persona de confianza hoy",
+          "Buscar orientación profesional",
+          "Reducir aislamiento",
+          "Crear plan básico de seguridad emocional"
+        ]
       }
     }
   }

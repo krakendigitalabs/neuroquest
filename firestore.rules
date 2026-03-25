@@ -176,6 +176,21 @@ service cloud.firestore {
     }
 
     /**
+     * @description Stores logs of a user's mental check-in assessments.
+     * @path /users/{userId}/mental_checkups/{checkupId}
+     * @allow (create) A user creating a checkup log for themselves: `request.auth.uid == userId`.
+     * @deny (get) A user trying to read another user's checkup logs.
+     * @principle Restricts access to a user's own data tree, with read-only access for assigned therapists.
+     */
+    match /users/{userId}/mental_checkups/{checkupId} {
+      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
+      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
+      allow create: if isOwner(userId) && incomingDataMatchesOwner(userId);
+      allow update: if isExistingOwner(userId) && ownerIsImmutable();
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
      * @description Defines reusable templates for therapeutic exercises.
      *              Read-only for all users, writable only by admins.
      * @path /exerciseTemplates/{templateId}
