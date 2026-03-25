@@ -21,6 +21,8 @@ type PersonalizedMission = {
   type: string;
   difficulty: string;
   xpReward: number;
+  targetBehavior: string;
+  resistanceTarget: string;
 };
 
 type State = {
@@ -104,7 +106,7 @@ export function PersonalizedMissionGenerator() {
   const handleAcceptMission = async () => {
     if (!firestore || !user || !state.personalizedMission) return;
 
-    const { title, description, type, difficulty, xpReward } = state.personalizedMission;
+    const { title, description, type, difficulty, xpReward, targetBehavior, resistanceTarget } = state.personalizedMission;
 
     const missionToSave = {
         title,
@@ -116,8 +118,8 @@ export function PersonalizedMissionGenerator() {
         status: 'active',
         assignedBy: 'AI',
         isAiGenerated: true,
-        targetBehavior: "AI Generated", // Placeholder as AI doesn't provide it yet
-        resistanceTarget: "AI Generated", // Placeholder as AI doesn't provide it yet
+        targetBehavior,
+        resistanceTarget,
         createdAt: serverTimestamp()
     };
 
@@ -145,7 +147,7 @@ export function PersonalizedMissionGenerator() {
       </form>
       
       {state.personalizedMission && !state.error && !missionAccepted && (
-        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
             {state.personalizedMission && (
                 <Card className="bg-secondary/50">
                     <CardHeader>
