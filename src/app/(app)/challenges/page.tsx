@@ -1,0 +1,8 @@
+export default function ChallengesPage() {
+    return (
+      <div>
+        <h1>Challenges</h1>
+        <p>Esta es la página de desafíos</p>
+      </div>
+    );
+  }
