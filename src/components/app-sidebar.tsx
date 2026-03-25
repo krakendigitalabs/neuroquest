@@ -66,16 +66,26 @@ export function AppSidebar() {
           <div className="flex items-center gap-3">
             <UserAvatar />
             <div>
-              <p className="font-semibold">{isProfileLoading ? '...' : (userProfile?.displayName || user?.displayName || t('sidebar.user'))}</p>
-              <p className="text-xs text-muted-foreground">{isProfileLoading ? '...' : userProfile ? t('userProgress.level', { level: userProfile.level }) : t('sidebar.level')}</p>
+              <p className="font-semibold">
+                {isProfileLoading
+                  ? '...'
+                  : userProfile?.displayName || user?.displayName || t('sidebar.user')}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {isProfileLoading
+                  ? '...'
+                  : t('userProgress.level', { level: userProfile?.level ?? 1 })}
+              </p>
             </div>
           </div>
-          <UserProgress 
-            level={isProfileLoading || !userProfile ? t('userProgress.level', { level: 0 }) : t('userProgress.level', { level: userProfile.level })}
+
+          <UserProgress
+            level={isProfileLoading || !userProfile ? 1 : (userProfile.level ?? 1)}
             currentXp={isProfileLoading || !userProfile ? 0 : userProfile.currentXp}
-            xpToNextLevel={isProfileLoading || !userProfile ? 100 : userProfile.xpToNextLevel} 
+            xpToNextLevel={isProfileLoading || !userProfile ? 100 : userProfile.xpToNextLevel}
           />
         </div>
+
         <SidebarMenu>
           {navItems.map((item) => (
             <SidebarMenuItem key={item.href}>
@@ -103,18 +113,37 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+
         <SidebarSeparator />
+
         <div className="p-2 flex gap-1 group-data-[collapsible=icon]:flex-col">
-            <Button variant={locale === 'en' ? 'secondary' : 'ghost'} size="sm" className="flex-1 justify-start" onClick={() => setLocale('en')}>
-                <span className="w-6 h-6 flex items-center justify-center">EN</span>
-                <span className="group-data-[collapsible=icon]:hidden">{t('languageSwitcher.english')}</span>
-            </Button>
-            <Button variant={locale === 'es' ? 'secondary' : 'ghost'} size="sm" className="flex-1 justify-start" onClick={() => setLocale('es')}>
-                <span className="w-6 h-6 flex items-center justify-center">ES</span>
-                <span className="group-data-[collapsible=icon]:hidden">{t('languageSwitcher.spanish')}</span>
-            </Button>
+          <Button
+            variant={locale === 'en' ? 'secondary' : 'ghost'}
+            size="sm"
+            className="flex-1 justify-start"
+            onClick={() => setLocale('en')}
+          >
+            <span className="w-6 h-6 flex items-center justify-center">EN</span>
+            <span className="group-data-[collapsible=icon]:hidden">
+              {t('languageSwitcher.english')}
+            </span>
+          </Button>
+
+          <Button
+            variant={locale === 'es' ? 'secondary' : 'ghost'}
+            size="sm"
+            className="flex-1 justify-start"
+            onClick={() => setLocale('es')}
+          >
+            <span className="w-6 h-6 flex items-center justify-center">ES</span>
+            <span className="group-data-[collapsible=icon]:hidden">
+              {t('languageSwitcher.spanish')}
+            </span>
+          </Button>
         </div>
+
         <SidebarSeparator />
+
         <div className="p-2">
           <CrisisButton />
         </div>

@@ -249,7 +249,7 @@
     "logout": "Cerrar Sesión"
   },
   "userProgress": {
-    "level": "Nivel {level}"
+    "level": "Level {level}"
   },
   "login": {
     "title": "Bienvenido a NeuroQuest",
