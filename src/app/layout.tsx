@@ -12,12 +12,20 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 function AppBody({ children }: { children: React.ReactNode }) {
   const { locale } = useTranslation();
+  const title =
+    locale === 'es'
+      ? 'NeuroQuest | Seguimiento mental con enfoque clínico'
+      : 'NeuroQuest | Mental health follow-up with clinical structure';
+  const description =
+    locale === 'es'
+      ? 'Plataforma digital de seguimiento mental con check-in clínico, observer, progreso longitudinal, soporte de crisis y portal para terapeutas.'
+      : 'A digital mental-health follow-up platform with clinical check-ins, observer workflows, longitudinal progress, crisis support, and a therapist portal.';
 
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
-        <title>NeuroQuest - Your Gamified Mental Wellness Journey</title>
-        <meta name="description" content="Transform your mental wellness journey into a gamified adventure. Conquer OCD and anxiety with NeuroQuest." />
+        <title>{title}</title>
+        <meta name="description" content={description} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
