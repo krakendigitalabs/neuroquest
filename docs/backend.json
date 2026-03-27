@@ -626,6 +626,68 @@
         "riskFlags",
         "professionalNote"
       ]
+    },
+    "MedicalSupportPlan": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Medical Support Plan",
+      "type": "object",
+      "description": "Stores clinician-guided or user-authored medical support plans for a user, including disorder, severity, clinical guidance, and authorship context.",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "disorder": {
+          "type": "string"
+        },
+        "severity": {
+          "type": "string"
+        },
+        "firstLine": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "management": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "note": {
+          "type": "string"
+        },
+        "alert": {
+          "type": "string"
+        },
+        "savedByRole": {
+          "type": "string"
+        },
+        "therapistId": {
+          "type": "string"
+        },
+        "targetPatientName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "userId",
+        "createdAt",
+        "disorder",
+        "severity",
+        "firstLine",
+        "management",
+        "note",
+        "savedByRole"
+      ]
     }
   },
   "auth": {
@@ -845,6 +907,26 @@
             {
               "name": "checkupId",
               "description": "The unique identifier for the checkup."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/medicalSupportPlans/{planId}",
+        "definition": {
+          "entityName": "MedicalSupportPlan",
+          "schema": {
+            "$ref": "#/backend/entities/MedicalSupportPlan"
+          },
+          "description": "Stores saved medical support plans for a user. These plans may be authored by the user directly or by an assigned therapist in patient context, and can be reviewed or updated over time.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who owns the medical support plan."
+            },
+            {
+              "name": "planId",
+              "description": "The unique identifier for the medical support plan."
             }
           ]
         }

@@ -10,5 +10,8 @@ export interface ThoughtRecord {
     associatedEmotion: string;
     intensity: number;
     isIntrusive: boolean;
+    analysis?: string;
+    reframingSuggestion?: string;
+    isTOCRelated?: boolean;
 }
     

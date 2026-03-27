@@ -1,8 +1,16 @@
+'use client';
+
+import { ComingSoonPage } from '@/components/coming-soon-page';
+import { useTranslation } from '@/context/language-provider';
+
 export default function MedicalSupportPage() {
-    return (
-      <div>
-        <h1>Medical Support</h1>
-        <p>Aquí irá el soporte médico</p>
-      </div>
-    );
-  }
+  const { t } = useTranslation();
+
+  return (
+    <ComingSoonPage
+      title={t('upcoming.medicalSupportTitle')}
+      description={t('upcoming.medicalSupportDescription')}
+      backLabel={t('upcoming.backToDashboard')}
+    />
+  );
+}

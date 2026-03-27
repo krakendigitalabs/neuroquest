@@ -65,6 +65,9 @@ export function ThoughtAnalyzer() {
         associatedEmotion: emotion,
         intensity,
         isIntrusive: result.isTOCRelated,
+        isTOCRelated: result.isTOCRelated,
+        analysis: result.analysis,
+        reframingSuggestion: result.reframingSuggestion,
       };
 
       const thoughtsCollection = collection(firestore, 'users', user.uid, 'thoughtRecords');

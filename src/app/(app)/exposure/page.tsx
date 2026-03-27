@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Target, CheckCircle, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -7,10 +8,13 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useTranslation } from '@/context/language-provider';
 import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
-import { collection, doc, runTransaction, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection, doc, runTransaction, serverTimestamp } from 'firebase/firestore';
 import type { ExposureMission } from '@/models/exposure-mission';
 import { WithId } from '@/firebase/firestore/use-collection';
 import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const MissionCard = ({ mission, onComplete }: { mission: WithId<ExposureMission>, onComplete: (missionId: string, xp: number) => void }) => {
   const { t } = useTranslation();
@@ -55,6 +59,13 @@ export default function ExposurePage() {
   const { t } = useTranslation();
   const { firestore, user } = useFirebase();
   const { toast } = useToast();
+  const [showCustomMissionForm, setShowCustomMissionForm] = useState(false);
+  const [missionTitle, setMissionTitle] = useState('');
+  const [missionDescription, setMissionDescription] = useState('');
+  const [difficultyLevel, setDifficultyLevel] = useState('5');
+  const [targetBehavior, setTargetBehavior] = useState('');
+  const [resistanceTarget, setResistanceTarget] = useState('');
+  const [isSavingMission, setIsSavingMission] = useState(false);
 
   const missionsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
@@ -62,6 +73,14 @@ export default function ExposurePage() {
   }, [firestore, user]);
 
   const { data: missions, isLoading } = useCollection<ExposureMission>(missionsQuery);
+
+  const resetCustomMissionForm = () => {
+    setMissionTitle('');
+    setMissionDescription('');
+    setDifficultyLevel('5');
+    setTargetBehavior('');
+    setResistanceTarget('');
+  };
 
   const handleCompleteMission = async (missionId: string, xp: number) => {
     if (!firestore || !user) return;
@@ -112,6 +131,57 @@ export default function ExposurePage() {
     }
   };
 
+  const handleCreateCustomMission = async () => {
+    if (!firestore || !user) return;
+    if (!missionTitle.trim() || !missionDescription.trim() || !targetBehavior.trim() || !resistanceTarget.trim()) {
+      toast({
+        variant: 'destructive',
+        title: t('exposure.customMissionValidationTitle'),
+        description: t('exposure.customMissionValidationDescription'),
+      });
+      return;
+    }
+
+    try {
+      setIsSavingMission(true);
+
+      const parsedDifficulty = Number(difficultyLevel);
+      const xpReward = 20 + parsedDifficulty * 5;
+
+      await addDoc(collection(firestore, 'users', user.uid, 'exposureMissions'), {
+        userId: user.uid,
+        title: missionTitle.trim(),
+        description: missionDescription.trim(),
+        difficultyLevel: parsedDifficulty,
+        status: 'active',
+        xpReward,
+        assignedBy: 'System',
+        targetBehavior: targetBehavior.trim(),
+        resistanceTarget: resistanceTarget.trim(),
+        isAiGenerated: false,
+        missionType: 'exposición',
+        createdAt: serverTimestamp(),
+      } satisfies Omit<ExposureMission, 'id'>);
+
+      toast({
+        title: t('exposure.customMissionCreatedTitle'),
+        description: t('exposure.customMissionCreatedDescription'),
+      });
+
+      resetCustomMissionForm();
+      setShowCustomMissionForm(false);
+    } catch (error) {
+      console.error('Failed to create custom mission:', error);
+      toast({
+        variant: 'destructive',
+        title: t('exposure.customMissionFailedTitle'),
+        description: t('exposure.customMissionFailedDescription'),
+      });
+    } finally {
+      setIsSavingMission(false);
+    }
+  };
+
   const availableMissions = missions?.filter(m => m.status === 'active' || m.status === 'pending') ?? [];
   const completedMissions = missions?.filter(m => m.status === 'completed') ?? [];
 
@@ -123,13 +193,67 @@ export default function ExposurePage() {
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
         <h1 className="text-3xl font-bold tracking-tight font-headline">{t('exposure.title')}</h1>
-        <Button>
+        <Button onClick={() => setShowCustomMissionForm((value) => !value)}>
           <Plus className="mr-2 h-4 w-4" /> {t('exposure.customMission')}
         </Button>
       </div>
       <p className="text-muted-foreground">
         {t('exposure.description')}
       </p>
+
+      {showCustomMissionForm && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('exposure.customMissionFormTitle')}</CardTitle>
+            <CardDescription>{t('exposure.customMissionFormDescription')}</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2 md:col-span-2">
+              <p className="text-sm font-medium">{t('exposure.customMissionTitleLabel')}</p>
+              <Input value={missionTitle} onChange={(event) => setMissionTitle(event.target.value)} />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <p className="text-sm font-medium">{t('exposure.customMissionDescriptionLabel')}</p>
+              <Textarea value={missionDescription} onChange={(event) => setMissionDescription(event.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm font-medium">{t('exposure.customMissionDifficultyLabel')}</p>
+              <Select value={difficultyLevel} onValueChange={setDifficultyLevel}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="2">{t('exposure.difficultyEasy')}</SelectItem>
+                  <SelectItem value="5">{t('exposure.difficultyMedium')}</SelectItem>
+                  <SelectItem value="8">{t('exposure.difficultyHard')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm font-medium">{t('exposure.customMissionBehaviorLabel')}</p>
+              <Input value={targetBehavior} onChange={(event) => setTargetBehavior(event.target.value)} />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <p className="text-sm font-medium">{t('exposure.customMissionResistanceLabel')}</p>
+              <Input value={resistanceTarget} onChange={(event) => setResistanceTarget(event.target.value)} />
+            </div>
+            <div className="flex gap-3 md:col-span-2">
+              <Button onClick={handleCreateCustomMission} disabled={isSavingMission}>
+                {isSavingMission ? t('exposure.customMissionSaving') : t('exposure.customMissionCreateButton')}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  resetCustomMissionForm();
+                  setShowCustomMissionForm(false);
+                }}
+              >
+                {t('exposure.customMissionCancel')}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="my-6">
         <Card>
@@ -148,6 +272,7 @@ export default function ExposurePage() {
           <h2 className="text-2xl font-bold tracking-tight font-headline mb-4">{t('exposure.availableMissions')}</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {isLoading && <p>{t('loading')}</p>}
+            {!isLoading && availableMissions.length === 0 && <p>{t('exposure.noAvailableMissions')}</p>}
             {availableMissions.map((mission) => <MissionCard key={mission.id} mission={mission} onComplete={handleCompleteMission} />)}
           </div>
         </div>
@@ -155,6 +280,7 @@ export default function ExposurePage() {
         <div>
           <h2 className="text-2xl font-bold tracking-tight font-headline mb-4">{t('exposure.completedMissions')}</h2>
           <div className="grid gap-4 md:grid-cols-2">
+            {!isLoading && completedMissions.length === 0 && <p>{t('exposure.noCompletedMissions')}</p>}
             {completedMissions.map((mission) => <MissionCard key={mission.id} mission={mission} onComplete={handleCompleteMission} />)}
           </div>
         </div>

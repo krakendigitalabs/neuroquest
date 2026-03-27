@@ -203,6 +203,20 @@ service cloud.firestore {
     }
 
     /**
+     * @description Stores clinician-guided medical support plans for a user.
+     *              Plans may be authored by the user or by their assigned therapist.
+     * @path /users/{userId}/medicalSupportPlans/{planId}
+     * @principle Allows collaborative care documentation while keeping records scoped to the patient.
+     */
+    match /users/{userId}/medicalSupportPlans/{planId} {
+      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
+      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
+      allow create: if (isOwner(userId) || isTherapistOfUser(userId) || isAdmin()) && incomingDataMatchesOwner(userId);
+      allow update: if (isExistingOwner(userId) || isTherapistOfUser(userId) || isAdmin()) && ownerIsImmutable();
+      allow delete: if isExistingOwner(userId) || isAdmin();
+    }
+
+    /**
      * @description Defines reusable templates for therapeutic exercises.
      *              Read-only for all users, writable only by admins.
      * @path /exerciseTemplates/{templateId}
