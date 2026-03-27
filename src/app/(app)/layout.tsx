@@ -34,6 +34,10 @@ function UserProfileInitializer({ user }: { user: User }) {
           isAnonymous: user.isAnonymous,
           createdAt: serverTimestamp(),
           therapistIds: [],
+          latestCheckInScore: 0,
+          latestCheckInLevel: 'healthy',
+          latestCheckInAt: null,
+          latestCheckInNote: '',
         };
         setDocumentNonBlocking(userRef, newUserProfile, { merge: false });
       }

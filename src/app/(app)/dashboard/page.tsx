@@ -30,13 +30,13 @@ export default function DashboardPage() {
   const xpEarned = userProfile?.currentXp ?? 0;
   const missionsCompleted = missions?.filter(m => m.status === 'completed').length ?? 0;
   const thoughtsIdentified = thoughts?.length ?? 0;
-  const compulsionsResisted = 0; // This is not tracked yet.
+  const latestCheckInScore = userProfile?.latestCheckInScore ?? null;
 
   const isLoading = isProfileLoading || areMissionsLoading || areThoughtsLoading;
 
   const stats = [
     { title: t('dashboard.xpEarned'), value: isLoading ? '...' : xpEarned.toLocaleString(), icon: <Award className="h-6 w-6 text-primary" /> },
-    { title: t('dashboard.compulsionsResisted'), value: isLoading ? '...' : compulsionsResisted, icon: <ShieldAlert className="h-6 w-6 text-primary" /> },
+    { title: t('dashboard.latestCheckIn'), value: isLoading ? '...' : latestCheckInScore !== null ? `${latestCheckInScore}/20` : t('dashboard.noCheckInYet'), icon: <ShieldAlert className="h-6 w-6 text-primary" /> },
     { title: t('dashboard.thoughtsIdentified'), value: isLoading ? '...' : thoughtsIdentified, icon: <BrainCircuit className="h-6 w-6 text-primary" /> },
     { title: t('dashboard.missionsCompleted'), value: isLoading ? '...' : missionsCompleted, icon: <Target className="h-6 w-6 text-primary" /> },
   ];

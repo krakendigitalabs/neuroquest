@@ -19,6 +19,8 @@
     "welcome": "¡Bienvenido de nuevo, Explorador!",
     "xpEarned": "XP Ganados",
     "compulsionsResisted": "Compulsiones Resistidas",
+    "latestCheckIn": "Último Check-In",
+    "noCheckInYet": "Sin check-in aún",
     "thoughtsIdentified": "Pensamientos Identificados",
     "missionsCompleted": "Misiones Completadas",
     "nextMissionTitle": "Tu Próxima Misión Personalizada",
@@ -103,7 +105,9 @@
     "generalThought": "Pensamiento General",
     "reframingSuggestion": "Sugerencia de Reencuadre",
     "example": "Ejemplo:",
-    "analysis": "Análisis"
+    "analysis": "Análisis",
+    "emotionPrompt": "¿Cómo te estás sintiendo?",
+    "intensityPrompt": "¿Qué tan intenso es?"
   },
   "observer": {
     "title": "Observador Mental",
@@ -118,7 +122,14 @@
     "label": "Etiqueta",
     "loadingThoughts": "Cargando pensamientos...",
     "emotions": {
-      "unknown": "Desconocida"
+      "unknown": "Desconocida",
+      "anxiety": "Ansiedad",
+      "fear": "Miedo",
+      "sadness": "Tristeza",
+      "guilt": "Culpa",
+      "anger": "Rabia",
+      "shame": "Vergüenza",
+      "confusion": "Confusión"
     },
     "labels": {
       "pensamiento_toc": "Pensamiento TOC",
@@ -130,6 +141,23 @@
   "progress": {
     "title": "Tu Progreso",
     "description": "Visualiza tu viaje. Sigue tus estadísticas para ver cuán lejos has llegado.",
+    "missionCompletionRate": "Tasa de Misiones Completadas",
+    "missionCompletionRateChange": "{value} misiones completadas vs la semana pasada",
+    "weeklyCheckInScore": "Puntaje Semanal de Check-In",
+    "weeklyCheckInChange": "{value} puntos vs la semana pasada",
+    "thoughtsLogged": "Pensamientos Registrados Esta Semana",
+    "thoughtsLoggedChange": "{value} pensamientos vs la semana pasada",
+    "checkInTrendTitle": "Tendencia de Check-Ins",
+    "checkInTrendDescription": "Tus últimos puntajes de chequeo mental guardados en Firestore.",
+    "missionStatusTitle": "Estado Actual de Misiones",
+    "missionStatusDescription": "Desglose actual de tus misiones de exposición por estado.",
+    "checkInScore": "Puntaje de Check-In",
+    "completed": "Completadas",
+    "active": "Activas",
+    "pending": "Pendientes",
+    "failed": "Fallidas",
+    "currentSnapshot": "Actual",
+    "entryLabel": "Registro",
     "fortitude": "Fortaleza Mental",
     "fortitudeChange": "+{value}% desde el mes pasado",
     "weeklyAnxiety": "Ansiedad Semanal",
@@ -222,8 +250,31 @@
     "activeThisWeekDesc": "Alta tasa de participación",
     "needsAttention": "Necesita Atención",
     "needsAttentionDesc": "Pacientes con ansiedad en aumento",
+    "averageLatestCheckIn": "Promedio del Último Check-In",
+    "averageLatestCheckInDesc": "Promedio del puntaje más reciente de cada paciente",
     "managePatients": "Gestiona a tus pacientes y mira su progreso.",
     "name": "Nombre",
+    "level": "Nivel",
+    "latestCheckIn": "Último Check-In",
+    "selectedPatient": "Paciente Seleccionado",
+    "latestMissionSummary": "Resumen de Misiones",
+    "recentThoughts": "Pensamientos Recientes",
+    "recentThoughtsDesc": "Últimos registros mentales de este paciente.",
+    "recentMissions": "Misiones Recientes",
+    "recentMissionsDesc": "Últimas misiones ERP de este paciente.",
+    "noThoughtsYet": "Aún no hay pensamientos registrados.",
+    "noMissionsYet": "Aún no hay misiones registradas.",
+    "completed": "Completadas",
+    "activeMissions": "Activas",
+    "searchPatients": "Buscar por nombre o correo",
+    "filterByStatus": "Filtrar por estado",
+    "noCheckInYet": "Sin check-in aún",
+    "noRecentActivity": "Sin actividad reciente",
+    "noPatientsAssigned": "No hay pacientes asignados actualmente a este terapeuta.",
+    "noPatientsMatchFilters": "Ningún paciente coincide con los filtros actuales.",
+    "totalPatientsRealDesc": "Conteo en vivo desde perfiles asignados",
+    "activeThisWeekRealDesc": "Pacientes con check-in en los últimos 7 días",
+    "needsAttentionRealDesc": "Pacientes cuyo último check-in es severo",
     "condition": "Condición",
     "status": "Estado",
     "progress": "Progreso",
@@ -240,6 +291,11 @@
     "statuses": {
       "active": "Activo",
       "needs_attention": "Necesita Atención"
+    },
+    "filters": {
+      "all": "Todos los pacientes",
+      "active": "Activos",
+      "needs_attention": "Necesitan atención"
     }
   },
   "sidebar": {
@@ -466,88 +522,112 @@
       "4": "Priorizar urgencias si hay crisis, riesgo de auto o heteroagresión."
     }
   },
-    "checkIn": {
-    "title": "Chequeo Mental",
-    "subtitle": "Evalúa tu estado emocional y recibe una misión personalizada para mejorar tu bienestar mental.",
-    "subtitle_marketing": "Descubre cómo está tu mente hoy y qué hacer para mejorarla paso a paso.",
-    "importantTitle": "Importante",
-    "importantText": "Esta herramienta no reemplaza un diagnóstico médico ni psicológico. Es una guía de autoevaluación y orientación.",
-    "submitButton": "Ver mi resultado",
-    "resultTitle": "Tu Resultado",
-    "restartButton": "Volver a evaluar",
-    "totalScore": "Puntaje total",
-    "category": "Resultado",
-    "assignedMission": "Misión Asignada",
-    "dailyMission": "Misión Diaria Personalizada",
-    "alertTitle": "Alerta Importante",
-    "alertText": "Tu respuesta sugiere malestar significativo o posible riesgo emocional. Busca apoyo profesional lo antes posible y contacta a una persona de confianza ahora mismo.",
-    "disclaimerTitle": "Orientación",
-    "disclaimerText": "Esta herramienta ofrece orientación general basada en síntomas autoinformados. No sustituye un diagnóstico médico, psiquiátrico o psicológico profesional.",
-    "validationError": "Por favor, responde todas las preguntas antes de continuar.",
-    "questions": [
-      { "id": 1, "text": "¿Te sientes nervioso, ansioso o en tensión sin razón clara?" },
-      { "id": 2, "text": "¿Has perdido interés o placer en actividades que antes disfrutabas?" },
-      { "id": 3, "text": "¿Tienes dificultad para dormir o duermes demasiado?" },
-      { "id": 4, "text": "¿Te sientes cansado o sin energía la mayor parte del tiempo?" },
-      { "id": 5, "text": "¿Te cuesta concentrarte o tomar decisiones simples?" },
-      { "id": 6, "text": "¿Te sientes triste, vacío o sin esperanza?" },
-      { "id": 7, "text": "¿Te irritas fácilmente o reaccionas de forma exagerada?" },
-      { "id": 8, "text": "¿Evitas situaciones sociales o actividades importantes?" },
-      { "id": 9, "text": "¿Sientes pensamientos negativos recurrentes sobre ti mismo?" },
-      { "id": 10, "text": "¿Has tenido pensamientos de hacerte daño o rendirte?" }
-    ],
-    "options": [
-      { "value": 0, "label": "Nunca" },
-      { "value": 1, "label": "Rara vez" },
-      { "value": 2, "label": "A veces" },
-      { "value": 3, "label": "Frecuente" },
-      { "value": 4, "label": "Casi siempre" }
-    ],
-    "results": {
-      "healthy": {
-        "category": "Estado saludable",
-        "mission": "Optimización mental",
-        "description": "Rutinas, hábitos y crecimiento personal.",
-        "tasks": [
-          "Ejercicio de respiración 5 minutos",
-          "Diario de gratitud",
-          "Rutina de sueño consistente",
-          "Mini reto de enfoque diario"
-        ]
-      },
-      "mild": {
-        "category": "Estrés leve",
-        "mission": "Regulación emocional",
-        "description": "Respiración, mindfulness y grounding.",
-        "tasks": [
-          "Respiración 4-4-6 por 5 minutos",
-          "Ejercicio grounding 5-4-3-2-1",
-          "Caminar 10 a 20 minutos",
-          "Reducir sobrecarga digital por 1 hora"
-        ]
-      },
-      "moderate": {
-        "category": "Ansiedad / depresión moderada",
-        "mission": "Reprogramación mental",
-        "description": "CBT, exposición gradual y regulación emocional.",
-        "tasks": [
-          "Registrar pensamiento automático negativo",
-          "Reformular una creencia limitante",
-          "Exposición gradual a una situación evitada",
-          "Journaling emocional de 10 minutos"
-        ]
-      },
-      "severe": {
-        "category": "Nivel severo",
-        "mission": "Intervención + apoyo profesional",
-        "description": "Seguimiento cercano, apoyo profesional y evaluación especializada.",
-        "tasks": [
-          "Hablar con una persona de confianza hoy",
-          "Buscar orientación profesional",
-          "Reducir aislamiento",
-          "Crear plan básico de seguridad emocional"
-        ]
-      }
-    }
+   "checkIn": {
+  "title": "Chequeo Mental",
+  "subtitle": "Registra cómo te sientes hoy.",
+  "moodLabel": "Estado de ánimo",
+  "anxietyLabel": "Nivel de ansiedad",
+  "energyLabel": "Nivel de energía",
+  "sleepLabel": "Horas de sueño",
+  "notesLabel": "Notas",
+  "notesPlaceholder": "Escribe cómo te sientes, qué pasó hoy o cualquier observación...",
+  "saveButton": "Guardar Check-In",
+  "savedMessage": "Check-In guardado correctamente.",
+  "moods": {
+    "veryBad": "Muy mal",
+    "bad": "Mal",
+    "neutral": "Neutral",
+    "good": "Bien",
+    "veryGood": "Muy bien"
+  },
+  "subtitle_marketing": "Descubre cómo está tu mente hoy y qué hacer para mejorarla paso a paso.",
+  "importantTitle": "Importante",
+  "importantText": "Esta herramienta no reemplaza un diagnóstico médico ni psicológico. Es una guía de autoevaluación y orientación.",
+  "submitButton": "Ver mi resultado",
+  "resultTitle": "Tu Resultado",
+  "restartButton": "Volver a evaluar",
+  "totalScore": "Puntaje total",
+  "category": "Resultado",
+  "assignedMission": "Misión Asignada",
+  "dailyMission": "Misión Diaria Personalizada",
+  "alertTitle": "Alerta Importante",
+  "alertText": "Tu respuesta sugiere malestar significativo o posible riesgo emocional. Busca apoyo profesional lo antes posible y contacta a una persona de confianza ahora mismo.",
+  "disclaimerTitle": "Orientación",
+  "disclaimerText": "Esta herramienta ofrece orientación general basada en síntomas autoinformados. No sustituye un diagnóstico médico, psiquiátrico o psicológico profesional.",
+  "defaultProfessionalNote": "El usuario completó un chequeo mental autoguiado.",
+  "familySupportRecommendation": "Comparte tu estado emocional actual con un familiar de confianza.",
+  "partnerSupportRecommendation": "Pide a tu pareja o red de apoyo ayuda emocional práctica esta semana.",
+  "workSupportRecommendation": "Protege tu rutina de trabajo manteniendo un bloque de enfoque sin multitarea.",
+  "workReliefRecommendation": "Reduce la presión laboral y divide las tareas complejas en pasos pequeños.",
+  "studySupportRecommendation": "Mantén sesiones de estudio cortas y estructuradas con una hora de cierre clara.",
+  "studyReliefRecommendation": "Reduce la carga cognitiva y prioriza solo las tareas de estudio esenciales hoy.",
+  "exerciseRecommendation": "Haz una caminata corta o movimiento suave para regular tu sistema nervioso.",
+  "readingRecommendation": "Revisa un recurso de grounding o TCC que te ayude a bajar el ritmo y replantear pensamientos.",
+  "validationError": "Por favor, responde todas las preguntas antes de continuar.",
+  "questions": [
+    { "id": 1, "text": "¿Te sientes nervioso, ansioso o en tensión sin razón clara?" },
+    { "id": 2, "text": "¿Has perdido interés o placer en actividades que antes disfrutabas?" },
+    { "id": 3, "text": "¿Tienes dificultad para dormir o duermes demasiado?" },
+    { "id": 4, "text": "¿Te sientes cansado o sin energía la mayor parte del tiempo?" },
+    { "id": 5, "text": "¿Te cuesta concentrarte o tomar decisiones simples?" },
+    { "id": 6, "text": "¿Te sientes triste, vacío o sin esperanza?" },
+    { "id": 7, "text": "¿Te irritas fácilmente o reaccionas de forma exagerada?" },
+    { "id": 8, "text": "¿Evitas situaciones sociales o actividades importantes?" },
+    { "id": 9, "text": "¿Sientes pensamientos negativos recurrentes sobre ti mismo?" },
+    { "id": 10, "text": "¿Has tenido pensamientos de hacerte daño o rendirte?" }
+  ],
+ "options": [
+  { "value": 0, "label": "Nunca" },
+  { "value": 1, "label": "Rara vez" },
+  { "value": 2, "label": "A veces" },
+  { "value": 3, "label": "Frecuente" },
+  { "value": 4, "label": "Casi siempre" }
+],
+"results": {
+  "healthy": {
+    "category": "Estado saludable",
+    "mission": "Optimización mental",
+    "description": "Rutinas, hábitos y crecimiento personal.",
+    "tasks": [
+      "Ejercicio de respiración 5 minutos",
+      "Diario de gratitud",
+      "Rutina de sueño consistente",
+      "Mini reto de enfoque diario"
+    ]
+  },
+  "mild": {
+    "category": "Estrés leve",
+    "mission": "Regulación emocional",
+    "description": "Respiración, mindfulness y grounding.",
+    "tasks": [
+      "Respiración 4-4-6 por 5 minutos",
+      "Ejercicio grounding 5-4-3-2-1",
+      "Caminar 10 a 20 minutos",
+      "Reducir sobrecarga digital por 1 hora"
+    ]
+  },
+  "moderate": {
+    "category": "Ansiedad / depresión moderada",
+    "mission": "Reprogramación mental",
+    "description": "CBT, exposición gradual y regulación emocional.",
+    "tasks": [
+      "Registrar pensamiento automático negativo",
+      "Reformular una creencia limitante",
+      "Exposición gradual a una situación evitada",
+      "Journaling emocional de 10 minutos"
+    ]
+  },
+  "severe": {
+    "category": "Nivel severo",
+    "mission": "Intervención + apoyo profesional",
+    "description": "Seguimiento cercano, apoyo profesional y evaluación especializada.",
+    "tasks": [
+      "Hablar con una persona de confianza hoy",
+      "Buscar orientación profesional",
+      "Reducir aislamiento",
+      "Crear plan básico de seguridad emocional"
+    ]
   }
+}
+}
 }
