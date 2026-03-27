@@ -21,16 +21,15 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useTranslation } from '@/context/language-provider';
-import { useAdmin } from '@/hooks/use-admin';
+import { useTherapistAccess } from '@/hooks/use-therapist-access';
 import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
 import type { ExposureMission } from '@/models/exposure-mission';
 import type { ThoughtRecord } from '@/models/thought-record';
 import type { UserProfile } from '@/models/user';
-import { getPatientStatus } from '@/app/therapist/_lib/therapist-utils';
+import { CHECK_IN_MAX_SCORE } from '@/lib/mental-check-in';
+import { getLatestPatientActivityDate, getPatientStatus } from '@/app/therapist/_lib/therapist-utils';
 import { buildThoughtInsights, getThoughtRiskLevel, toDate } from '@/lib/thought-insights';
 import { normalizeThoughtRecords } from '@/lib/thought-records';
-
-const CHECK_IN_MAX_SCORE = 21;
 
 function translateLabel(t: (key: string) => string, label?: string) {
   if (!label) return '';
@@ -46,19 +45,9 @@ function translateEmotion(t: (key: string) => string, emotion?: string) {
   return translation === key ? emotion : translation;
 }
 
-function getLatestActivityDate(patient: UserProfile) {
-  const latestCheckIn = toDate(patient.latestCheckInAt);
-  const latestThought = toDate(patient.latestThoughtAt);
-
-  if (!latestCheckIn) return latestThought;
-  if (!latestThought) return latestCheckIn;
-
-  return latestCheckIn > latestThought ? latestCheckIn : latestThought;
-}
-
 export default function TherapistDashboard() {
   const { t, locale } = useTranslation();
-  const { isAdmin, isLoading } = useAdmin();
+  const { hasTherapistAccess, isLoading } = useTherapistAccess();
   const { firestore, user } = useFirebase();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
@@ -66,36 +55,36 @@ export default function TherapistDashboard() {
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
 
   const patientsQuery = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
+    if (!firestore || !user || !hasTherapistAccess) return null;
     return query(collection(firestore, 'users'), where('therapistIds', 'array-contains', user.uid));
-  }, [firestore, user]);
+  }, [firestore, hasTherapistAccess, user]);
   const { data: patients, isLoading: arePatientsLoading } = useCollection<UserProfile>(patientsQuery);
 
   const thoughtsQuery = useMemoFirebase(() => {
-    if (!firestore || !selectedPatientId) return null;
+    if (!firestore || !selectedPatientId || !hasTherapistAccess) return null;
     return collection(firestore, 'users', selectedPatientId, 'thoughtRecords');
-  }, [firestore, selectedPatientId]);
+  }, [firestore, hasTherapistAccess, selectedPatientId]);
   const { data: thoughts, isLoading: areThoughtsLoading } = useCollection<ThoughtRecord>(thoughtsQuery);
   const normalizedThoughts = useMemo(() => normalizeThoughtRecords(thoughts), [thoughts]);
 
   const missionsQuery = useMemoFirebase(() => {
-    if (!firestore || !selectedPatientId) return null;
+    if (!firestore || !selectedPatientId || !hasTherapistAccess) return null;
     return collection(firestore, 'users', selectedPatientId, 'exposureMissions');
-  }, [firestore, selectedPatientId]);
+  }, [firestore, hasTherapistAccess, selectedPatientId]);
   const { data: missions, isLoading: areMissionsLoading } = useCollection<ExposureMission>(missionsQuery);
 
   useEffect(() => {
-    if (!isLoading && !isAdmin) {
+    if (!isLoading && !hasTherapistAccess) {
       router.push('/dashboard');
     }
-  }, [isAdmin, isLoading, router]);
+  }, [hasTherapistAccess, isLoading, router]);
 
   const patientRows = useMemo(
     () =>
       (patients ?? []).map((patient) => {
         const progressValue = patient.xpToNextLevel > 0 ? (patient.currentXp / patient.xpToNextLevel) * 100 : 0;
         const hasCheckIn = !!patient.latestCheckInAt;
-        const lastActivityDate = getLatestActivityDate(patient);
+        const lastActivityDate = getLatestPatientActivityDate(patient);
         return {
           ...patient,
           hasCheckIn,
@@ -172,7 +161,7 @@ export default function TherapistDashboard() {
       ).toFixed(1)
     : null;
 
-  if (isLoading || !isAdmin || arePatientsLoading || areThoughtsLoading || areMissionsLoading) {
+  if (isLoading || arePatientsLoading || areThoughtsLoading || areMissionsLoading) {
     return <div>{t('loading')}</div>;
   }
 

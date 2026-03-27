@@ -6,13 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Logo } from '@/components/logo';
 import { useTranslation } from '@/context/language-provider';
-import { useAdmin } from '@/hooks/use-admin';
+import { useTherapistAccess } from '@/hooks/use-therapist-access';
 import { useUser } from '@/firebase';
 
 export default function Home() {
   const { t } = useTranslation();
   const { user } = useUser();
-  const { isAdmin } = useAdmin();
+  const { hasTherapistAccess } = useTherapistAccess();
 
   const features = [
     {
@@ -45,7 +45,7 @@ export default function Home() {
           <span className="sr-only">NeuroQuest</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          {isAdmin && (
+          {hasTherapistAccess && (
             <Link
               href="/therapist"
               className="text-sm font-medium hover:underline underline-offset-4"

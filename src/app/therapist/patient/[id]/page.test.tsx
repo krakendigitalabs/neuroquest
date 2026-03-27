@@ -6,8 +6,8 @@ import TherapistPatientDetailPage from './page';
 const pushMock = vi.fn();
 const useCollectionMock = vi.fn();
 const useDocMock = vi.fn();
-const useAdminMock = vi.fn();
 const useFirebaseMock = vi.fn();
+const useTherapistAccessMock = vi.fn();
 
 vi.mock('next/link', () => ({
   default: ({ children, href }: { children: React.ReactNode; href: string }) => <a href={href}>{children}</a>,
@@ -23,8 +23,8 @@ vi.mock('firebase/firestore', () => ({
   doc: (_firestore: unknown, ...segments: string[]) => ({ path: segments.join('/') }),
 }));
 
-vi.mock('@/hooks/use-admin', () => ({
-  useAdmin: () => useAdminMock(),
+vi.mock('@/hooks/use-therapist-access', () => ({
+  useTherapistAccess: () => useTherapistAccessMock(),
 }));
 
 vi.mock('@/firebase', () => ({
@@ -95,7 +95,12 @@ vi.mock('@/components/logo', () => ({
 describe('TherapistPatientDetailPage', () => {
   beforeEach(() => {
     pushMock.mockReset();
-    useAdminMock.mockReturnValue({ isAdmin: true, isLoading: false });
+    useTherapistAccessMock.mockReturnValue({
+      hasTherapistAccess: true,
+      isAdmin: false,
+      isLoading: false,
+      isTherapist: true,
+    });
     useFirebaseMock.mockReturnValue({ firestore: {}, user: { uid: 'therapist-1' } });
     useDocMock.mockImplementation((ref: { path: string }) => {
       if (ref.path === 'users/patient-1') {
@@ -130,7 +135,7 @@ describe('TherapistPatientDetailPage', () => {
               resultTitle: 'Severe OCD signal',
               level: 'severe',
               score: 18,
-              maxScore: 21,
+              maxScore: 40,
               summary: 'Escalating contamination obsessions',
               professionalNote: 'Needs ERP follow-up',
             },
@@ -185,10 +190,24 @@ describe('TherapistPatientDetailPage', () => {
 
     expect(screen.getByText('Pat Doe')).toBeInTheDocument();
     expect(screen.getByText('pat@example.com')).toBeInTheDocument();
-    expect(screen.getByText('18/21')).toBeInTheDocument();
+    expect(screen.getByText('18/40')).toBeInTheDocument();
     expect(screen.getAllByText('I will contaminate everyone')).toHaveLength(2);
     expect(screen.getByText('Touch the doorknob once')).toBeInTheDocument();
     expect(screen.getByText('High')).toBeInTheDocument();
     expect(screen.getAllByText('Needs attention')).toHaveLength(2);
+  });
+
+  it('allows therapist access without requiring admin role', () => {
+    useTherapistAccessMock.mockReturnValue({
+      hasTherapistAccess: true,
+      isAdmin: false,
+      isLoading: false,
+      isTherapist: true,
+    });
+
+    render(<TherapistPatientDetailPage />);
+
+    expect(pushMock).not.toHaveBeenCalledWith('/dashboard');
+    expect(screen.getAllByText('Pat Doe').length).toBeGreaterThan(0);
   });
 });

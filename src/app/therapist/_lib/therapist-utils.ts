@@ -1,3 +1,5 @@
+import type { UserProfile } from '@/models/user';
+
 export function toDate(value: unknown): Date | null {
   if (!value) return null;
   if (value instanceof Date) return value;
@@ -18,4 +20,14 @@ export function toDate(value: unknown): Date | null {
 
 export function getPatientStatus(level?: string) {
   return level === 'severe' ? 'needs_attention' : 'active';
+}
+
+export function getLatestPatientActivityDate(patient: Pick<UserProfile, 'latestCheckInAt' | 'latestThoughtAt'>) {
+  const latestCheckIn = toDate(patient.latestCheckInAt);
+  const latestThought = toDate(patient.latestThoughtAt);
+
+  if (!latestCheckIn) return latestThought;
+  if (!latestThought) return latestCheckIn;
+
+  return latestCheckIn > latestThought ? latestCheckIn : latestThought;
 }

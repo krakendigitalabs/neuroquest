@@ -132,7 +132,10 @@ export default function DashboardPage() {
                   <p className="mt-1 text-sm text-muted-foreground">
                     {t('dashboard.crisisBannerDescription')}
                   </p>
-                  <div className="mt-3">
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Button asChild variant="outline" size="sm">
+                      <Link href="/medical-support">{t('therapist.openMedicalSupport')}</Link>
+                    </Button>
                     <Button asChild variant="destructive" size="sm">
                       <Link href="/crisis">{t('sidebar.crisisSupport')}</Link>
                     </Button>

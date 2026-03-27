@@ -11,16 +11,10 @@ import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
 import { useTranslation } from '@/context/language-provider';
 import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
 import { useUserProfile } from '@/hooks/use-user-profile';
-import { getCheckInTrendLabel } from '@/lib/mental-check-in';
 import type { MentalCheckup } from '@/models/mental-checkup';
 import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import type { TooltipProps } from 'recharts';
-import { normalizeProgressCheckups } from '@/lib/progress-checkups';
-
-function average(numbers: number[]) {
-  if (!numbers.length) return 0;
-  return numbers.reduce((sum, value) => sum + value, 0) / numbers.length;
-}
+import { getProgressMetrics, normalizeProgressCheckups } from '@/lib/progress-checkups';
 
 const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
   if (active && payload && payload.length) {
@@ -52,18 +46,11 @@ export default function ProgressPage() {
   const { data: checkups } = useCollection<MentalCheckup>(checkupsQuery);
 
   const sortedCheckups = useMemo(() => normalizeProgressCheckups(checkups), [checkups]);
-
-  const latestCheckup = sortedCheckups[0] ?? null;
-  const latestFive = sortedCheckups.slice(0, 5);
-  const latestAverage = Math.round(average(sortedCheckups.slice(0, 5).map((checkup) => checkup.score)) * 10) / 10;
-  const previousAverage = Math.round(average(sortedCheckups.slice(5, 10).map((checkup) => checkup.score)) * 10) / 10;
-  const trendDirection = getCheckInTrendLabel(latestAverage, previousAverage);
-  const trendDelta = Math.round((latestAverage - previousAverage) * 10) / 10;
+  const metrics = useMemo(() => getProgressMetrics(sortedCheckups), [sortedCheckups]);
 
   const trendData = useMemo(() => (
-    [...sortedCheckups]
+    [...metrics.trendData]
       .reverse()
-      .slice(-7)
       .map((checkup, index) => {
         return {
           day: checkup.createdAt
@@ -72,13 +59,30 @@ export default function ProgressPage() {
           score: checkup.score,
         };
       })
-  ), [locale, sortedCheckups, t]);
+  ), [locale, metrics.trendData, t]);
 
   const chartConfig = {
     score: { label: t('progress.checkInScore'), color: 'hsl(var(--destructive))' },
   };
   const generatedAt = useMemo(() => new Date(), []);
   const reportPatient = userProfile?.displayName || user?.displayName || user?.email || t('sidebar.guestUser');
+  const reportClinicalSummary = useMemo(() => {
+    if (!metrics.latestLevel) {
+      return t('progress.reportClinicalSummaryEmpty');
+    }
+
+    if (!metrics.trendDirection || metrics.trendDelta === null) {
+      return t('progress.reportClinicalSummaryNoTrend', {
+        level: t(`checkIn.results.${metrics.latestLevel}.category`),
+      });
+    }
+
+    return t('progress.reportClinicalSummaryWithTrend', {
+      level: t(`checkIn.results.${metrics.latestLevel}.category`),
+      trend: t(`progress.trendStates.${metrics.trendDirection}`).toLowerCase(),
+      delta: metrics.trendDelta.toLocaleString(locale),
+    });
+  }, [locale, metrics.latestLevel, metrics.trendDelta, metrics.trendDirection, t]);
 
   const handlePrint = () => {
     window.print();
@@ -102,7 +106,9 @@ export default function ProgressPage() {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{latestAverage.toLocaleString(locale)}</div>
+            <div className="text-2xl font-bold">
+              {metrics.latestAverage !== null ? metrics.latestAverage.toLocaleString(locale) : t('progress.noCheckInsYet')}
+            </div>
             <p className="text-xs text-muted-foreground">{t('progress.averageScoreDescription')}</p>
           </CardContent>
         </Card>
@@ -110,17 +116,23 @@ export default function ProgressPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t('progress.trendTitle')}</CardTitle>
-            {trendDirection === 'up' ? (
+            {metrics.trendDirection === 'up' ? (
               <TrendingUp className="h-4 w-4 text-destructive" />
-            ) : trendDirection === 'down' ? (
+            ) : metrics.trendDirection === 'down' ? (
               <TrendingDown className="h-4 w-4 text-primary" />
             ) : (
               <LineChart className="h-4 w-4 text-muted-foreground" />
             )}
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{t(`progress.trendStates.${trendDirection}`)}</div>
-            <p className="text-xs text-muted-foreground">{t('progress.trendDescription', { value: trendDelta.toLocaleString(locale) })}</p>
+            <div className="text-2xl font-bold">
+              {metrics.trendDirection ? t(`progress.trendStates.${metrics.trendDirection}`) : t('progress.trendUnavailableTitle')}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {metrics.trendDelta !== null
+                ? t('progress.trendDescription', { value: metrics.trendDelta.toLocaleString(locale) })
+                : t('progress.trendUnavailableDescription')}
+            </p>
           </CardContent>
         </Card>
 
@@ -131,7 +143,7 @@ export default function ProgressPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {latestCheckup ? t(`checkIn.results.${latestCheckup.level}.category`) : t('progress.noCheckInsYet')}
+              {metrics.latestLevel ? t(`checkIn.results.${metrics.latestLevel}.category`) : t('progress.noCheckInsYet')}
             </div>
             <p className="text-xs text-muted-foreground">{t('progress.latestLevelDescription')}</p>
           </CardContent>
@@ -148,15 +160,19 @@ export default function ProgressPage() {
             <CardDescription>{t('progress.checkInTrendDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-64">
-              <ComposedChart data={trendData}>
-                <CartesianGrid vertical={false} />
-                <XAxis dataKey="day" tickLine={false} axisLine={false} />
-                <YAxis width={20} tickLine={false} axisLine={false} />
-                <ChartTooltip content={<CustomTooltip />} />
-                <Line type="monotone" dataKey="score" stroke={chartConfig.score.color} strokeWidth={2} dot name={t('progress.checkInScore')} />
-              </ComposedChart>
-            </ChartContainer>
+            {trendData.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t('progress.noCheckInsYet')}</p>
+            ) : (
+              <ChartContainer config={chartConfig} className="h-64">
+                <ComposedChart data={trendData}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                  <YAxis width={20} tickLine={false} axisLine={false} />
+                  <ChartTooltip content={<CustomTooltip />} />
+                  <Line type="monotone" dataKey="score" stroke={chartConfig.score.color} strokeWidth={2} dot name={t('progress.checkInScore')} />
+                </ComposedChart>
+              </ChartContainer>
+            )}
           </CardContent>
         </Card>
 
@@ -166,11 +182,11 @@ export default function ProgressPage() {
             <CardDescription>{t('progress.latestCheckInsDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            {latestFive.length === 0 ? (
+            {metrics.latestFive.length === 0 ? (
               <p className="text-sm text-muted-foreground">{t('progress.noCheckInsYet')}</p>
             ) : null}
 
-            {latestFive.map((checkup) => (
+            {metrics.latestFive.map((checkup) => (
               <div key={checkup.id} className="rounded-lg border p-3">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-sm font-medium">{checkup.resultTitle}</p>
@@ -203,17 +219,23 @@ export default function ProgressPage() {
               <p><span className="font-medium">{t('progress.reportGeneratedAtLabel')}:</span> {generatedAt.toLocaleString(locale)}</p>
             </div>
           </div>
+          <div className="rounded-lg border p-4">
+            <p className="font-medium">{t('progress.reportClinicalSummaryTitle')}</p>
+            <p className="mt-2">{reportClinicalSummary}</p>
+          </div>
           <p>
             <span className="font-medium">{t('progress.averageScoreTitle')}:</span>{' '}
-            {latestAverage.toLocaleString(locale)}
+            {metrics.latestAverage !== null ? metrics.latestAverage.toLocaleString(locale) : t('progress.noCheckInsYet')}
           </p>
           <p>
             <span className="font-medium">{t('progress.trendTitle')}:</span>{' '}
-            {t(`progress.trendStates.${trendDirection}`)} ({trendDelta.toLocaleString(locale)})
+            {metrics.trendDirection && metrics.trendDelta !== null
+              ? `${t(`progress.trendStates.${metrics.trendDirection}`)} (${metrics.trendDelta.toLocaleString(locale)})`
+              : t('progress.trendUnavailableDescription')}
           </p>
           <p>
             <span className="font-medium">{t('progress.latestLevelTitle')}:</span>{' '}
-            {latestCheckup ? t(`checkIn.results.${latestCheckup.level}.category`) : t('progress.noCheckInsYet')}
+            {metrics.latestLevel ? t(`checkIn.results.${metrics.latestLevel}.category`) : t('progress.noCheckInsYet')}
           </p>
           <p>
             <span className="font-medium">{t('progress.reportCheckInCount')}:</span>{' '}
@@ -221,11 +243,11 @@ export default function ProgressPage() {
           </p>
           <div className="rounded-lg border p-4">
             <p className="font-medium">{t('progress.reportRecentHistoryTitle')}</p>
-            {latestFive.length === 0 ? (
+            {metrics.latestFive.length === 0 ? (
               <p className="mt-2 text-muted-foreground">{t('progress.noCheckInsYet')}</p>
             ) : (
               <div className="mt-3 space-y-2">
-                {latestFive.map((checkup) => (
+                {metrics.latestFive.map((checkup) => (
                   <div key={`report-${checkup.id}`} className="grid gap-1 border-b pb-2 last:border-b-0 last:pb-0 md:grid-cols-[1.2fr_0.8fr_1fr]">
                     <p>{checkup.createdAt?.toLocaleString(locale) ?? t('progress.unknownDate')}</p>
                     <p>{checkup.score}/{checkup.maxScore || '—'}</p>

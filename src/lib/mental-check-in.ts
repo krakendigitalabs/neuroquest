@@ -1,5 +1,5 @@
 import type { CheckupAnswer } from '@/models/mental-checkup';
-import { CLINICAL_MENTAL_CHECK_IN_THRESHOLDS } from '@/config/clinical';
+import { CLINICAL_MENTAL_CHECK_IN_MAX_SCORE, CLINICAL_MENTAL_CHECK_IN_THRESHOLDS } from '@/config/clinical';
 
 export type MentalCheckInLevel = 'healthy' | 'mild' | 'moderate' | 'severe';
 export type MentalCheckInThreshold = {
@@ -7,7 +7,7 @@ export type MentalCheckInThreshold = {
   maxScore: number;
 };
 
-export const CHECK_IN_MAX_SCORE = 40;
+export const CHECK_IN_MAX_SCORE = CLINICAL_MENTAL_CHECK_IN_MAX_SCORE;
 export const MENTAL_CHECK_IN_THRESHOLDS: MentalCheckInThreshold[] = CLINICAL_MENTAL_CHECK_IN_THRESHOLDS;
 
 export function calculateMentalCheckInScore(answers: CheckupAnswer[]) {

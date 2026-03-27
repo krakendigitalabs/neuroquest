@@ -10,18 +10,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Logo } from '@/components/logo';
 import { useTranslation } from '@/context/language-provider';
-import { useAdmin } from '@/hooks/use-admin';
+import { useTherapistAccess } from '@/hooks/use-therapist-access';
 import { useCollection, useDoc, useFirebase, useMemoFirebase } from '@/firebase';
 import type { ExposureMission } from '@/models/exposure-mission';
 import type { MentalCheckup } from '@/models/mental-checkup';
 import type { ThoughtRecord } from '@/models/thought-record';
 import type { UserProfile } from '@/models/user';
-import { getPatientStatus } from '@/app/therapist/_lib/therapist-utils';
+import { CHECK_IN_MAX_SCORE } from '@/lib/mental-check-in';
+import { getLatestPatientActivityDate, getPatientStatus } from '@/app/therapist/_lib/therapist-utils';
 import { buildThoughtInsights, buildThoughtTimeline, getThoughtRiskLevel, toDate } from '@/lib/thought-insights';
 import { normalizeThoughtRecords } from '@/lib/thought-records';
 import { isAssignedTherapist } from '@/lib/therapist-access';
-
-const CHECK_IN_MAX_SCORE = 21;
 
 function translateEmotion(t: (key: string) => string, emotion?: string) {
   if (!emotion) return '';
@@ -32,50 +31,50 @@ function translateEmotion(t: (key: string) => string, emotion?: string) {
 
 export default function TherapistPatientDetailPage() {
   const { t, locale } = useTranslation();
-  const { isAdmin, isLoading } = useAdmin();
+  const { hasTherapistAccess, isAdmin, isLoading } = useTherapistAccess();
   const { firestore, user } = useFirebase();
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const patientId = params?.id;
 
   const patientDocRef = useMemoFirebase(() => {
-    if (!firestore || !patientId) return null;
+    if (!firestore || !patientId || !hasTherapistAccess) return null;
     return doc(firestore, 'users', patientId);
-  }, [firestore, patientId]);
+  }, [firestore, hasTherapistAccess, patientId]);
   const { data: patient, isLoading: isPatientLoading } = useDoc<UserProfile>(patientDocRef);
 
-  const isAssignedPatient = isAssignedTherapist(patient, user?.uid);
+  const canViewPatient = isAdmin || isAssignedTherapist(patient, user?.uid);
 
   const checkupsQuery = useMemoFirebase(() => {
-    if (!firestore || !patientId || !isAssignedPatient) return null;
+    if (!firestore || !patientId || !canViewPatient) return null;
     return collection(firestore, 'users', patientId, 'mental_checkups');
-  }, [firestore, patientId, isAssignedPatient]);
+  }, [canViewPatient, firestore, patientId]);
   const { data: checkups, isLoading: areCheckupsLoading } = useCollection<MentalCheckup>(checkupsQuery);
 
   const thoughtsQuery = useMemoFirebase(() => {
-    if (!firestore || !patientId || !isAssignedPatient) return null;
+    if (!firestore || !patientId || !canViewPatient) return null;
     return collection(firestore, 'users', patientId, 'thoughtRecords');
-  }, [firestore, patientId, isAssignedPatient]);
+  }, [canViewPatient, firestore, patientId]);
   const { data: thoughts, isLoading: areThoughtsLoading } = useCollection<ThoughtRecord>(thoughtsQuery);
   const normalizedThoughts = useMemo(() => normalizeThoughtRecords(thoughts), [thoughts]);
 
   const missionsQuery = useMemoFirebase(() => {
-    if (!firestore || !patientId || !isAssignedPatient) return null;
+    if (!firestore || !patientId || !canViewPatient) return null;
     return collection(firestore, 'users', patientId, 'exposureMissions');
-  }, [firestore, patientId, isAssignedPatient]);
+  }, [canViewPatient, firestore, patientId]);
   const { data: missions, isLoading: areMissionsLoading } = useCollection<ExposureMission>(missionsQuery);
 
   useEffect(() => {
-    if (!isLoading && !isAdmin) {
+    if (!isLoading && !hasTherapistAccess) {
       router.push('/dashboard');
     }
-  }, [isAdmin, isLoading, router]);
+  }, [hasTherapistAccess, isLoading, router]);
 
   useEffect(() => {
-    if (!isLoading && !isPatientLoading && patient && user && !isAssignedPatient) {
+    if (!isLoading && !isPatientLoading && patient && user && !canViewPatient) {
       router.push('/therapist');
     }
-  }, [isAssignedPatient, isLoading, isPatientLoading, patient, router, user]);
+  }, [canViewPatient, isLoading, isPatientLoading, patient, router, user]);
 
   const sortedCheckups = [...(checkups ?? [])].sort(
     (a, b) => (toDate(b.createdAt)?.getTime() ?? 0) - (toDate(a.createdAt)?.getTime() ?? 0)
@@ -94,17 +93,14 @@ export default function TherapistPatientDetailPage() {
   const activeMissions = (missions ?? []).filter((mission) => mission.status === 'active').length;
   const hasLatestCheckIn = !!patient?.latestCheckInAt;
   const patientStatus = getPatientStatus(patient?.latestCheckInLevel);
-  const lastActivity = patient?.latestThoughtAt
-    ? toDate(patient.latestThoughtAt)?.toLocaleDateString(locale)
-    : patient?.latestCheckInAt
-      ? toDate(patient.latestCheckInAt)?.toLocaleDateString(locale)
-      : t('therapist.noRecentActivity');
+  const lastActivityDate = patient ? getLatestPatientActivityDate(patient) : null;
+  const lastActivity = lastActivityDate ? lastActivityDate.toLocaleDateString(locale) : t('therapist.noRecentActivity');
 
   if (isLoading || isPatientLoading || areCheckupsLoading || areThoughtsLoading || areMissionsLoading) {
     return <div>{t('loading')}</div>;
   }
 
-  if (!patient || !isAssignedPatient) {
+  if (!patient || !canViewPatient) {
     return (
       <div className="flex min-h-screen items-center justify-center p-6">
         <Card className="w-full max-w-lg">

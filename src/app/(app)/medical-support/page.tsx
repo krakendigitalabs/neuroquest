@@ -27,15 +27,22 @@ export default function MedicalSupportPage() {
   const { user } = useFirebase();
   const { userProfile, isLoading } = useUserProfile();
 
-  const latestLevel = userProfile?.latestCheckInLevel ?? null;
-  const latestScore = userProfile?.latestCheckInScore ?? null;
   const latestDate = toDate(userProfile?.latestCheckInAt);
+  const hasLatestCheckIn = !!latestDate;
+  const latestLevel = hasLatestCheckIn ? (userProfile?.latestCheckInLevel ?? null) : null;
+  const latestScore = hasLatestCheckIn ? (userProfile?.latestCheckInScore ?? null) : null;
 
   const currentItems = latestLevel
     ? Array.from({ length: 3 }, (_, index) => t(`medical.dynamic.${latestLevel}.items.${index}`))
     : [];
   const generatedAt = toDate(new Date());
   const reportPatient = userProfile?.displayName || user?.displayName || user?.email || t('sidebar.guestUser');
+  const reportClinicalSummary = latestLevel
+    ? t('medical.reportClinicalSummaryWithLevel', {
+        level: t(`checkIn.results.${latestLevel}.category`),
+        guidance: t(`medical.dynamic.${latestLevel}.title`),
+      })
+    : t('medical.reportClinicalSummaryEmpty');
 
   const handlePrint = () => {
     window.print();
@@ -147,6 +154,10 @@ export default function MedicalSupportPage() {
               <p><span className="font-medium">{t('medical.reportPatientLabel')}:</span> {reportPatient}</p>
               <p><span className="font-medium">{t('medical.reportGeneratedAtLabel')}:</span> {generatedAt?.toLocaleString(locale) ?? t('progress.unknownDate')}</p>
             </div>
+          </div>
+          <div className="rounded-lg border p-4">
+            <p className="font-medium">{t('medical.reportClinicalSummaryTitle')}</p>
+            <p className="mt-2">{reportClinicalSummary}</p>
           </div>
           <p>
             <span className="font-medium">{t('medical.latestCheckInTitle')}:</span>{' '}
