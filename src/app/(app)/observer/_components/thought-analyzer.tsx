@@ -8,11 +8,12 @@ import { useToast } from '@/hooks/use-toast';
 import { analyzeThought } from '@/ai/flows/thought-analysis-and-coaching-flow';
 import { Badge } from '@/components/ui/badge';
 import { Wand2 } from 'lucide-react';
-import { useRef, useEffect, useActionState } from 'react';
+import { useRef, useEffect, useActionState, useState } from 'react';
 import { useTranslation } from '@/context/language-provider';
 import { useFirebase } from '@/firebase';
-import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
-import { collection, serverTimestamp } from 'firebase/firestore';
+import { addDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { collection, doc, serverTimestamp } from 'firebase/firestore';
+import { Input } from '@/components/ui/input';
 
 type State = {
   isTOCRelated?: boolean;
@@ -40,11 +41,16 @@ export function ThoughtAnalyzer() {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const { t } = useTranslation();
+  const [intensity, setIntensity] = useState(5);
+  const [compulsionUrge, setCompulsionUrge] = useState(3);
 
   const analyzeAction = async (prevState: State, formData: FormData): Promise<State> => {
     const thought = formData.get('thought') as string;
+    const situation = (formData.get('situation') as string)?.trim() || '';
+    const trigger = (formData.get('trigger') as string)?.trim() || '';
     const emotion = (formData.get('emotion') as string) || 'unknown';
     const intensity = Number(formData.get('intensity') as string) || 5;
+    const compulsionUrge = Number(formData.get('compulsionUrge') as string) || 0;
     if (!thought || thought.trim().length < 5) {
       return { error: 'thoughtAnalyzer.validationError' };
     }
@@ -60,18 +66,31 @@ export function ThoughtAnalyzer() {
         userId: user.uid,
         recordedAt: serverTimestamp(),
         thoughtText: thought,
+        situation,
+        trigger,
         cognitiveLabel: result.isTOCRelated ? 'toc_thought' : 'general_thought',
         isFactNotThought: true,
         associatedEmotion: emotion,
         intensity,
+        compulsionUrge,
         isIntrusive: result.isTOCRelated,
         isTOCRelated: result.isTOCRelated,
         analysis: result.analysis,
         reframingSuggestion: result.reframingSuggestion,
+        source: 'observer' as const,
       };
 
       const thoughtsCollection = collection(firestore, 'users', user.uid, 'thoughtRecords');
       await addDocumentNonBlocking(thoughtsCollection, thoughtRecord);
+      const userRef = doc(firestore, 'users', user.uid);
+      updateDocumentNonBlocking(userRef, {
+        latestThoughtAt: serverTimestamp(),
+        latestThoughtEmotion: emotion,
+        latestThoughtIntensity: intensity,
+        latestThoughtLabel: thoughtRecord.cognitiveLabel,
+        latestThoughtPreview: thought.trim().slice(0, 180),
+        latestThoughtIsIntrusive: thoughtRecord.isIntrusive,
+      });
 
       return { ...result, thought };
     } catch (error) {
@@ -95,6 +114,8 @@ export function ThoughtAnalyzer() {
         description: t('thoughtAnalyzer.thoughtLoggedDesc'),
       })
       formRef.current?.reset();
+      setIntensity(5);
+      setCompulsionUrge(3);
     }
   }, [state, toast, t]);
 
@@ -113,6 +134,28 @@ export function ThoughtAnalyzer() {
             required
             minLength={5}
           />
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-sm font-medium" htmlFor="situation">
+                {t('observer.situation')}
+              </label>
+              <Input
+                id="situation"
+                name="situation"
+                placeholder={t('observer.situationPlaceholder')}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium" htmlFor="trigger">
+                {t('observer.trigger')}
+              </label>
+              <Input
+                id="trigger"
+                name="trigger"
+                placeholder={t('observer.triggerPlaceholder')}
+              />
+            </div>
+          </div>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <label className="text-sm font-medium" htmlFor="emotion">
@@ -136,7 +179,7 @@ export function ThoughtAnalyzer() {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium" htmlFor="intensity">
-                {t('observer.intensity')}: 5/10
+                {t('observer.intensity')}: {intensity}/10
               </label>
               <input
                 id="intensity"
@@ -144,10 +187,26 @@ export function ThoughtAnalyzer() {
                 type="range"
                 min="1"
                 max="10"
-                defaultValue="5"
+                value={intensity}
+                onChange={(event) => setIntensity(Number(event.target.value))}
                 className="w-full"
               />
             </div>
+          </div>
+          <div className="mt-4 space-y-2">
+            <label className="text-sm font-medium" htmlFor="compulsionUrge">
+              {t('observer.compulsionUrge')}: {compulsionUrge}/10
+            </label>
+            <input
+              id="compulsionUrge"
+              name="compulsionUrge"
+              type="range"
+              min="0"
+              max="10"
+              value={compulsionUrge}
+              onChange={(event) => setCompulsionUrge(Number(event.target.value))}
+              className="w-full"
+            />
           </div>
         </CardContent>
         <CardFooter>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import Link from 'next/link';
 import { Award, ShieldAlert, Star, Target } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { PersonalizedMissionGenerator } from './_components/personalized-mission-generator';
@@ -9,7 +10,8 @@ import { useUserProfile } from '@/hooks/use-user-profile';
 import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import type { ExposureMission } from '@/models/exposure-mission';
-import type { ThoughtRecord } from '@/models/thought-record';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 const CHECK_IN_MAX_SCORE = 21;
 
@@ -27,7 +29,7 @@ function toDate(value: unknown): Date | null {
 }
 
 export default function DashboardPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { firestore, user } = useFirebase();
   const { userProfile, isLoading: isProfileLoading } = useUserProfile();
 
@@ -37,15 +39,8 @@ export default function DashboardPage() {
   }, [firestore, user]);
   const { data: missions, isLoading: areMissionsLoading } = useCollection<ExposureMission>(missionsQuery);
 
-  const thoughtsQuery = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
-    return collection(firestore, 'users', user.uid, 'thoughtRecords');
-  }, [firestore, user]);
-  const { data: thoughts, isLoading: areThoughtsLoading } = useCollection<ThoughtRecord>(thoughtsQuery);
-
   const xpEarned = userProfile?.currentXp ?? 0;
   const level = userProfile?.level ?? 1;
-  const missionsCompleted = missions?.filter(m => m.status === 'completed').length ?? 0;
   const hasLatestCheckIn = !!userProfile?.latestCheckInAt;
   const latestCheckInScore = hasLatestCheckIn ? (userProfile?.latestCheckInScore ?? null) : null;
   const activeMission = useMemo(() => {
@@ -53,6 +48,7 @@ export default function DashboardPage() {
       .filter((mission) => mission.status === 'active' || mission.status === 'pending')
       .sort((a, b) => (toDate(b.createdAt)?.getTime() ?? 0) - (toDate(a.createdAt)?.getTime() ?? 0))[0] ?? null;
   }, [missions]);
+  const latestCheckInDate = toDate(userProfile?.latestCheckInAt);
   const summaryText = useMemo(() => {
     if (!hasLatestCheckIn) {
       return t('dashboard.summaryNoCheckIn');
@@ -63,13 +59,13 @@ export default function DashboardPage() {
     return note || t(`dashboard.summaryBySeverity.${severityKey}`);
   }, [hasLatestCheckIn, t, userProfile?.latestCheckInLevel, userProfile?.latestCheckInNote]);
 
-  const isLoading = isProfileLoading || areMissionsLoading || areThoughtsLoading;
+  const isLoading = isProfileLoading || areMissionsLoading;
 
   const stats = [
-    { title: t('dashboard.xpEarned'), value: isLoading ? '...' : xpEarned.toLocaleString(), icon: <Award className="h-6 w-6 text-primary" /> },
+    { title: t('dashboard.xpEarned'), value: isLoading ? '...' : xpEarned.toLocaleString(locale), icon: <Award className="h-6 w-6 text-primary" /> },
     { title: t('dashboard.levelTitle'), value: isLoading ? '...' : t('userProgress.level', { level }), icon: <Star className="h-6 w-6 text-primary" /> },
     { title: t('dashboard.latestCheckIn'), value: isLoading ? '...' : latestCheckInScore !== null ? `${latestCheckInScore}/${CHECK_IN_MAX_SCORE}` : t('dashboard.noCheckInYet'), icon: <ShieldAlert className="h-6 w-6 text-primary" /> },
-    { title: t('dashboard.missionsCompleted'), value: isLoading ? '...' : missionsCompleted, icon: <Target className="h-6 w-6 text-primary" /> },
+    { title: t('dashboard.activeMissionTitle'), value: isLoading ? '...' : activeMission?.title || t('dashboard.noActiveMission'), icon: <Target className="h-6 w-6 text-primary" /> },
   ];
 
   return (
@@ -104,15 +100,49 @@ export default function DashboardPage() {
               <p className="mt-2 text-lg font-semibold">
                 {isLoading ? '...' : activeMission?.title || t('dashboard.noActiveMission')}
               </p>
+              {activeMission && !isLoading && (
+                <div className="mt-2">
+                  <Badge variant={activeMission.status === 'active' ? 'secondary' : 'outline'}>
+                    {t(`progress.${activeMission.status}`)}
+                  </Badge>
+                </div>
+              )}
               <p className="mt-2 text-sm text-muted-foreground">
                 {isLoading ? '...' : activeMission?.description || t('dashboard.activeMissionHint')}
               </p>
             </div>
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">{t('dashboard.summaryTitle')}</p>
+              {hasLatestCheckIn && latestCheckInDate && !isLoading && (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {t('dashboard.latestCheckInDate', { date: latestCheckInDate.toLocaleString(locale) })}
+                </p>
+              )}
+              {hasLatestCheckIn && userProfile?.latestCheckInLevel && !isLoading && (
+                <div className="mt-2">
+                  <Badge variant={userProfile.latestCheckInLevel === 'severe' ? 'destructive' : 'secondary'}>
+                    {t(`checkIn.results.${userProfile.latestCheckInLevel}.category`)}
+                  </Badge>
+                </div>
+              )}
               <p className="mt-2 text-sm leading-6 text-foreground">
                 {isLoading ? '...' : summaryText}
               </p>
+              {userProfile?.latestCheckInLevel === 'severe' && !isLoading && (
+                <div className="mt-4 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+                  <p className="text-sm font-semibold text-destructive">
+                    {t('dashboard.crisisBannerTitle')}
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {t('dashboard.crisisBannerDescription')}
+                  </p>
+                  <div className="mt-3">
+                    <Button asChild variant="destructive" size="sm">
+                      <Link href="/crisis">{t('sidebar.crisisSupport')}</Link>
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

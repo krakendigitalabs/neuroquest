@@ -30,7 +30,10 @@
     "noActiveMission": "Aún no hay una misión activa",
     "activeMissionHint": "Genera o crea una misión para mantener en marcha tu trabajo ERP.",
     "summaryTitle": "Resumen Breve",
+    "latestCheckInDate": "Último check-in: {date}",
     "summaryNoCheckIn": "Completa tu primer check-in mental para desbloquear aquí un resumen personalizado.",
+    "crisisBannerTitle": "Necesitas una ruta de apoyo inmediata",
+    "crisisBannerDescription": "Tu último check-in quedó en nivel severo. Abre apoyo en crisis para ver líneas de emergencia y centros de atención en Medellín.",
     "summaryBySeverity": {
       "healthy": "Tu último check-in se ve estable. Mantén las rutinas que te están funcionando.",
       "mild": "Tu último check-in muestra tensión leve. Sostén grounding y hábitos cortos de regulación.",
@@ -46,7 +49,16 @@
     "challengesTitle": "Desafíos Próximamente",
     "challengesDescription": "Esta ruta queda fuera del alcance del MVP actual. Los flujos centrales de seguimiento y terapia ya están funcionales.",
     "medicalSupportTitle": "Apoyo Médico Próximamente",
-    "medicalSupportDescription": "Esta ruta aún no forma parte del MVP actual. El MVP funcional se centra en dashboard, check-in, progress, therapist y observer."
+    "medicalSupportDescription": "Esta ruta aún no forma parte del MVP actual. El MVP funcional se centra en dashboard, check-in, progress, therapist y observer.",
+    "readyTitle": "Listo para demo",
+    "readyDescription": "Estas son las rutas y flujos reales disponibles hoy en el MVP.",
+    "readyItems": {
+      "dashboard": "Dashboard conectado a Firestore con estado actual, XP, nivel y misión activa.",
+      "checkIn": "Mental Check-In con guardado real de historial y actualización denormalizada del usuario.",
+      "progress": "Progress con métricas, tendencia y últimos registros del usuario.",
+      "observer": "Observer con pensamientos guardados, análisis y seguimiento de patrones.",
+      "therapist": "Therapist con lista de pacientes reales y detalle clínico por paciente."
+    }
   },
   "languageSwitcher": {
     "english": "Inglés",
@@ -106,6 +118,7 @@
     "completeMission": "Completar Misión",
     "missionCompletedToast": "¡Misión Completada!",
     "missionCompletedToastDesc": "¡Has ganado {xp} XP!",
+    "xpRewardBadge": "+{xp} XP",
     "missionCompletionFailed": "No se pudo completar la misión",
     "noAvailableMissions": "No hay misiones disponibles. ¡Intenta generar una nueva en el tablero!",
     "noCompletedMissions": "Aún no has completado ninguna misión.",
@@ -151,12 +164,39 @@
     "title": "Observador Mental",
     "description": "Registra tus pensamientos intrusivos o angustiantes a continuación. Nuestra IA te ayudará a analizarlos y reencuadrarlos desde una perspectiva de TCC/ERP.",
     "recentThoughts": "Tus Pensamientos Recientes",
+    "patternsTitle": "Patrones recientes",
+    "patternsDescription": "Una vista corta de frecuencia, intensidad y presión compulsiva para entender cómo viene la semana.",
     "thought": "Pensamiento",
     "analysis": "Análisis",
     "reframing": "Sugerencia de Reencuadre",
     "noThoughts": "Aún no has registrado ningún pensamiento. Usa la herramienta de arriba para comenzar.",
     "emotion": "Emoción",
     "intensity": "Intensidad",
+    "compulsionUrge": "Urgencia compulsiva",
+    "situation": "Situación",
+    "situationPlaceholder": "Ej: estaba saliendo de casa / recibí un mensaje / estaba solo",
+    "trigger": "Disparador",
+    "triggerPlaceholder": "Ej: suciedad, duda, culpa, error, salud, revisión",
+    "totalLogged": "Pensamientos guardados",
+    "totalLoggedDesc": "Historial total en tu registro mental.",
+    "last7Days": "Últimos 7 días",
+    "last7DaysDesc": "Actividad reciente para seguimiento.",
+    "averageIntensity": "Intensidad promedio",
+    "averageIntensityDesc": "Promedio de malestar registrado.",
+    "intrusiveRate": "Tasa intrusiva",
+    "topEmotionDesc": "Emoción dominante: {emotion}",
+    "noEmotionTrend": "Aún no hay patrón emocional claro.",
+    "averageCompulsionUrge": "Urgencia promedio",
+    "highRiskThoughts": "Pensamientos de alta carga",
+    "timelinePoint": "{count} registros · intensidad media {intensity}/10",
+    "intrusiveThought": "Intrusivo",
+    "nonIntrusiveThought": "No intrusivo",
+    "noData": "Sin dato",
+    "riskLevels": {
+      "low": "Baja carga",
+      "medium": "Carga media",
+      "high": "Alta carga"
+    },
     "label": "Etiqueta",
     "loadingThoughts": "Cargando pensamientos...",
     "emotions": {
@@ -179,6 +219,22 @@
   "progress": {
     "title": "Tu Progreso",
     "description": "Visualiza tu viaje. Sigue tus estadísticas para ver cuán lejos has llegado.",
+    "averageScoreTitle": "Promedio reciente",
+    "averageScoreDescription": "Promedio de los últimos 5 check-ins guardados.",
+    "printReport": "Imprimir reporte",
+    "reportTitle": "Reporte imprimible",
+    "reportDescription": "Resumen clínico breve basado en tus check-ins guardados.",
+    "reportHeaderTitle": "Encabezado del reporte",
+    "reportPatientLabel": "Paciente",
+    "reportGeneratedAtLabel": "Fecha de emisión",
+    "reportCheckInCount": "Total de check-ins",
+    "reportRecentHistoryTitle": "Historial reciente",
+    "reportPatientSignature": "Firma del paciente",
+    "reportTherapistSignature": "Firma del terapeuta",
+    "trendTitle": "Tendencia",
+    "trendDescription": "Cambio frente al bloque anterior: {value} puntos.",
+    "latestLevelTitle": "Último nivel",
+    "latestLevelDescription": "Severidad registrada en tu check-in más reciente.",
     "missionCompletionRate": "Tasa de Misiones Completadas",
     "missionCompletionRateChange": "{value} misiones completadas vs la semana pasada",
     "weeklyCheckInScore": "Puntaje Semanal de Check-In",
@@ -189,7 +245,22 @@
     "checkInTrendDescription": "Tus últimos puntajes de chequeo mental guardados en Firestore.",
     "missionStatusTitle": "Estado Actual de Misiones",
     "missionStatusDescription": "Desglose actual de tus misiones de exposición por estado.",
+    "latestCheckInsTitle": "Últimos check-ins",
+    "latestCheckInsDescription": "Tus registros mentales más recientes guardados en Firestore.",
+    "latestMissionsTitle": "Últimas misiones",
+    "latestMissionsDescription": "Actividad reciente de tus misiones ERP.",
+    "latestThoughtsTitle": "Últimos pensamientos",
+    "latestThoughtsDescription": "Tus registros mentales recientes para contexto.",
+    "noCheckInsYet": "Aún no hay check-ins guardados.",
+    "noMissionsYet": "Aún no hay misiones guardadas.",
+    "noThoughtsYet": "Aún no hay pensamientos guardados.",
+    "unknownDate": "Fecha no disponible",
     "checkInScore": "Puntaje de Check-In",
+    "trendStates": {
+      "up": "En aumento",
+      "down": "Mejorando",
+      "stable": "Estable"
+    },
     "completed": "Completadas",
     "active": "Activas",
     "pending": "Pendientes",
@@ -254,14 +325,11 @@
     "title": "Apoyo en Crisis",
     "backToApp": "Volver a la App",
     "notAlone": "No Estás Solo",
-    "description": "Si estás en crisis o en peligro inmediato, por favor usa los recursos a continuación o llama al 911. Tu seguridad es la máxima prioridad.",
-    "resource1Desc": "Llama o escribe al 988 en Estados Unidos para apoyo inmediato en crisis y prevención del suicidio.",
-    "resource2Desc": "Envía HOME al 741741 para conectarte por texto con un consejero de crisis capacitado.",
-    "resource3Desc": "Apoyo especializado 24/7 en crisis para jóvenes LGBTQ+ y sus comunidades.",
-    "resource4Desc": "Información, orientación y referencias desde la línea de apoyo de la National Alliance on Mental Illness.",
+    "description": "Si estás en crisis o en peligro inmediato en Medellín o el área metropolitana, usa estas líneas de emergencia y centros de atención en salud mental. Tu seguridad es la prioridad.",
     "disclaimer": "NeuroQuest es una herramienta de apoyo y desarrollo de habilidades, no un sustituto del consejo, diagnóstico o tratamiento médico profesional.",
     "medellin": {
       "title": "Números de Emergencia – Medellín",
+      "directoryDescription": "Directorio breve con líneas y centros conocidos para atención urgente o seguimiento psiquiátrico y psicológico.",
       "mainEmergency": {
         "title": "Emergencia grave → 123",
         "desc": "Línea principal y opción más rápida general (policía, ambulancias, bomberos, etc.)"
@@ -278,7 +346,45 @@
       "civilDefense": "Defensa Civil → 144",
       "gaula": "GAULA (extorsión/secuestro) → 165",
       "womensHelpline": "Violencia contra la mujer → 155",
-      "disasterRelief": "Atención de desastres → 111"
+      "disasterRelief": "Atención de desastres → 111",
+      "recognizedClinicsTitle": "Clínicas psiquiátricas reconocidas",
+      "recognizedClinics": {
+        "sanJuanDeDios": "Clínica San Juan de Dios",
+        "delOriente": "Clínica del Oriente - Corporación para la Salud Mental",
+        "sagradoCorazon": "Clínica Psiquiátrica Nuestra Señora del Sagrado Corazón",
+        "insam": "Clínica Psiquiátrica INSAM",
+        "samein": "Samein S.A.",
+        "nuevaVida": "Hogar Psiquiátrico Nueva Vida",
+        "miDescanso": "Hogar Psiquiátrico Mi Descanso",
+        "laFlorida": "Hogar de Reposo La Florida"
+      },
+      "specializedCentersTitle": "Centros e IPS especializadas en salud mental",
+      "specializedCenters": {
+        "cuidarte": "Cuidarte IPS",
+        "mentePlena": "Mente Plena Sermente",
+        "conciencia": "Conciencia S.A.S",
+        "cic": "Fundación Centro de Investigación Clínica (CIC)",
+        "institutoDolor": "Instituto Colombiano del Dolor (con psiquiatría)",
+        "miMente": "MiMente IPS",
+        "emotivamente": "Emotivamente",
+        "sentidoRealidad": "Sentido & Realidad",
+        "preactiva": "Preactiva (adicciones y salud mental)"
+      },
+      "psychiatricHospitalsTitle": "Hospitales con atención psiquiátrica",
+      "psychiatricHospitals": {
+        "hospitalMental": "Hospital Mental de Antioquia (Bello, área metropolitana)",
+        "hospitalGeneral": "Hospital General de Medellín",
+        "pabloTobon": "Hospital Pablo Tobón Uribe",
+        "lasVegas": "Clínica Las Vegas"
+      },
+      "otherCentersTitle": "Otros centros y opciones",
+      "otherCenters": {
+        "elPoblado": "Centro Médico Integral El Poblado",
+        "medplus": "Medplus (servicio de psiquiatría)",
+        "cadSamein": "CAD Samein (rehabilitación y salud mental)"
+      },
+      "urgentCareTitle": "Si necesitas atención hoy mismo",
+      "urgentCareDescription": "Ante riesgo de suicidio, agresividad, psicosis o pérdida de control, llama al 123 o acude a urgencias de cualquier hospital para remisión psiquiátrica inmediata."
     }
   },
   "therapist": {
@@ -302,6 +408,14 @@
     "latestMissionSummary": "Resumen de Misiones",
     "recentThoughts": "Pensamientos Recientes",
     "recentThoughtsDesc": "Últimos registros mentales de este paciente.",
+    "observerTracking": "Seguimiento Observer",
+    "observerTrackingDesc": "Frecuencia, intensidad y presión compulsiva del registro mental del paciente.",
+    "thoughtsThisWeek": "Pensamientos esta semana",
+    "averageIntensity": "Intensidad media",
+    "intrusiveRate": "Tasa intrusiva",
+    "mainEmotion": "Emoción principal",
+    "lastMentalRecord": "Último registro mental",
+    "latestThoughtPreview": "Vista previa del último pensamiento",
     "recentMissions": "Misiones Recientes",
     "recentMissionsDesc": "Últimas misiones ERP de este paciente.",
     "noThoughtsYet": "Aún no hay pensamientos registrados.",
@@ -358,12 +472,14 @@
   },
   "sidebar": {
     "user": "Usuario",
+    "guestUser": "Invitado",
+    "anonymousUser": "Usuario anónimo",
     "level": "Novato Mental",
     "crisisSupport": "Apoyo en Crisis",
     "logout": "Cerrar Sesión"
   },
   "userProgress": {
-    "level": "Level {level}"
+    "level": "Nivel {level}"
   },
   "login": {
     "title": "Bienvenido a NeuroQuest",
@@ -602,7 +718,7 @@
     "invalidPatientContextTitle": "Contexto de paciente no disponible",
     "invalidPatientContextDescription": "Este paciente no está disponible para tu sesión actual de terapeuta."
   },
-   "checkIn": {
+  "checkIn": {
   "title": "Chequeo Mental",
   "subtitle": "Registra cómo te sientes hoy.",
   "moodLabel": "Estado de ánimo",
@@ -612,7 +728,14 @@
   "notesLabel": "Notas",
   "notesPlaceholder": "Escribe cómo te sientes, qué pasó hoy o cualquier observación...",
   "saveButton": "Guardar Check-In",
+  "saving": "Guardando...",
   "savedMessage": "Check-In guardado correctamente.",
+  "saveError": "No se pudo guardar el check-in. Inténtalo de nuevo.",
+  "sessionError": "No hay una sesión activa de usuario.",
+  "firestoreUnavailable": "Firestore no está disponible en esta sesión.",
+  "previewTitle": "Vista previa",
+  "pendingAnswers": "Pendiente",
+  "completeAllQuestions": "Responde todas las preguntas para ver un resultado real antes de guardar.",
   "moods": {
     "veryBad": "Muy mal",
     "bad": "Mal",
@@ -632,6 +755,7 @@
   "dailyMission": "Misión Diaria Personalizada",
   "alertTitle": "Alerta Importante",
   "alertText": "Tu respuesta sugiere malestar significativo o posible riesgo emocional. Busca apoyo profesional lo antes posible y contacta a una persona de confianza ahora mismo.",
+  "openCrisisSupport": "Abrir apoyo en crisis",
   "disclaimerTitle": "Orientación",
   "disclaimerText": "Esta herramienta ofrece orientación general basada en síntomas autoinformados. No sustituye un diagnóstico médico, psiquiátrico o psicológico profesional.",
   "defaultProfessionalNote": "El usuario completó un chequeo mental autoguiado.",
@@ -709,5 +833,68 @@
     ]
   }
 }
+},
+  "medical": {
+    "title": "Apoyo Médico",
+    "description": "Orientación clínica básica basada en tu último Mental Check-In guardado en Firestore.",
+    "printReport": "Imprimir reporte",
+    "reportTitle": "Reporte clínico imprimible",
+    "reportDescription": "Resumen rápido para seguimiento clínico o conversación con un profesional.",
+    "reportHeaderTitle": "Encabezado del reporte",
+    "reportPatientLabel": "Paciente",
+    "reportGeneratedAtLabel": "Fecha de emisión",
+    "reportRecommendationsTitle": "Recomendaciones activas",
+    "reportPatientSignature": "Firma del paciente",
+    "reportTherapistSignature": "Firma del terapeuta",
+    "disclaimerTitle": "No reemplaza evaluación médica",
+  "disclaimerDescription": "Esta vista orienta el siguiente paso según tu severidad reciente. No genera dosis automáticas ni reemplaza valoración médica, psiquiátrica o psicológica.",
+  "latestCheckInTitle": "Último check-in disponible",
+  "latestCheckInDescription": "Se toma el último nivel denormalizado guardado en tu perfil de usuario.",
+  "latestCheckInScore": "Puntaje registrado: {score}",
+  "latestCheckInDate": "Actualizado: {date}",
+  "noCheckInYet": "Aún no hay un check-in guardado para generar orientación.",
+  "guidanceTitle": "Orientación sugerida",
+  "guidanceDescription": "El contenido cambia según tu último nivel registrado.",
+  "completeCheckInFirst": "Completa primero tu Mental Check-In para desbloquear esta vista clínica.",
+  "severeAlertTitle": "Se requiere apoyo inmediato",
+  "severeAlertDescription": "Tu último nivel es severo. Prioriza ayuda profesional y usa apoyo en crisis si hay riesgo o pérdida de control.",
+  "dynamic": {
+    "mild": {
+      "title": "Recomendaciones básicas",
+      "description": "El nivel leve sugiere seguimiento cercano de hábitos y regulación.",
+      "items": [
+        "Mantén sueño, alimentación y rutina diaria lo más estables posible.",
+        "Usa ejercicios breves de respiración, grounding o journaling una o dos veces al día.",
+        "Si el malestar aumenta o se mantiene, agenda valoración profesional."
+      ]
+    },
+    "moderate": {
+      "title": "Intervención sugerida",
+      "description": "El nivel moderado sugiere aumentar soporte y seguimiento clínico.",
+      "items": [
+        "Considera valoración profesional en psicología o psiquiatría para seguimiento estructurado.",
+        "Reduce aislamiento y define una red mínima de apoyo esta semana.",
+        "Monitorea cambios en sueño, ansiedad, desesperanza o pensamientos de daño."
+      ]
+    },
+    "severe": {
+      "title": "Alerta clínica",
+      "description": "El nivel severo requiere acción rápida y priorización de seguridad.",
+      "items": [
+        "Busca apoyo profesional urgente y no te quedes solo si sientes pérdida de control.",
+        "Contacta una persona de confianza y comparte que necesitas acompañamiento inmediato.",
+        "Si hay riesgo de suicidio, psicosis o agresividad, usa el módulo Crisis Support ahora."
+      ]
+    },
+    "healthy": {
+      "title": "Seguimiento preventivo",
+      "description": "El nivel saludable permite mantener monitoreo y prevención.",
+      "items": [
+        "Sostén hábitos protectores y registra cambios importantes si aparecen.",
+        "Mantén chequeos periódicos para detectar elevaciones tempranas de malestar.",
+        "Usa la app para reforzar regulación, exposición o observación cuando sea útil."
+      ]
+    }
+  }
 }
 }

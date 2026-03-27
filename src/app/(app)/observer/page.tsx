@@ -1,64 +1,100 @@
 'use client';
 
+import { useMemo } from 'react';
+import { AlertTriangle, BrainCircuit, History, Siren, Sparkles } from 'lucide-react';
 import { ThoughtAnalyzer } from './_components/thought-analyzer';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { History } from 'lucide-react';
 import { useTranslation } from '@/context/language-provider';
 import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
-import { useState, useEffect } from 'react';
-import { WithId } from '@/firebase/firestore/use-collection';
-import {ThoughtRecord} from '@/models/thought-record';
+import type { ThoughtRecord } from '@/models/thought-record';
+import { buildThoughtInsights, buildThoughtTimeline, getThoughtRiskLevel, toDate } from '@/lib/thought-insights';
 
-function ThoughtHistoryItem({ item }: { item: WithId<ThoughtRecord> }) {
+function translateLabel(t: (key: string) => string, label?: string) {
+  if (!label) return '';
+  const key = `observer.labels.${label.toLowerCase().replace(/ /g, '_')}`;
+  const translation = t(key);
+  return translation === key ? label : translation;
+}
+
+function translateEmotion(t: (key: string) => string, emotion?: string) {
+  if (!emotion) return '';
+  const key = `observer.emotions.${emotion.toLowerCase()}`;
+  const translation = t(key);
+  return translation === key ? emotion : translation;
+}
+
+function ThoughtHistoryItem({ item }: { item: ThoughtRecord }) {
   const { t, locale } = useTranslation();
-  const [formattedDate, setFormattedDate] = useState('');
-
-  useEffect(() => {
-    if (item.recordedAt) {
-      // This effect runs only on the client, after hydration, preventing mismatch.
-      const date = (item.recordedAt as any).toDate ? (item.recordedAt as any).toDate() : new Date(item.recordedAt as any);
-      setFormattedDate(date.toLocaleString(locale, {
+  const date = toDate(item.recordedAt);
+  const formattedDate = date
+    ? date.toLocaleString(locale, {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
         hour: '2-digit',
-        minute: '2-digit'
-      }));
-    }
-  }, [item.recordedAt, locale]);
-
-  const getLabel = (label: string) => {
-    if (!label) return '';
-    const key = `observer.labels.${label.toLowerCase().replace(/ /g, '_')}`;
-    const translation = t(key);
-    return translation === key ? label : translation;
-  }
-
-  const getEmotion = (emotion: string) => {
-    if (!emotion) return '';
-    const key = `observer.emotions.${emotion.toLowerCase()}`;
-    const translation = t(key);
-    return translation === key ? emotion : translation;
-  }
+        minute: '2-digit',
+      })
+    : '';
+  const riskLevel = getThoughtRiskLevel(item);
 
   return (
     <Card className="bg-card">
-      <CardHeader>
-        <CardTitle className="text-lg">{t('observer.thought')}: "{item.thoughtText}"</CardTitle>
-        <CardDescription>{formattedDate || ' '}</CardDescription>
+      <CardHeader className="gap-3">
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div className="space-y-1">
+            <CardTitle className="text-lg leading-snug">"{item.thoughtText}"</CardTitle>
+            <CardDescription>{formattedDate || ' '}</CardDescription>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant={riskLevel === 'high' ? 'destructive' : riskLevel === 'medium' ? 'outline' : 'secondary'}>
+              {t(`observer.riskLevels.${riskLevel}`)}
+            </Badge>
+            <Badge variant={item.isIntrusive ? 'destructive' : 'secondary'}>
+              {item.isIntrusive ? t('observer.intrusiveThought') : t('observer.nonIntrusiveThought')}
+            </Badge>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent className="grid gap-2">
-         <p><strong className="text-primary">{t('observer.emotion')}:</strong> {getEmotion(item.associatedEmotion)} ({t('observer.intensity')}: {item.intensity})</p>
-         <p><strong className="text-accent">{t('observer.label')}:</strong> {getLabel(item.cognitiveLabel)}</p>
+      <CardContent className="grid gap-4">
+        <div className="grid gap-3 md:grid-cols-2">
+          <p className="text-sm">
+            <strong className="text-primary">{t('observer.emotion')}:</strong>{' '}
+            {translateEmotion(t, item.associatedEmotion)} ({t('observer.intensity')}: {item.intensity}/10)
+          </p>
+          <p className="text-sm">
+            <strong className="text-accent">{t('observer.label')}:</strong>{' '}
+            {translateLabel(t, item.cognitiveLabel)}
+          </p>
+          <p className="text-sm">
+            <strong>{t('observer.compulsionUrge')}:</strong> {item.compulsionUrge ?? 0}/10
+          </p>
+          <p className="text-sm">
+            <strong>{t('observer.trigger')}:</strong> {item.trigger || t('observer.noData')}
+          </p>
+        </div>
+        <div className="grid gap-3 md:grid-cols-2">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">{t('observer.situation')}</p>
+            <p className="text-sm">{item.situation || t('observer.noData')}</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">{t('observer.reframing')}</p>
+            <p className="text-sm">{item.reframingSuggestion || t('observer.noData')}</p>
+          </div>
+        </div>
+        <div>
+          <p className="text-sm font-medium text-muted-foreground">{t('observer.analysis')}</p>
+          <p className="text-sm">{item.analysis || t('observer.noData')}</p>
+        </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
-
 export default function ObserverPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { firestore, user } = useFirebase();
 
   const thoughtsQuery = useMemoFirebase(() => {
@@ -68,8 +104,19 @@ export default function ObserverPage() {
 
   const { data: thoughtHistory, isLoading } = useCollection<ThoughtRecord>(thoughtsQuery);
 
+  const sortedThoughts = useMemo(
+    () =>
+      [...(thoughtHistory ?? [])].sort(
+        (a, b) => (toDate(b.recordedAt)?.getTime() ?? 0) - (toDate(a.recordedAt)?.getTime() ?? 0)
+      ),
+    [thoughtHistory]
+  );
+
+  const insights = useMemo(() => buildThoughtInsights(sortedThoughts), [sortedThoughts]);
+  const timeline = useMemo(() => buildThoughtTimeline(sortedThoughts, 7), [sortedThoughts]);
+
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+    <div className="flex-1 space-y-6 p-4 pt-6 md:p-8">
       <div className="flex items-center justify-between space-y-2">
         <h1 className="text-3xl font-bold tracking-tight font-headline">{t('observer.title')}</h1>
       </div>
@@ -79,17 +126,110 @@ export default function ObserverPage() {
 
       <ThoughtAnalyzer />
 
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold tracking-tight font-headline flex items-center gap-2 mb-4">
-          <History className="h-6 w-6" />
-          {t('observer.recentThoughts')}
-        </h2>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('observer.totalLogged')}</CardTitle>
+            <History className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{insights.totalCount}</div>
+            <p className="text-xs text-muted-foreground">{t('observer.totalLoggedDesc')}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('observer.last7Days')}</CardTitle>
+            <Sparkles className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{insights.recentCount}</div>
+            <p className="text-xs text-muted-foreground">{t('observer.last7DaysDesc')}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('observer.averageIntensity')}</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{insights.averageIntensity.toLocaleString(locale)}</div>
+            <p className="text-xs text-muted-foreground">{t('observer.averageIntensityDesc')}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('observer.intrusiveRate')}</CardTitle>
+            <Siren className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{insights.intrusiveRate}%</div>
+            <p className="text-xs text-muted-foreground">
+              {insights.topEmotion
+                ? t('observer.topEmotionDesc', { emotion: translateEmotion(t, insights.topEmotion) })
+                : t('observer.noEmotionTrend')}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BrainCircuit className="h-5 w-5" />
+              {t('observer.patternsTitle')}
+            </CardTitle>
+            <CardDescription>{t('observer.patternsDescription')}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-lg border p-4">
+                <p className="text-sm text-muted-foreground">{t('observer.averageCompulsionUrge')}</p>
+                <p className="text-2xl font-semibold">{insights.averageCompulsionUrge.toLocaleString(locale)}</p>
+              </div>
+              <div className="rounded-lg border p-4">
+                <p className="text-sm text-muted-foreground">{t('observer.highRiskThoughts')}</p>
+                <p className="text-2xl font-semibold">{insights.highRiskCount}</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {timeline.map((point) => (
+                <div key={point.day} className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>{point.day}</span>
+                    <span className="text-muted-foreground">
+                      {t('observer.timelinePoint', {
+                        count: point.count,
+                        intensity: point.averageIntensity.toLocaleString(locale),
+                      })}
+                    </span>
+                  </div>
+                  <div className="h-2 rounded-full bg-muted">
+                    <div
+                      className="h-2 rounded-full bg-primary transition-all"
+                      style={{ width: `${Math.min((point.count / Math.max(insights.recentCount, 1)) * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
         <div className="space-y-4">
-          {isLoading && <p>{t('observer.loadingThoughts')}</p>}
-          {thoughtHistory && thoughtHistory.length === 0 && <p>{t('observer.noThoughts')}</p>}
-          {thoughtHistory && thoughtHistory.map((item) => (
-            <ThoughtHistoryItem key={item.id} item={item} />
-          ))}
+          <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight font-headline">
+            <History className="h-6 w-6" />
+            {t('observer.recentThoughts')}
+          </h2>
+          <div className="space-y-4">
+            {isLoading && <p>{t('observer.loadingThoughts')}</p>}
+            {!isLoading && sortedThoughts.length === 0 && <p>{t('observer.noThoughts')}</p>}
+            {sortedThoughts.map((item) => (
+              <ThoughtHistoryItem key={item.id} item={item} />
+            ))}
+          </div>
         </div>
       </div>
     </div>

@@ -104,6 +104,20 @@ service cloud.firestore {
         (!('latestCheckInNote' in request.resource.data) || request.resource.data.latestCheckInNote is string);
     }
 
+    /**
+     * Validates denormalized latest thought summary fields stored on the user
+     * profile so therapist dashboards can show recent observer activity without
+     * loading every subcollection first.
+     */
+    function hasValidLatestThoughtSummary() {
+      return (!('latestThoughtAt' in request.resource.data) || request.resource.data.latestThoughtAt == null || request.resource.data.latestThoughtAt is timestamp) &&
+        (!('latestThoughtEmotion' in request.resource.data) || request.resource.data.latestThoughtEmotion is string) &&
+        (!('latestThoughtIntensity' in request.resource.data) || request.resource.data.latestThoughtIntensity is number) &&
+        (!('latestThoughtLabel' in request.resource.data) || request.resource.data.latestThoughtLabel is string) &&
+        (!('latestThoughtPreview' in request.resource.data) || request.resource.data.latestThoughtPreview is string) &&
+        (!('latestThoughtIsIntrusive' in request.resource.data) || request.resource.data.latestThoughtIsIntrusive is bool);
+    }
+
     // -------------------------------------------------------------------------
     // Collection Rules
     // -------------------------------------------------------------------------
@@ -119,8 +133,8 @@ service cloud.firestore {
     match /users/{userId} {
       allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
       allow list: if isSignedIn(); // Secured by query: .where('therapistIds', 'array-contains', auth.uid)
-      allow create: if isOwner(userId) && request.resource.data.id == userId && hasValidLatestCheckInSummary();
-      allow update: if isOwner(userId) && request.resource.data.id == resource.data.id && hasValidLatestCheckInSummary();
+      allow create: if isOwner(userId) && request.resource.data.id == userId && hasValidLatestCheckInSummary() && hasValidLatestThoughtSummary();
+      allow update: if isOwner(userId) && request.resource.data.id == resource.data.id && hasValidLatestCheckInSummary() && hasValidLatestThoughtSummary();
       allow delete: if isOwner(userId);
     }
 
