@@ -12,6 +12,8 @@
     "typecheck": "next typegen && tsc --noEmit --incremental false",
     "test": "vitest run",
     "test:watch": "vitest",
+    "validate": "npm run typecheck && npm run lint && npm run test && npm run build",
+    "deploy:firebase": "firebase deploy --only firestore:rules,firestore:indexes",
     "seed:firestore": "node scripts/seed-firestore.cjs"
   },
   "dependencies": {

@@ -45,6 +45,51 @@ npm run dev
 http://localhost:9002
 ```
 
+## Deployment Alignment
+
+As of March 27, 2026, the live domain `neuroquest.krakendigitalabs.com` is served by Vercel, not by Firebase Hosting.
+
+Verified production signals:
+
+- DNS resolves `neuroquest.krakendigitalabs.com` to `76.76.21.21`
+- HTTP response includes `Server: Vercel`
+- Firebase Hosting site `https://studio-3083535459-c0472.web.app` is a separate placeholder deployment and is not the live product
+
+Operational model for this repo:
+
+- Vercel serves the Next.js application
+- Firebase provides Authentication, Firestore, and rules/index deployment
+- `firebase.json` should be treated as legacy Hosting config unless a future migration explicitly revives Firebase Hosting for web delivery
+
+Required Vercel environment variables:
+
+- `NEXT_PUBLIC_FIREBASE_API_KEY`
+- `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+- `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+- `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
+- `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
+- `NEXT_PUBLIC_FIREBASE_APP_ID`
+- `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID`
+- `GEMINI_API_KEY`
+
+Recommended deployment split:
+
+- Use Vercel for app deploys
+- Use Firebase CLI for Firestore rules and indexes only
+
+Release helper commands:
+
+```bash
+npm run validate
+npm run deploy:firebase
+```
+
+Detailed deployment notes live in:
+
+```text
+docs/deployment.md
+```
+
 ## Real Clinical Flow
 
 ### 1. Mental Check-In
@@ -162,7 +207,7 @@ As of March 27, 2026, dependency maintenance for this repo is in a stable state:
 
 Residual `npm audit` findings remain, but they are currently limited to low-severity transitive issues in the Genkit and Google Cloud dependency chain. The available `npm audit` suggestion for those findings points to incompatible downgrade paths such as `genkit@1.16.1` or `genkit-cli@0.0.2`, which are not considered safe remediation steps for this project.
 
-There is also a non-blocking build warning from Genkit/OpenTelemetry about `@opentelemetry/exporter-jaeger` resolution. It does not currently break build, lint, tests, or runtime validation, but it should be monitored on future Genkit upgrades.
+The previous build warning around `@opentelemetry/exporter-jaeger` was resolved by installing the missing package explicitly.
 
 ## Current Branch
 
