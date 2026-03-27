@@ -25,7 +25,7 @@ function SignInButton() {
       toast({
         variant: "destructive",
         title: t('login.signInErrorTitle'),
-        description: error.message || t('login.signInErrorDescription'),
+        description: t('login.signInErrorDescription'),
       })
     }
   };
@@ -47,7 +47,7 @@ function GuestSignInButton() {
             toast({
               variant: "destructive",
               title: t('login.guestSignInErrorTitle'),
-              description: error.message || t('login.guestSignInErrorDescription'),
+              description: t('login.guestSignInErrorDescription'),
             })
         }
     };

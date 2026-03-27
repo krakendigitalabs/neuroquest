@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { collection, doc } from 'firebase/firestore';
@@ -16,12 +16,20 @@ import type { ExposureMission } from '@/models/exposure-mission';
 import type { MentalCheckup } from '@/models/mental-checkup';
 import type { ThoughtRecord } from '@/models/thought-record';
 import type { UserProfile } from '@/models/user';
-import { getPatientStatus, toDate } from '@/app/therapist/_lib/therapist-utils';
+import { getPatientStatus } from '@/app/therapist/_lib/therapist-utils';
+import { buildThoughtInsights, buildThoughtTimeline, getThoughtRiskLevel, toDate } from '@/lib/thought-insights';
 
 const CHECK_IN_MAX_SCORE = 21;
 
+function translateEmotion(t: (key: string) => string, emotion?: string) {
+  if (!emotion) return '';
+  const key = `observer.emotions.${emotion.toLowerCase()}`;
+  const translation = t(key);
+  return translation === key ? emotion : translation;
+}
+
 export default function TherapistPatientDetailPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { isAdmin, isLoading } = useAdmin();
   const { firestore, user } = useFirebase();
   const router = useRouter();
@@ -66,20 +74,28 @@ export default function TherapistPatientDetailPage() {
     }
   }, [isAssignedPatient, isLoading, isPatientLoading, patient, router, user]);
 
-  const sortedCheckups = [...(checkups ?? [])]
-    .sort((a, b) => (toDate(b.createdAt)?.getTime() ?? 0) - (toDate(a.createdAt)?.getTime() ?? 0));
-  const sortedThoughts = [...(thoughts ?? [])]
-    .sort((a, b) => (toDate(b.recordedAt)?.getTime() ?? 0) - (toDate(a.recordedAt)?.getTime() ?? 0))
-    .slice(0, 6);
+  const sortedCheckups = [...(checkups ?? [])].sort(
+    (a, b) => (toDate(b.createdAt)?.getTime() ?? 0) - (toDate(a.createdAt)?.getTime() ?? 0)
+  );
+  const sortedThoughts = [...(thoughts ?? [])].sort(
+    (a, b) => (toDate(b.recordedAt)?.getTime() ?? 0) - (toDate(a.recordedAt)?.getTime() ?? 0)
+  );
   const sortedMissions = [...(missions ?? [])]
     .sort((a, b) => (toDate(b.completionDate ?? b.createdAt)?.getTime() ?? 0) - (toDate(a.completionDate ?? a.createdAt)?.getTime() ?? 0))
     .slice(0, 6);
+
+  const thoughtInsights = useMemo(() => buildThoughtInsights(sortedThoughts), [sortedThoughts]);
+  const thoughtTimeline = useMemo(() => buildThoughtTimeline(sortedThoughts, 7), [sortedThoughts]);
 
   const completedMissions = (missions ?? []).filter((mission) => mission.status === 'completed').length;
   const activeMissions = (missions ?? []).filter((mission) => mission.status === 'active').length;
   const hasLatestCheckIn = !!patient?.latestCheckInAt;
   const patientStatus = getPatientStatus(patient?.latestCheckInLevel);
-  const lastActivity = patient?.latestCheckInAt ? toDate(patient.latestCheckInAt)?.toLocaleDateString() : t('therapist.noRecentActivity');
+  const lastActivity = patient?.latestThoughtAt
+    ? toDate(patient.latestThoughtAt)?.toLocaleDateString(locale)
+    : patient?.latestCheckInAt
+      ? toDate(patient.latestCheckInAt)?.toLocaleDateString(locale)
+      : t('therapist.noRecentActivity');
 
   if (isLoading || isPatientLoading || areCheckupsLoading || areThoughtsLoading || areMissionsLoading) {
     return <div>{t('loading')}</div>;
@@ -138,10 +154,30 @@ export default function TherapistPatientDetailPage() {
               <CardTitle className="text-sm font-medium">{t('therapist.latestCheckIn')}</CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">
-                {hasLatestCheckIn && typeof patient.latestCheckInScore === 'number' ? `${patient.latestCheckInScore}/${CHECK_IN_MAX_SCORE}` : t('therapist.noCheckInYet')}
+              <div className="text-2xl font-bold">
+                {hasLatestCheckIn && typeof patient.latestCheckInScore === 'number'
+                  ? `${patient.latestCheckInScore}/${CHECK_IN_MAX_SCORE}`
+                  : t('therapist.noCheckInYet')}
               </div>
               <p className="text-xs text-muted-foreground">{lastActivity}</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">{t('therapist.lastMentalRecord')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {patient.latestThoughtIntensity
+                  ? `${patient.latestThoughtIntensity}/10`
+                  : t('therapist.noThoughtsYet')}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {patient.latestThoughtEmotion
+                  ? translateEmotion(t, patient.latestThoughtEmotion)
+                  : t('therapist.noThoughtsYet')}
+              </p>
             </CardContent>
           </Card>
 
@@ -154,16 +190,6 @@ export default function TherapistPatientDetailPage() {
               <p className="text-xs text-muted-foreground">
                 {activeMissions} {t('therapist.activeMissions').toLowerCase()}
               </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">{t('therapist.level')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{t('userProgress.level', { level: patient.level })}</div>
-              <p className="text-xs text-muted-foreground">{patient.currentXp}/{patient.xpToNextLevel} XP</p>
             </CardContent>
           </Card>
 
@@ -200,7 +226,7 @@ export default function TherapistPatientDetailPage() {
                     <div className="min-w-0">
                       <p className="break-words font-medium">{checkup.resultTitle}</p>
                       <p className="text-xs text-muted-foreground">
-                        {toDate(checkup.createdAt)?.toLocaleString() ?? t('therapist.noRecentActivity')}
+                        {toDate(checkup.createdAt)?.toLocaleString(locale) ?? t('therapist.noRecentActivity')}
                       </p>
                     </div>
                     <Badge className="w-fit" variant={checkup.level === 'severe' ? 'destructive' : 'secondary'}>
@@ -242,6 +268,12 @@ export default function TherapistPatientDetailPage() {
                     {t(`therapist.statuses.${patientStatus}`)}
                   </Badge>
                 </div>
+                {patient.latestThoughtPreview && (
+                  <div>
+                    <p className="text-muted-foreground">{t('therapist.latestThoughtPreview')}</p>
+                    <p className="break-words">{patient.latestThoughtPreview}</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -249,22 +281,53 @@ export default function TherapistPatientDetailPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BrainCircuit className="h-5 w-5" />
-                  {t('therapist.recentThoughts')}
+                  {t('therapist.observerTracking')}
                 </CardTitle>
-                <CardDescription>{t('therapist.recentThoughtsDesc')}</CardDescription>
+                <CardDescription>{t('therapist.observerTrackingDesc')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                {sortedThoughts.length === 0 && (
-                  <p className="text-sm text-muted-foreground">{t('therapist.noThoughtsYet')}</p>
-                )}
-                {sortedThoughts.map((thought) => (
-                  <div key={thought.id} className="rounded-lg border p-3">
-                    <p className="break-words text-sm font-medium">{thought.thoughtText}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {t('observer.emotion')}: {thought.associatedEmotion} | {t('observer.intensity')}: {thought.intensity}
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-lg border p-3">
+                    <p className="text-xs text-muted-foreground">{t('therapist.thoughtsThisWeek')}</p>
+                    <p className="text-xl font-semibold">{thoughtInsights.recentCount}</p>
+                  </div>
+                  <div className="rounded-lg border p-3">
+                    <p className="text-xs text-muted-foreground">{t('therapist.averageIntensity')}</p>
+                    <p className="text-xl font-semibold">{thoughtInsights.averageIntensity.toLocaleString(locale)}</p>
+                  </div>
+                  <div className="rounded-lg border p-3">
+                    <p className="text-xs text-muted-foreground">{t('therapist.intrusiveRate')}</p>
+                    <p className="text-xl font-semibold">{thoughtInsights.intrusiveRate}%</p>
+                  </div>
+                  <div className="rounded-lg border p-3">
+                    <p className="text-xs text-muted-foreground">{t('therapist.mainEmotion')}</p>
+                    <p className="text-xl font-semibold">
+                      {thoughtInsights.topEmotion ? translateEmotion(t, thoughtInsights.topEmotion) : t('therapist.noThoughtsYet')}
                     </p>
                   </div>
-                ))}
+                </div>
+
+                <div className="space-y-3">
+                  {thoughtTimeline.map((point) => (
+                    <div key={point.day} className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span>{point.day}</span>
+                        <span className="text-muted-foreground">
+                          {t('observer.timelinePoint', {
+                            count: point.count,
+                            intensity: point.averageIntensity.toLocaleString(locale),
+                          })}
+                        </span>
+                      </div>
+                      <div className="h-2 rounded-full bg-muted">
+                        <div
+                          className="h-2 rounded-full bg-primary transition-all"
+                          style={{ width: `${Math.min((point.count / Math.max(thoughtInsights.recentCount, 1)) * 100, 100)}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
 
@@ -285,7 +348,7 @@ export default function TherapistPatientDetailPage() {
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <p className="break-words text-sm font-medium">{mission.title}</p>
                       <Badge variant={mission.status === 'completed' ? 'secondary' : mission.status === 'failed' ? 'destructive' : 'outline'}>
-                        {mission.status}
+                        {t(`progress.${mission.status}`)}
                       </Badge>
                     </div>
                     <p className="mt-1 break-words text-xs text-muted-foreground">{mission.description}</p>
@@ -295,6 +358,58 @@ export default function TherapistPatientDetailPage() {
             </Card>
           </div>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BrainCircuit className="h-5 w-5" />
+              {t('therapist.recentThoughts')}
+            </CardTitle>
+            <CardDescription>{t('therapist.recentThoughtsDesc')}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {sortedThoughts.length === 0 && (
+              <p className="text-sm text-muted-foreground">{t('therapist.noThoughtsYet')}</p>
+            )}
+            {sortedThoughts.slice(0, 8).map((thought) => (
+              <div key={thought.id} className="rounded-lg border p-4">
+                <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                  <div className="space-y-1">
+                    <p className="break-words text-sm font-medium">{thought.thoughtText}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {toDate(thought.recordedAt)?.toLocaleString(locale) ?? t('therapist.noRecentActivity')}
+                    </p>
+                  </div>
+                  <Badge variant={getThoughtRiskLevel(thought) === 'high' ? 'destructive' : 'secondary'}>
+                    {t(`observer.riskLevels.${getThoughtRiskLevel(thought)}`)}
+                  </Badge>
+                </div>
+                <div className="mt-3 grid gap-2 md:grid-cols-2">
+                  <p className="text-xs text-muted-foreground">
+                    {t('observer.emotion')}: {translateEmotion(t, thought.associatedEmotion)} | {t('observer.intensity')}: {thought.intensity}/10
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {t('observer.compulsionUrge')}: {thought.compulsionUrge ?? 0}/10 | {t('observer.trigger')}: {thought.trigger || t('observer.noData')}
+                  </p>
+                </div>
+                <div className="mt-3 grid gap-3 md:grid-cols-3">
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">{t('observer.situation')}</p>
+                    <p className="text-sm">{thought.situation || t('observer.noData')}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">{t('observer.analysis')}</p>
+                    <p className="text-sm">{thought.analysis || t('observer.noData')}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">{t('observer.reframing')}</p>
+                    <p className="text-sm">{thought.reframingSuggestion || t('observer.noData')}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       </main>
     </div>
   );

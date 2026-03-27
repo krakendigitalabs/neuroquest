@@ -42,7 +42,7 @@ const MissionCard = ({ mission, onComplete }: { mission: WithId<ExposureMission>
           <Badge variant="outline">{getDifficulty(mission.difficultyLevel)}</Badge>
         </div>
         <div className="flex items-center gap-4">
-          <Badge variant="default" className="bg-primary">{`+${mission.xpReward} XP`}</Badge>
+          <Badge variant="default" className="bg-primary">{t('exposure.xpRewardBadge', { xp: mission.xpReward })}</Badge>
           {mission.status !== 'completed' && (
               <Button size="sm" onClick={() => onComplete(mission.id, mission.xpReward)}>
                 {t('exposure.completeMission')}

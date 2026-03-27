@@ -13,6 +13,7 @@ import { useTranslation } from '@/context/language-provider';
 
 function UserProfileInitializer({ user }: { user: User }) {
   const { firestore } = useFirebase();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const createUserProfile = async () => {
@@ -25,7 +26,7 @@ function UserProfileInitializer({ user }: { user: User }) {
         const newUserProfile = {
           id: user.uid,
           email: user.email || '',
-          displayName: user.isAnonymous ? 'Guest' : (user.displayName || 'Anonymous User'),
+          displayName: user.isAnonymous ? t('sidebar.guestUser') : (user.displayName || t('sidebar.anonymousUser')),
           photoURL: user.photoURL || '',
           level: 1,
           currentXp: 0,
@@ -38,13 +39,19 @@ function UserProfileInitializer({ user }: { user: User }) {
           latestCheckInLevel: 'healthy',
           latestCheckInAt: null,
           latestCheckInNote: '',
+          latestThoughtAt: null,
+          latestThoughtEmotion: '',
+          latestThoughtIntensity: 0,
+          latestThoughtLabel: '',
+          latestThoughtPreview: '',
+          latestThoughtIsIntrusive: false,
         };
         setDocumentNonBlocking(userRef, newUserProfile, { merge: false });
       }
     };
 
     createUserProfile();
-  }, [user, firestore]);
+  }, [user, firestore, t]);
 
   return null;
 }

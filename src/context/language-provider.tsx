@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useState, useContext, ReactNode, useMemo } from 'react';
+import { createContext, useState, useContext, ReactNode, useMemo, useEffect } from 'react';
 import en from '@/locales/en.json';
 import es from '@/locales/es.json';
 
@@ -17,7 +17,21 @@ type LanguageContextType = {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocale] = useState<Locale>('en');
+  const [locale, setLocale] = useState<Locale>(() => {
+    if (typeof window === 'undefined') return 'en';
+
+    const storedLocale = window.localStorage.getItem('neuroquest-locale');
+    if (storedLocale === 'en' || storedLocale === 'es') return storedLocale;
+
+    const browserLocale = window.navigator.language.toLowerCase();
+    return browserLocale.startsWith('es') ? 'es' : 'en';
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem('neuroquest-locale', locale);
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   const t = useMemo(
     () => (key: string, variables?: Record<string, string | number>): string => {

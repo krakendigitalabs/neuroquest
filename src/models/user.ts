@@ -16,4 +16,10 @@ export interface UserProfile {
   latestCheckInLevel?: 'healthy' | 'mild' | 'moderate' | 'severe';
   latestCheckInAt?: FieldValue | string | Date;
   latestCheckInNote?: string;
+  latestThoughtAt?: FieldValue | string | Date | null;
+  latestThoughtEmotion?: string;
+  latestThoughtIntensity?: number;
+  latestThoughtLabel?: string;
+  latestThoughtPreview?: string;
+  latestThoughtIsIntrusive?: boolean;
 }
