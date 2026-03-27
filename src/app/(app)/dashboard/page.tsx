@@ -11,6 +11,8 @@ import { collection } from 'firebase/firestore';
 import type { ExposureMission } from '@/models/exposure-mission';
 import type { ThoughtRecord } from '@/models/thought-record';
 
+const CHECK_IN_MAX_SCORE = 21;
+
 function toDate(value: unknown): Date | null {
   if (!value) return null;
   if (value instanceof Date) return value;
@@ -66,7 +68,7 @@ export default function DashboardPage() {
   const stats = [
     { title: t('dashboard.xpEarned'), value: isLoading ? '...' : xpEarned.toLocaleString(), icon: <Award className="h-6 w-6 text-primary" /> },
     { title: t('dashboard.levelTitle'), value: isLoading ? '...' : t('userProgress.level', { level }), icon: <Star className="h-6 w-6 text-primary" /> },
-    { title: t('dashboard.latestCheckIn'), value: isLoading ? '...' : latestCheckInScore !== null ? `${latestCheckInScore}/20` : t('dashboard.noCheckInYet'), icon: <ShieldAlert className="h-6 w-6 text-primary" /> },
+    { title: t('dashboard.latestCheckIn'), value: isLoading ? '...' : latestCheckInScore !== null ? `${latestCheckInScore}/${CHECK_IN_MAX_SCORE}` : t('dashboard.noCheckInYet'), icon: <ShieldAlert className="h-6 w-6 text-primary" /> },
     { title: t('dashboard.missionsCompleted'), value: isLoading ? '...' : missionsCompleted, icon: <Target className="h-6 w-6 text-primary" /> },
   ];
 

@@ -16,6 +16,8 @@ type MissionResult = {
   tasks: string[];
 };
 
+const CHECK_IN_MAX_SCORE = 21;
+
 function getMoodScore(mood: string) {
   switch (mood) {
     case 'very-bad':
@@ -183,7 +185,7 @@ export default function CheckInPage() {
       userId: user?.uid ?? '',
       patientName: userProfile?.displayName || user?.displayName || user?.email || 'Guest',
       score: computedScore,
-      maxScore: 20,
+      maxScore: CHECK_IN_MAX_SCORE,
       level: computedSeverity,
       resultTitle: currentMission.category,
       mission: currentMission.mission,
@@ -309,6 +311,7 @@ export default function CheckInPage() {
         <div className="rounded-lg border p-4 bg-muted/30 space-y-2">
           <p className="text-sm font-semibold">Preview</p>
           <p className="text-sm">Score: {computedScore}</p>
+          <p className="text-sm">Max score: {CHECK_IN_MAX_SCORE}</p>
           <p className="text-sm">Severity: {computedSeverity}</p>
           <p className="text-sm">Mission: {currentMission.mission}</p>
         </div>
