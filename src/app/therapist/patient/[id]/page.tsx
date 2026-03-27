@@ -18,6 +18,8 @@ import type { ThoughtRecord } from '@/models/thought-record';
 import type { UserProfile } from '@/models/user';
 import { getPatientStatus, toDate } from '@/app/therapist/_lib/therapist-utils';
 
+const CHECK_IN_MAX_SCORE = 21;
+
 export default function TherapistPatientDetailPage() {
   const { t } = useTranslation();
   const { isAdmin, isLoading } = useAdmin();
@@ -137,7 +139,7 @@ export default function TherapistPatientDetailPage() {
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">
-                {hasLatestCheckIn && typeof patient.latestCheckInScore === 'number' ? `${patient.latestCheckInScore}/20` : t('therapist.noCheckInYet')}
+                {hasLatestCheckIn && typeof patient.latestCheckInScore === 'number' ? `${patient.latestCheckInScore}/${CHECK_IN_MAX_SCORE}` : t('therapist.noCheckInYet')}
               </div>
               <p className="text-xs text-muted-foreground">{lastActivity}</p>
             </CardContent>

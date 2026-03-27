@@ -28,6 +28,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getPatientStatus, toDate } from "@/app/therapist/_lib/therapist-utils";
 
+const CHECK_IN_MAX_SCORE = 21;
+
 export default function TherapistDashboard() {
   const { t } = useTranslation();
   const { isAdmin, isLoading } = useAdmin();
@@ -257,7 +259,7 @@ export default function TherapistDashboard() {
                     <div>
                       <p className="text-xs text-muted-foreground">{t('therapist.latestCheckIn')}</p>
                       <p className="text-sm font-medium">
-                        {patient.hasCheckIn && typeof patient.latestCheckInScore === 'number' ? `${patient.latestCheckInScore}/20` : t('therapist.noCheckInYet')}
+                        {patient.hasCheckIn && typeof patient.latestCheckInScore === 'number' ? `${patient.latestCheckInScore}/${CHECK_IN_MAX_SCORE}` : t('therapist.noCheckInYet')}
                       </p>
                     </div>
                     <div>
@@ -308,7 +310,7 @@ export default function TherapistDashboard() {
                     >
                       <TableCell className="font-medium">{patient.displayName || patient.email}</TableCell>
                       <TableCell>{t('userProgress.level', { level: patient.level })}</TableCell>
-                      <TableCell>{patient.hasCheckIn && typeof patient.latestCheckInScore === 'number' ? `${patient.latestCheckInScore}/20` : t('therapist.noCheckInYet')}</TableCell>
+                      <TableCell>{patient.hasCheckIn && typeof patient.latestCheckInScore === 'number' ? `${patient.latestCheckInScore}/${CHECK_IN_MAX_SCORE}` : t('therapist.noCheckInYet')}</TableCell>
                       <TableCell>
                         <Badge variant={patient.status === 'active' ? 'secondary' : 'destructive'}>{t(`therapist.statuses.${patient.status}`)}</Badge>
                       </TableCell>
@@ -350,7 +352,7 @@ export default function TherapistDashboard() {
                 <div>
                   <p className="text-sm text-muted-foreground">{t('therapist.latestCheckIn')}</p>
                   <p className="break-words text-lg font-semibold">
-                    {selectedPatient.hasCheckIn && typeof selectedPatient.latestCheckInScore === 'number' ? `${selectedPatient.latestCheckInScore}/20` : t('therapist.noCheckInYet')}
+                    {selectedPatient.hasCheckIn && typeof selectedPatient.latestCheckInScore === 'number' ? `${selectedPatient.latestCheckInScore}/${CHECK_IN_MAX_SCORE}` : t('therapist.noCheckInYet')}
                   </p>
                 </div>
                 <div>
