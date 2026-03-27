@@ -1,0 +1,299 @@
+'use client';
+
+import { useEffect } from 'react';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { collection, doc } from 'firebase/firestore';
+import { AlertTriangle, ArrowLeft, BrainCircuit, ClipboardList, ShieldAlert, UserRound } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Logo } from '@/components/logo';
+import { useTranslation } from '@/context/language-provider';
+import { useAdmin } from '@/hooks/use-admin';
+import { useCollection, useDoc, useFirebase, useMemoFirebase } from '@/firebase';
+import type { ExposureMission } from '@/models/exposure-mission';
+import type { MentalCheckup } from '@/models/mental-checkup';
+import type { ThoughtRecord } from '@/models/thought-record';
+import type { UserProfile } from '@/models/user';
+import { getPatientStatus, toDate } from '@/app/therapist/_lib/therapist-utils';
+
+export default function TherapistPatientDetailPage() {
+  const { t } = useTranslation();
+  const { isAdmin, isLoading } = useAdmin();
+  const { firestore, user } = useFirebase();
+  const router = useRouter();
+  const params = useParams<{ id: string }>();
+  const patientId = params?.id;
+
+  const patientDocRef = useMemoFirebase(() => {
+    if (!firestore || !patientId) return null;
+    return doc(firestore, 'users', patientId);
+  }, [firestore, patientId]);
+  const { data: patient, isLoading: isPatientLoading } = useDoc<UserProfile>(patientDocRef);
+
+  const isAssignedPatient = !!user && !!patient && Array.isArray(patient.therapistIds) && patient.therapistIds.includes(user.uid);
+
+  const checkupsQuery = useMemoFirebase(() => {
+    if (!firestore || !patientId || !isAssignedPatient) return null;
+    return collection(firestore, 'users', patientId, 'mental_checkups');
+  }, [firestore, patientId, isAssignedPatient]);
+  const { data: checkups, isLoading: areCheckupsLoading } = useCollection<MentalCheckup>(checkupsQuery);
+
+  const thoughtsQuery = useMemoFirebase(() => {
+    if (!firestore || !patientId || !isAssignedPatient) return null;
+    return collection(firestore, 'users', patientId, 'thoughtRecords');
+  }, [firestore, patientId, isAssignedPatient]);
+  const { data: thoughts, isLoading: areThoughtsLoading } = useCollection<ThoughtRecord>(thoughtsQuery);
+
+  const missionsQuery = useMemoFirebase(() => {
+    if (!firestore || !patientId || !isAssignedPatient) return null;
+    return collection(firestore, 'users', patientId, 'exposureMissions');
+  }, [firestore, patientId, isAssignedPatient]);
+  const { data: missions, isLoading: areMissionsLoading } = useCollection<ExposureMission>(missionsQuery);
+
+  useEffect(() => {
+    if (!isLoading && !isAdmin) {
+      router.push('/dashboard');
+    }
+  }, [isAdmin, isLoading, router]);
+
+  useEffect(() => {
+    if (!isLoading && !isPatientLoading && patient && user && !isAssignedPatient) {
+      router.push('/therapist');
+    }
+  }, [isAssignedPatient, isLoading, isPatientLoading, patient, router, user]);
+
+  const sortedCheckups = [...(checkups ?? [])]
+    .sort((a, b) => (toDate(b.createdAt)?.getTime() ?? 0) - (toDate(a.createdAt)?.getTime() ?? 0));
+  const sortedThoughts = [...(thoughts ?? [])]
+    .sort((a, b) => (toDate(b.recordedAt)?.getTime() ?? 0) - (toDate(a.recordedAt)?.getTime() ?? 0))
+    .slice(0, 6);
+  const sortedMissions = [...(missions ?? [])]
+    .sort((a, b) => (toDate(b.completionDate ?? b.createdAt)?.getTime() ?? 0) - (toDate(a.completionDate ?? a.createdAt)?.getTime() ?? 0))
+    .slice(0, 6);
+
+  const completedMissions = (missions ?? []).filter((mission) => mission.status === 'completed').length;
+  const activeMissions = (missions ?? []).filter((mission) => mission.status === 'active').length;
+  const hasLatestCheckIn = !!patient?.latestCheckInAt;
+  const patientStatus = getPatientStatus(patient?.latestCheckInLevel);
+  const lastActivity = patient?.latestCheckInAt ? toDate(patient.latestCheckInAt)?.toLocaleDateString() : t('therapist.noRecentActivity');
+
+  if (isLoading || isPatientLoading || areCheckupsLoading || areThoughtsLoading || areMissionsLoading) {
+    return <div>{t('loading')}</div>;
+  }
+
+  if (!patient || !isAssignedPatient) {
+    return (
+      <div className="flex min-h-screen items-center justify-center p-6">
+        <Card className="w-full max-w-lg">
+          <CardHeader>
+            <CardTitle>{t('therapist.patientNotFound')}</CardTitle>
+            <CardDescription>{t('therapist.patientNotAssigned')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild variant="outline">
+              <Link href="/therapist">{t('therapist.backToPatients')}</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex min-h-screen w-full flex-col">
+      <header className="sticky top-0 flex min-h-16 flex-wrap items-center gap-3 border-b bg-background px-4 py-3 md:px-6">
+        <Logo className="shrink-0" />
+        <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:items-center">
+          <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
+            <Link href="/therapist">
+              <ArrowLeft className="h-4 w-4" />
+              {t('therapist.backToPatients')}
+            </Link>
+          </Button>
+          <Link href="/">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto">{t('therapist.backToSite')}</Button>
+          </Link>
+        </div>
+      </header>
+
+      <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-sm text-muted-foreground">{t('therapist.patientDetail')}</p>
+            <h1 className="break-words text-2xl font-semibold md:text-3xl">{patient.displayName || patient.email}</h1>
+            <p className="break-all text-sm text-muted-foreground">{patient.email}</p>
+          </div>
+          <Badge className="w-fit" variant={patientStatus === 'active' ? 'secondary' : 'destructive'}>
+            {t(`therapist.statuses.${patientStatus}`)}
+          </Badge>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">{t('therapist.latestCheckIn')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">
+                {hasLatestCheckIn && typeof patient.latestCheckInScore === 'number' ? `${patient.latestCheckInScore}/20` : t('therapist.noCheckInYet')}
+              </div>
+              <p className="text-xs text-muted-foreground">{lastActivity}</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">{t('therapist.latestMissionSummary')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{completedMissions}</div>
+              <p className="text-xs text-muted-foreground">
+                {activeMissions} {t('therapist.activeMissions').toLowerCase()}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">{t('therapist.level')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{t('userProgress.level', { level: patient.level })}</div>
+              <p className="text-xs text-muted-foreground">{patient.currentXp}/{patient.xpToNextLevel} XP</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">{t('therapist.riskLevel')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2 text-2xl font-bold">
+                <ShieldAlert className="h-5 w-5" />
+                {patient.latestCheckInLevel ?? t('therapist.noCheckInYet')}
+              </div>
+              <p className="text-xs text-muted-foreground">{t('therapist.riskLevelDesc')}</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5" />
+                {t('therapist.checkInHistory')}
+              </CardTitle>
+              <CardDescription>{t('therapist.checkInHistoryDesc')}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {sortedCheckups.length === 0 && (
+                <p className="text-sm text-muted-foreground">{t('therapist.noCheckInsYet')}</p>
+              )}
+              {sortedCheckups.map((checkup) => (
+                <div key={checkup.id} className="rounded-lg border p-4">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="break-words font-medium">{checkup.resultTitle}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {toDate(checkup.createdAt)?.toLocaleString() ?? t('therapist.noRecentActivity')}
+                      </p>
+                    </div>
+                    <Badge className="w-fit" variant={checkup.level === 'severe' ? 'destructive' : 'secondary'}>
+                      {checkup.level}
+                    </Badge>
+                  </div>
+                  <p className="mt-2 break-words text-sm">{checkup.summary}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {t('therapist.scoreLabel')}: {checkup.score}/{checkup.maxScore}
+                  </p>
+                  <p className="mt-2 break-words text-sm text-muted-foreground">
+                    {t('therapist.latestNote')}: {checkup.professionalNote}
+                  </p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <UserRound className="h-5 w-5" />
+                  {t('therapist.patientOverview')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div>
+                  <p className="text-muted-foreground">{t('therapist.latestNote')}</p>
+                  <p className="break-words">{patient.latestCheckInNote || t('therapist.noCheckInYet')}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">{t('therapist.lastActivity')}</p>
+                  <p>{lastActivity}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">{t('therapist.status')}</p>
+                  <Badge variant={patientStatus === 'active' ? 'secondary' : 'destructive'}>
+                    {t(`therapist.statuses.${patientStatus}`)}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BrainCircuit className="h-5 w-5" />
+                  {t('therapist.recentThoughts')}
+                </CardTitle>
+                <CardDescription>{t('therapist.recentThoughtsDesc')}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {sortedThoughts.length === 0 && (
+                  <p className="text-sm text-muted-foreground">{t('therapist.noThoughtsYet')}</p>
+                )}
+                {sortedThoughts.map((thought) => (
+                  <div key={thought.id} className="rounded-lg border p-3">
+                    <p className="break-words text-sm font-medium">{thought.thoughtText}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {t('observer.emotion')}: {thought.associatedEmotion} | {t('observer.intensity')}: {thought.intensity}
+                    </p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ClipboardList className="h-5 w-5" />
+                  {t('therapist.recentMissions')}
+                </CardTitle>
+                <CardDescription>{t('therapist.recentMissionsDesc')}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {sortedMissions.length === 0 && (
+                  <p className="text-sm text-muted-foreground">{t('therapist.noMissionsYet')}</p>
+                )}
+                {sortedMissions.map((mission) => (
+                  <div key={mission.id} className="rounded-lg border p-3">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <p className="break-words text-sm font-medium">{mission.title}</p>
+                      <Badge variant={mission.status === 'completed' ? 'secondary' : mission.status === 'failed' ? 'destructive' : 'outline'}>
+                        {mission.status}
+                      </Badge>
+                    </div>
+                    <p className="mt-1 break-words text-xs text-muted-foreground">{mission.description}</p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}

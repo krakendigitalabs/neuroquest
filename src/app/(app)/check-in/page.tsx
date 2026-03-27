@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from '@/context/language-provider';
 import { useFirebase } from '@/firebase';
-import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import type { CheckupAnswer, MentalCheckup, Recommendations, RiskFlags } from '@/models/mental-checkup';
 
@@ -217,12 +217,12 @@ export default function CheckInPage() {
 
       await addDoc(collection(firestore, 'users', user.uid, 'mental_checkups'), payload);
 
-      await updateDoc(doc(firestore, 'users', user.uid), {
+      await setDoc(doc(firestore, 'users', user.uid), {
         latestCheckInScore: computedScore,
         latestCheckInLevel: computedSeverity,
         latestCheckInAt: serverTimestamp(),
         latestCheckInNote: notes.trim() || t('checkIn.defaultProfessionalNote'),
-      });
+      }, { merge: true });
 
       setSaved(true);
     } catch (err) {
