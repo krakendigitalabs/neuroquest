@@ -11,7 +11,7 @@ const translations: Record<Locale, any> = { en, es };
 type LanguageContextType = {
   locale: Locale;
   setLocale: (locale: Locale) => void;
-  t: (key: string) => string;
+  t: (key: string, variables?: Record<string, string | number>) => string;
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -19,7 +19,8 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [locale, setLocale] = useState<Locale>('en');
 
-  const t = useMemo(() => (key: string): string => {
+  const t = useMemo(
+    () => (key: string, variables?: Record<string, string | number>): string => {
     const keys = key.split('.');
     let result = translations[locale];
     for (const k of keys) {
@@ -34,10 +35,22 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
               return key;
             }
         }
-        return fallbackResult;
+        result = fallbackResult;
+        break;
       }
     }
-    return typeof result === 'string' ? result : key;
+    if (typeof result !== 'string') {
+      return key;
+    }
+
+    if (!variables) {
+      return result;
+    }
+
+    return result.replace(/\{(\w+)\}/g, (_, variableName: string) => {
+      const value = variables[variableName];
+      return value === undefined ? `{${variableName}}` : String(value);
+    });
   }, [locale]);
 
   const value = {

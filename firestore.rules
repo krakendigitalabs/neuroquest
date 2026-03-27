@@ -92,6 +92,18 @@ service cloud.firestore {
       return request.resource.data.userId == resource.data.userId;
     }
 
+    /**
+     * Validates denormalized latest mental check-in summary fields stored on the
+     * user profile. This keeps dashboard and therapist list reads cheap while
+     * preserving a predictable shape for owner updates.
+     */
+    function hasValidLatestCheckInSummary() {
+      return (!('latestCheckInScore' in request.resource.data) || request.resource.data.latestCheckInScore is number) &&
+        (!('latestCheckInLevel' in request.resource.data) || request.resource.data.latestCheckInLevel in ['healthy', 'mild', 'moderate', 'severe']) &&
+        (!('latestCheckInAt' in request.resource.data) || request.resource.data.latestCheckInAt == null || request.resource.data.latestCheckInAt is timestamp) &&
+        (!('latestCheckInNote' in request.resource.data) || request.resource.data.latestCheckInNote is string);
+    }
+
     // -------------------------------------------------------------------------
     // Collection Rules
     // -------------------------------------------------------------------------
@@ -107,8 +119,8 @@ service cloud.firestore {
     match /users/{userId} {
       allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
       allow list: if isSignedIn(); // Secured by query: .where('therapistIds', 'array-contains', auth.uid)
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isOwner(userId) && request.resource.data.id == resource.data.id;
+      allow create: if isOwner(userId) && request.resource.data.id == userId && hasValidLatestCheckInSummary();
+      allow update: if isOwner(userId) && request.resource.data.id == resource.data.id && hasValidLatestCheckInSummary();
       allow delete: if isOwner(userId);
     }
 

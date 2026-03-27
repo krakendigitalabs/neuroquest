@@ -43,6 +43,8 @@ export function ThoughtAnalyzer() {
 
   const analyzeAction = async (prevState: State, formData: FormData): Promise<State> => {
     const thought = formData.get('thought') as string;
+    const emotion = (formData.get('emotion') as string) || 'unknown';
+    const intensity = Number(formData.get('intensity') as string) || 5;
     if (!thought || thought.trim().length < 5) {
       return { error: 'thoughtAnalyzer.validationError' };
     }
@@ -60,8 +62,8 @@ export function ThoughtAnalyzer() {
         thoughtText: thought,
         cognitiveLabel: result.isTOCRelated ? 'toc_thought' : 'general_thought',
         isFactNotThought: true,
-        associatedEmotion: 'unknown', // This could be a user input
-        intensity: 5, // This could be a user input
+        associatedEmotion: emotion,
+        intensity,
         isIntrusive: result.isTOCRelated,
       };
 
@@ -108,6 +110,42 @@ export function ThoughtAnalyzer() {
             required
             minLength={5}
           />
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-sm font-medium" htmlFor="emotion">
+                {t('observer.emotion')}
+              </label>
+              <select
+                id="emotion"
+                name="emotion"
+                defaultValue="anxiety"
+                className="w-full rounded-md border px-3 py-2 bg-background"
+              >
+                <option value="anxiety">{t('observer.emotions.anxiety')}</option>
+                <option value="fear">{t('observer.emotions.fear')}</option>
+                <option value="sadness">{t('observer.emotions.sadness')}</option>
+                <option value="guilt">{t('observer.emotions.guilt')}</option>
+                <option value="anger">{t('observer.emotions.anger')}</option>
+                <option value="shame">{t('observer.emotions.shame')}</option>
+                <option value="confusion">{t('observer.emotions.confusion')}</option>
+                <option value="unknown">{t('observer.emotions.unknown')}</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium" htmlFor="intensity">
+                {t('observer.intensity')}: 5/10
+              </label>
+              <input
+                id="intensity"
+                name="intensity"
+                type="range"
+                min="1"
+                max="10"
+                defaultValue="5"
+                className="w-full"
+              />
+            </div>
+          </div>
         </CardContent>
         <CardFooter>
           <AnalyzeButton />

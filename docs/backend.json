@@ -4,7 +4,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "User",
       "type": "object",
-      "description": "Represents a user of the NeuroQuest application, including their profile, gamified progress, and associated therapeutic data.",
+      "description": "Represents a user of the NeuroQuest application, including their profile, gamified progress, associated therapeutic data, and denormalized latest check-in summary fields used by dashboard and therapist views.",
       "properties": {
         "id": {
           "type": "string",
@@ -54,6 +54,32 @@
           "type": "string",
           "description": "Timestamp when the user account was created.",
           "format": "date-time"
+        },
+        "latestCheckInScore": {
+          "type": "number",
+          "description": "Denormalized score from the user's most recent mental check-in, used for fast reads in dashboard and therapist views."
+        },
+        "latestCheckInLevel": {
+          "type": "string",
+          "description": "Denormalized severity level from the user's most recent mental check-in.",
+          "enum": [
+            "healthy",
+            "mild",
+            "moderate",
+            "severe"
+          ]
+        },
+        "latestCheckInAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Timestamp of the user's most recent mental check-in. Null when the user has not completed a check-in yet.",
+          "format": "date-time"
+        },
+        "latestCheckInNote": {
+          "type": "string",
+          "description": "Short free-text note captured on the user's most recent mental check-in."
         }
       },
       "required": [
@@ -810,7 +836,7 @@
           "schema": {
             "$ref": "#/backend/entities/MentalCheckup"
           },
-          "description": "Stores a log of a user's mental check-in assessment results. This data is private to the user but viewable by their assigned therapists.",
+          "description": "Stores the full historical log of a user's mental check-in assessment results. The latest check-in summary is also denormalized onto the parent user document for fast dashboard and therapist list reads.",
           "params": [
             {
               "name": "userId",

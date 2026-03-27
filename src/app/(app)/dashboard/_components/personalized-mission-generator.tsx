@@ -21,8 +21,8 @@ type PersonalizedMission = {
   type: string;
   difficulty: string;
   xpReward: number;
-  targetBehavior: string;
-  resistanceTarget: string;
+  targetBehavior?: string;
+  resistanceTarget?: string;
 };
 
 type State = {
@@ -118,8 +118,8 @@ export function PersonalizedMissionGenerator() {
         status: 'active',
         assignedBy: 'AI',
         isAiGenerated: true,
-        targetBehavior,
-        resistanceTarget,
+        targetBehavior: targetBehavior ?? title,
+        resistanceTarget: resistanceTarget ?? 'Complete the mission once',
         createdAt: serverTimestamp()
     };
 

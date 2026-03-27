@@ -1,12 +1,12 @@
-import { FieldValue } from "firebase/firestore";
+import { FieldValue, Timestamp } from "firebase/firestore";
 
-interface CheckupAnswer {
+export interface CheckupAnswer {
     questionId: number;
     question: string;
     value: number;
 }
 
-interface Recommendations {
+export interface Recommendations {
     daily: string[];
     family: string[];
     partner: string[];
@@ -16,14 +16,14 @@ interface Recommendations {
     readings: string[];
 }
 
-interface RiskFlags {
+export interface RiskFlags {
     selfHarmRisk: boolean;
     needsProfessionalSupport: boolean;
 }
 
 export interface MentalCheckup {
     id?: string;
-    createdAt: FieldValue;
+    createdAt: FieldValue | Timestamp | Date | string;
     userId: string;
     patientName: string;
     age?: number;

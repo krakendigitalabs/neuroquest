@@ -4,7 +4,7 @@ import { Progress } from "@/components/ui/progress"
 import { useState, useEffect } from "react";
 
 type UserProgressProps = {
-  level: string;
+  level: string | number;
   currentXp: number;
   xpToNextLevel: number;
 };
