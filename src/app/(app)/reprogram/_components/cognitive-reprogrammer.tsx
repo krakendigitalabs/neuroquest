@@ -99,7 +99,7 @@ export function CognitiveReprogrammer() {
                 </div>
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground italic">
-                "{state.initialThought}"
+                &quot;{state.initialThought}&quot;
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2">
@@ -125,7 +125,7 @@ export function CognitiveReprogrammer() {
                 </div>
               </AccordionTrigger>
               <AccordionContent className="font-semibold">
-                "{state.reprogrammedThought}"
+                &quot;{state.reprogrammedThought}&quot;
                  <p className="mt-4 font-normal text-muted-foreground">{state.conclusion}</p>
               </AccordionContent>
             </AccordionItem>

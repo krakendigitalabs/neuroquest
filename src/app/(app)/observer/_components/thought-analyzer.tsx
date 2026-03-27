@@ -11,9 +11,8 @@ import { Wand2 } from 'lucide-react';
 import { useRef, useEffect, useActionState, useState } from 'react';
 import { useTranslation } from '@/context/language-provider';
 import { useFirebase } from '@/firebase';
-import { addDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
-import { collection, doc, serverTimestamp } from 'firebase/firestore';
 import { Input } from '@/components/ui/input';
+import { persistThoughtRecord } from '@/lib/thought-records';
 
 type State = {
   isTOCRelated?: boolean;
@@ -61,35 +60,17 @@ export function ThoughtAnalyzer() {
 
     try {
       const result = await analyzeThought({ thought });
-      
-      const thoughtRecord = {
+
+      await persistThoughtRecord({
+        firestore,
         userId: user.uid,
-        recordedAt: serverTimestamp(),
-        thoughtText: thought,
+        thought,
         situation,
         trigger,
-        cognitiveLabel: result.isTOCRelated ? 'toc_thought' : 'general_thought',
-        isFactNotThought: true,
-        associatedEmotion: emotion,
+        emotion,
         intensity,
         compulsionUrge,
-        isIntrusive: result.isTOCRelated,
-        isTOCRelated: result.isTOCRelated,
-        analysis: result.analysis,
-        reframingSuggestion: result.reframingSuggestion,
-        source: 'observer' as const,
-      };
-
-      const thoughtsCollection = collection(firestore, 'users', user.uid, 'thoughtRecords');
-      await addDocumentNonBlocking(thoughtsCollection, thoughtRecord);
-      const userRef = doc(firestore, 'users', user.uid);
-      updateDocumentNonBlocking(userRef, {
-        latestThoughtAt: serverTimestamp(),
-        latestThoughtEmotion: emotion,
-        latestThoughtIntensity: intensity,
-        latestThoughtLabel: thoughtRecord.cognitiveLabel,
-        latestThoughtPreview: thought.trim().slice(0, 180),
-        latestThoughtIsIntrusive: thoughtRecord.isIntrusive,
+        result,
       });
 
       return { ...result, thought };

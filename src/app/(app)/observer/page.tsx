@@ -10,6 +10,7 @@ import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import type { ThoughtRecord } from '@/models/thought-record';
 import { buildThoughtInsights, buildThoughtTimeline, getThoughtRiskLevel, toDate } from '@/lib/thought-insights';
+import { normalizeThoughtRecords } from '@/lib/thought-records';
 
 function translateLabel(t: (key: string) => string, label?: string) {
   if (!label) return '';
@@ -44,7 +45,7 @@ function ThoughtHistoryItem({ item }: { item: ThoughtRecord }) {
       <CardHeader className="gap-3">
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div className="space-y-1">
-            <CardTitle className="text-lg leading-snug">"{item.thoughtText}"</CardTitle>
+            <CardTitle className="text-lg leading-snug">&quot;{item.thoughtText}&quot;</CardTitle>
             <CardDescription>{formattedDate || ' '}</CardDescription>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -103,13 +104,14 @@ export default function ObserverPage() {
   }, [firestore, user]);
 
   const { data: thoughtHistory, isLoading } = useCollection<ThoughtRecord>(thoughtsQuery);
+  const normalizedThoughtHistory = useMemo(() => normalizeThoughtRecords(thoughtHistory), [thoughtHistory]);
 
   const sortedThoughts = useMemo(
     () =>
-      [...(thoughtHistory ?? [])].sort(
+      [...normalizedThoughtHistory].sort(
         (a, b) => (toDate(b.recordedAt)?.getTime() ?? 0) - (toDate(a.recordedAt)?.getTime() ?? 0)
       ),
-    [thoughtHistory]
+    [normalizedThoughtHistory]
   );
 
   const insights = useMemo(() => buildThoughtInsights(sortedThoughts), [sortedThoughts]);

@@ -18,6 +18,8 @@ import type { ThoughtRecord } from '@/models/thought-record';
 import type { UserProfile } from '@/models/user';
 import { getPatientStatus } from '@/app/therapist/_lib/therapist-utils';
 import { buildThoughtInsights, buildThoughtTimeline, getThoughtRiskLevel, toDate } from '@/lib/thought-insights';
+import { normalizeThoughtRecords } from '@/lib/thought-records';
+import { isAssignedTherapist } from '@/lib/therapist-access';
 
 const CHECK_IN_MAX_SCORE = 21;
 
@@ -42,7 +44,7 @@ export default function TherapistPatientDetailPage() {
   }, [firestore, patientId]);
   const { data: patient, isLoading: isPatientLoading } = useDoc<UserProfile>(patientDocRef);
 
-  const isAssignedPatient = !!user && !!patient && Array.isArray(patient.therapistIds) && patient.therapistIds.includes(user.uid);
+  const isAssignedPatient = isAssignedTherapist(patient, user?.uid);
 
   const checkupsQuery = useMemoFirebase(() => {
     if (!firestore || !patientId || !isAssignedPatient) return null;
@@ -55,6 +57,7 @@ export default function TherapistPatientDetailPage() {
     return collection(firestore, 'users', patientId, 'thoughtRecords');
   }, [firestore, patientId, isAssignedPatient]);
   const { data: thoughts, isLoading: areThoughtsLoading } = useCollection<ThoughtRecord>(thoughtsQuery);
+  const normalizedThoughts = useMemo(() => normalizeThoughtRecords(thoughts), [thoughts]);
 
   const missionsQuery = useMemoFirebase(() => {
     if (!firestore || !patientId || !isAssignedPatient) return null;
@@ -77,7 +80,7 @@ export default function TherapistPatientDetailPage() {
   const sortedCheckups = [...(checkups ?? [])].sort(
     (a, b) => (toDate(b.createdAt)?.getTime() ?? 0) - (toDate(a.createdAt)?.getTime() ?? 0)
   );
-  const sortedThoughts = [...(thoughts ?? [])].sort(
+  const sortedThoughts = [...normalizedThoughts].sort(
     (a, b) => (toDate(b.recordedAt)?.getTime() ?? 0) - (toDate(a.recordedAt)?.getTime() ?? 0)
   );
   const sortedMissions = [...(missions ?? [])]

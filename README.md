@@ -143,6 +143,27 @@ Type-check the app with:
 npm run typecheck
 ```
 
+Additional validation commands:
+
+```bash
+npm run lint
+npm run test
+npm run build
+```
+
+## Dependency Security Note
+
+As of March 27, 2026, dependency maintenance for this repo is in a stable state:
+
+- `next` was updated to `15.5.14`
+- `genkit`, `genkit-cli`, and `@genkit-ai/google-genai` were aligned to `1.31.0`
+- `patch-package` was updated to `8.0.1`
+- `npm run typecheck`, `npm run lint`, `npm run test`, and `npm run build` all pass
+
+Residual `npm audit` findings remain, but they are currently limited to low-severity transitive issues in the Genkit and Google Cloud dependency chain. The available `npm audit` suggestion for those findings points to incompatible downgrade paths such as `genkit@1.16.1` or `genkit-cli@0.0.2`, which are not considered safe remediation steps for this project.
+
+There is also a non-blocking build warning from Genkit/OpenTelemetry about `@opentelemetry/exporter-jaeger` resolution. It does not currently break build, lint, tests, or runtime validation, but it should be monitored on future Genkit upgrades.
+
 ## Current Branch
 
 Latest uploaded branch for this work:

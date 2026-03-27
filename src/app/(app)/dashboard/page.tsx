@@ -12,8 +12,8 @@ import { collection } from 'firebase/firestore';
 import type { ExposureMission } from '@/models/exposure-mission';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-
-const CHECK_IN_MAX_SCORE = 21;
+import { CHECK_IN_MAX_SCORE } from '@/lib/mental-check-in';
+import { getLatestActiveMission } from '@/lib/dashboard';
 
 function toDate(value: unknown): Date | null {
   if (!value) return null;
@@ -43,11 +43,7 @@ export default function DashboardPage() {
   const level = userProfile?.level ?? 1;
   const hasLatestCheckIn = !!userProfile?.latestCheckInAt;
   const latestCheckInScore = hasLatestCheckIn ? (userProfile?.latestCheckInScore ?? null) : null;
-  const activeMission = useMemo(() => {
-    return [...(missions ?? [])]
-      .filter((mission) => mission.status === 'active' || mission.status === 'pending')
-      .sort((a, b) => (toDate(b.createdAt)?.getTime() ?? 0) - (toDate(a.createdAt)?.getTime() ?? 0))[0] ?? null;
-  }, [missions]);
+  const activeMission = useMemo(() => getLatestActiveMission(missions), [missions]);
   const latestCheckInDate = toDate(userProfile?.latestCheckInAt);
   const summaryText = useMemo(() => {
     if (!hasLatestCheckIn) {

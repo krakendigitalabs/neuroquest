@@ -15,19 +15,7 @@ import { getCheckInTrendLabel } from '@/lib/mental-check-in';
 import type { MentalCheckup } from '@/models/mental-checkup';
 import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import type { TooltipProps } from 'recharts';
-
-function toDate(value: unknown): Date | null {
-  if (!value) return null;
-  if (value instanceof Date) return value;
-  if (typeof value === 'string' || typeof value === 'number') {
-    const parsed = new Date(value);
-    return Number.isNaN(parsed.getTime()) ? null : parsed;
-  }
-  if (typeof value === 'object' && value !== null && 'toDate' in value && typeof (value as { toDate: () => Date }).toDate === 'function') {
-    return (value as { toDate: () => Date }).toDate();
-  }
-  return null;
-}
+import { normalizeProgressCheckups } from '@/lib/progress-checkups';
 
 function average(numbers: number[]) {
   if (!numbers.length) return 0;
@@ -63,9 +51,7 @@ export default function ProgressPage() {
 
   const { data: checkups } = useCollection<MentalCheckup>(checkupsQuery);
 
-  const sortedCheckups = useMemo(() => (
-    [...(checkups ?? [])].sort((a, b) => (toDate(b.createdAt)?.getTime() ?? 0) - (toDate(a.createdAt)?.getTime() ?? 0))
-  ), [checkups]);
+  const sortedCheckups = useMemo(() => normalizeProgressCheckups(checkups), [checkups]);
 
   const latestCheckup = sortedCheckups[0] ?? null;
   const latestFive = sortedCheckups.slice(0, 5);
@@ -79,9 +65,10 @@ export default function ProgressPage() {
       .reverse()
       .slice(-7)
       .map((checkup, index) => {
-        const date = toDate(checkup.createdAt);
         return {
-          day: date ? date.toLocaleDateString(locale, { month: 'short', day: 'numeric' }) : `${t('progress.entryLabel')} ${index + 1}`,
+          day: checkup.createdAt
+            ? checkup.createdAt.toLocaleDateString(locale, { month: 'short', day: 'numeric' })
+            : `${t('progress.entryLabel')} ${index + 1}`,
           score: checkup.score,
         };
       })
@@ -191,9 +178,11 @@ export default function ProgressPage() {
                     {t(`checkIn.results.${checkup.level}.category`)}
                   </Badge>
                 </div>
-                <p className="mt-2 text-sm font-semibold">{t('progress.checkInScore')}: {checkup.score}/{checkup.maxScore}</p>
+                <p className="mt-2 text-sm font-semibold">
+                  {t('progress.checkInScore')}: {checkup.score}/{checkup.maxScore || '—'}
+                </p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {toDate(checkup.createdAt)?.toLocaleString(locale) ?? t('progress.unknownDate')}
+                  {checkup.createdAt?.toLocaleString(locale) ?? t('progress.unknownDate')}
                 </p>
               </div>
             ))}
@@ -238,8 +227,8 @@ export default function ProgressPage() {
               <div className="mt-3 space-y-2">
                 {latestFive.map((checkup) => (
                   <div key={`report-${checkup.id}`} className="grid gap-1 border-b pb-2 last:border-b-0 last:pb-0 md:grid-cols-[1.2fr_0.8fr_1fr]">
-                    <p>{toDate(checkup.createdAt)?.toLocaleString(locale) ?? t('progress.unknownDate')}</p>
-                    <p>{checkup.score}/{checkup.maxScore}</p>
+                    <p>{checkup.createdAt?.toLocaleString(locale) ?? t('progress.unknownDate')}</p>
+                    <p>{checkup.score}/{checkup.maxScore || '—'}</p>
                     <p>{t(`checkIn.results.${checkup.level}.category`)}</p>
                   </div>
                 ))}

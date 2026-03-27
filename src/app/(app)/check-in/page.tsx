@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { addDoc, collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +9,8 @@ import { useTranslation } from '@/context/language-provider';
 import { useFirebase } from '@/firebase';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { calculateMentalCheckInScore, CHECK_IN_MAX_SCORE, getMentalCheckInLevel, type MentalCheckInLevel } from '@/lib/mental-check-in';
-import type { CheckupAnswer, MentalCheckup, Recommendations, RiskFlags } from '@/models/mental-checkup';
+import type { CheckupAnswer, Recommendations, RiskFlags } from '@/models/mental-checkup';
+import { persistMentalCheckIn } from '@/lib/check-in-records';
 
 type MissionResult = {
   category: string;
@@ -142,34 +142,25 @@ export default function CheckInPage() {
       return;
     }
 
-    const payload: MentalCheckup = {
-      userId: user.uid,
-      patientName: userProfile?.displayName || user.displayName || user.email || t('sidebar.guestUser'),
-      score: computedScore,
-      maxScore: CHECK_IN_MAX_SCORE,
-      level: computedSeverity,
-      resultTitle: currentMission.category,
-      mission: currentMission.mission,
-      summary: currentMission.description,
-      answers: draftAnswers,
-      recommendations,
-      activatedModules: ['check-in'],
-      riskFlags,
-      professionalNote: notes.trim() || t('checkIn.defaultProfessionalNote'),
-      createdAt: serverTimestamp(),
-    };
-
     try {
       setSaving(true);
+      const professionalNote = notes.trim() || t('checkIn.defaultProfessionalNote');
 
-      await addDoc(collection(firestore, 'users', user.uid, 'mental_checkups'), payload);
-
-      await setDoc(doc(firestore, 'users', user.uid), {
-        latestCheckInScore: computedScore,
-        latestCheckInLevel: computedSeverity,
-        latestCheckInAt: serverTimestamp(),
-        latestCheckInNote: notes.trim() || t('checkIn.defaultProfessionalNote'),
-      }, { merge: true });
+      await persistMentalCheckIn({
+        firestore,
+        userId: user.uid,
+        patientName: userProfile?.displayName || user.displayName || user.email || t('sidebar.guestUser'),
+        score: computedScore,
+        maxScore: CHECK_IN_MAX_SCORE,
+        level: computedSeverity,
+        resultTitle: currentMission.category,
+        mission: currentMission.mission,
+        summary: currentMission.description,
+        answers: draftAnswers,
+        recommendations,
+        riskFlags,
+        professionalNote,
+      });
 
       setSaved(true);
       setResult({

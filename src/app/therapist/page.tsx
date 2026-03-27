@@ -28,6 +28,7 @@ import type { ThoughtRecord } from '@/models/thought-record';
 import type { UserProfile } from '@/models/user';
 import { getPatientStatus } from '@/app/therapist/_lib/therapist-utils';
 import { buildThoughtInsights, getThoughtRiskLevel, toDate } from '@/lib/thought-insights';
+import { normalizeThoughtRecords } from '@/lib/thought-records';
 
 const CHECK_IN_MAX_SCORE = 21;
 
@@ -75,6 +76,7 @@ export default function TherapistDashboard() {
     return collection(firestore, 'users', selectedPatientId, 'thoughtRecords');
   }, [firestore, selectedPatientId]);
   const { data: thoughts, isLoading: areThoughtsLoading } = useCollection<ThoughtRecord>(thoughtsQuery);
+  const normalizedThoughts = useMemo(() => normalizeThoughtRecords(thoughts), [thoughts]);
 
   const missionsQuery = useMemoFirebase(() => {
     if (!firestore || !selectedPatientId) return null;
@@ -106,7 +108,7 @@ export default function TherapistDashboard() {
             : 'checkin',
         };
       }),
-    [patients, t]
+    [locale, patients, t]
   );
 
   const filteredPatients = patientRows.filter((patient) => {
@@ -130,7 +132,7 @@ export default function TherapistDashboard() {
 
   const selectedPatient = filteredPatients.find((patient) => patient.id === selectedPatientId) ?? null;
   const selectedPatientThoughts = selectedPatient
-    ? [...(thoughts ?? [])]
+    ? [...normalizedThoughts]
         .sort((a, b) => (toDate(b.recordedAt)?.getTime() ?? 0) - (toDate(a.recordedAt)?.getTime() ?? 0))
         .slice(0, 5)
     : [];
@@ -146,8 +148,8 @@ export default function TherapistDashboard() {
     : [];
 
   const selectedThoughtInsights = useMemo(
-    () => buildThoughtInsights(thoughts ?? []),
-    [thoughts]
+    () => buildThoughtInsights(normalizedThoughts),
+    [normalizedThoughts]
   );
 
   const selectedPatientCompletedMissions = (missions ?? []).filter((mission) => mission.status === 'completed').length;

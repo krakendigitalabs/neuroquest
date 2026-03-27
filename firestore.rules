@@ -73,7 +73,9 @@ service cloud.firestore {
      * Performs an efficient `get` on the therapist's own document.
      */
     function isTherapistOfUser(userId) {
-      return isSignedIn() && get(/databases/$(database)/documents/therapists/$(request.auth.uid)).data.patientIds.hasAny([userId]);
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(userId)) &&
+        get(/databases/$(database)/documents/users/$(userId)).data.therapistIds.hasAny([request.auth.uid]);
     }
 
     /**
@@ -132,7 +134,7 @@ service cloud.firestore {
      */
     match /users/{userId} {
       allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
-      allow list: if isSignedIn(); // Secured by query: .where('therapistIds', 'array-contains', auth.uid)
+      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
       allow create: if isOwner(userId) && request.resource.data.id == userId && hasValidLatestCheckInSummary() && hasValidLatestThoughtSummary();
       allow update: if isOwner(userId) && request.resource.data.id == resource.data.id && hasValidLatestCheckInSummary() && hasValidLatestThoughtSummary();
       allow delete: if isOwner(userId);
@@ -163,8 +165,8 @@ service cloud.firestore {
      * @principle Implements global roles via 'Existence over Content'. Managed out-of-band.
      */
     match /roles_admin/{adminId} {
-      allow get: if isSignedIn();
-      allow list: if isSignedIn();
+      allow get: if isOwner(adminId) || isAdmin();
+      allow list: if false;
       allow create: if false; // Must be managed by a trusted backend process
       allow update: if false;
       allow delete: if false;

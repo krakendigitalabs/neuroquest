@@ -1,13 +1,17 @@
-import { cn } from "@/lib/utils"
-import { BrainCircuit } from "lucide-react"
+import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 export function Logo({ className }: { className?: string }) {
   return (
-    <div className={cn("flex items-center gap-2", className)}>
-      <BrainCircuit className="h-8 w-8 text-primary" />
-      <span className="text-2xl font-bold tracking-tight font-headline">
-        NeuroQuest
-      </span>
+    <div className={cn('flex items-center', className)}>
+      <Image
+        src="https://res.cloudinary.com/dr50ioh9h/image/upload/v1774634796/logo_neuroquest_bwnnf4.png"
+        alt="NeuroQuest"
+        width={220}
+        height={56}
+        priority
+        className="h-12 w-auto object-contain"
+      />
     </div>
-  )
+  );
 }

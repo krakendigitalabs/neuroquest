@@ -14,6 +14,8 @@ import { useCollection, useFirebase, useMemoFirebase, addDocumentNonBlocking } f
 import { collection, serverTimestamp } from 'firebase/firestore';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import type { ThoughtRecord } from '@/models/thought-record';
+import { toDate } from '@/lib/thought-insights';
+import { normalizeThoughtRecords } from '@/lib/thought-records';
 
 type PersonalizedMission = {
   title: string;
@@ -44,7 +46,7 @@ const generateMissionAction = async (prevState: State, formData: FormData): Prom
       thoughtRecords: thoughtRecords.map((r: any) => ({
         thought: r.thoughtText,
         label: r.cognitiveLabel,
-        timestamp: r.recordedAt?.toDate ? r.recordedAt.toDate().toISOString() : new Date().toISOString(),
+        timestamp: toDate(r.recordedAt)?.toISOString() ?? new Date().toISOString(),
       })),
       anxietyLogs: [], // Not implemented yet in the app
       compulsionRecords: [], // Not implemented yet in the app
@@ -85,6 +87,7 @@ export function PersonalizedMissionGenerator() {
   }, [firestore, user]);
 
   const { data: thoughtHistory } = useCollection<ThoughtRecord>(thoughtsQuery);
+  const normalizedThoughtHistory = normalizeThoughtRecords(thoughtHistory);
 
   useEffect(() => {
     if (state.error) {
@@ -135,7 +138,7 @@ export function PersonalizedMissionGenerator() {
   };
   
   const formInputContext = JSON.stringify({
-    thoughtRecords: thoughtHistory || [],
+    thoughtRecords: normalizedThoughtHistory,
     userLevel: userProfile?.level || 1,
   });
 
@@ -178,7 +181,7 @@ export function PersonalizedMissionGenerator() {
                     {state.cognitiveCoachingSuggestion.example && (
                         <CardContent>
                             <p className="text-sm text-muted-foreground italic">
-                                {t('thoughtAnalyzer.example')} "{state.cognitiveCoachingSuggestion.example}"
+                                {t('thoughtAnalyzer.example')} &quot;{state.cognitiveCoachingSuggestion.example}&quot;
                             </p>
                         </CardContent>
                     )}
