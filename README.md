@@ -150,3 +150,11 @@ Latest uploaded branch for this work:
 ```text
 nueva-rama
 ```
+
+## Legal Notice
+
+Copyright © 2026 Yessy Alejandro Lotero Hernandez.
+
+All rights reserved.
+
+This repository, its source code, design, content, branding, flows, and related materials are proprietary. No part of this project may be copied, reproduced, distributed, modified, sublicensed, published, or used for commercial or non-commercial purposes without prior written authorization from Yessy Alejandro Lotero Hernandez.
