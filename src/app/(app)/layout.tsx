@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation';
 import { doc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { User } from 'firebase/auth';
 
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { useFirebase } from '@/firebase';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { useTranslation } from '@/context/language-provider';
+import { Logo } from '@/components/logo';
 
 function UserProfileInitializer({ user }: { user: User }) {
   const { firestore } = useFirebase();
@@ -77,7 +78,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <UserProfileInitializer user={user} />
       <AppSidebar />
-      <SidebarInset>{children}</SidebarInset>
+      <SidebarInset>
+        <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-border/60 bg-background/95 px-4 py-3 backdrop-blur md:hidden">
+          <SidebarTrigger className="h-10 w-10 rounded-xl border border-border/70 bg-background shadow-sm" />
+          <Logo className="min-w-0 flex-1" />
+        </div>
+        {children}
+      </SidebarInset>
     </SidebarProvider>
   );
 }
