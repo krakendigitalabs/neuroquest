@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarSeparator,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import {
   LayoutDashboard,
@@ -39,11 +40,23 @@ export function AppSidebar() {
   const { t } = useTranslation();
   const { auth, user } = useFirebase();
   const { userProfile, isLoading: isProfileLoading } = useUserProfile();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   const handleLogout = async () => {
     if (auth) {
       await signOut(auth);
     }
+  };
+
+  const handleNavigate = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
+  const handleLogoutClick = async () => {
+    handleNavigate();
+    await handleLogout();
   };
 
   const navItems = [
@@ -97,7 +110,7 @@ export function AppSidebar() {
                 tooltip={{ children: item.label }}
                 className="min-h-11 px-3 py-2 text-sm sm:min-h-8 sm:px-2 sm:py-2"
               >
-                <Link href={item.href}>
+                <Link href={item.href} onClick={handleNavigate}>
                   {item.icon}
                   <span>{item.label}</span>
                 </Link>
@@ -110,7 +123,7 @@ export function AppSidebar() {
       <SidebarFooter className="gap-3 p-3 pt-2 sm:gap-2 sm:p-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleLogout} className="min-h-11 px-3 py-2 text-sm sm:min-h-8 sm:px-2 sm:py-2">
+            <SidebarMenuButton onClick={handleLogoutClick} className="min-h-11 px-3 py-2 text-sm sm:min-h-8 sm:px-2 sm:py-2">
               <LogOut />
               <span>{t('sidebar.logout')}</span>
             </SidebarMenuButton>
