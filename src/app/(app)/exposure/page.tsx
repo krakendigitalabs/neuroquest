@@ -25,7 +25,25 @@ const MissionCard = ({ mission, onComplete }: { mission: WithId<ExposureMission>
     return t('exposure.difficultyHard');
   }
 
-  const missionTypeKey = (mission.missionType || '').toLowerCase().replace(/ /g, '_');
+  const normalizedMissionType = (mission.missionType || '').toLowerCase().replace(/ /g, '_');
+  const missionTypeKey = (() => {
+    switch (normalizedMissionType) {
+      case 'observer':
+      case 'observador_mental':
+        return 'observer';
+      case 'exposure':
+      case 'exposición':
+        return 'exposure';
+      case 'regulation':
+      case 'regulación_emocional':
+        return 'regulation';
+      case 'reprogram':
+      case 'reprogramación_cognitiva':
+        return 'reprogram';
+      default:
+        return normalizedMissionType;
+    }
+  })();
 
   return (
     <Card className={`transition-all ${mission.status === 'completed' ? 'bg-secondary/30' : 'hover:shadow-lg hover:-translate-y-1'}`}>

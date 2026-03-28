@@ -14,6 +14,9 @@ const CognitiveReprogrammingInputSchema = z.object({
   thought: z
     .string()
     .describe('The catastrophic or magical thought the user wants to challenge.'),
+  locale: z
+    .enum(['es', 'en'])
+    .describe('The active UI language to use in the response.'),
 });
 export type CognitiveReprogrammingInput = z.infer<
   typeof CognitiveReprogrammingInputSchema
@@ -60,6 +63,7 @@ const cognitiveReprogrammingPrompt = ai.definePrompt({
   prompt: `You are an AI assistant specializing in Cognitive Behavioral Therapy (CBT) and Exposure and Response Prevention (ERP), focused on helping users challenge cognitive distortions, particularly catastrophizing and magical thinking related to OCD and anxiety.
 
 The user has identified the following intrusive thought: "{{{thought}}}".
+Use the same language indicated by locale (es = Spanish, en = English) for every output field.
 
 Your task is to guide them through a cognitive restructuring process. Analyze the thought and provide the following:
 

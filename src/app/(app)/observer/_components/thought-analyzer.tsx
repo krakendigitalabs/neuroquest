@@ -39,7 +39,7 @@ export function ThoughtAnalyzer() {
   const { firestore, user } = useFirebase();
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [intensity, setIntensity] = useState(5);
   const [compulsionUrge, setCompulsionUrge] = useState(3);
 
@@ -59,7 +59,7 @@ export function ThoughtAnalyzer() {
     }
 
     try {
-      const result = await analyzeThought({ thought });
+      const result = await analyzeThought({ thought, locale });
 
       await persistThoughtRecord({
         firestore,

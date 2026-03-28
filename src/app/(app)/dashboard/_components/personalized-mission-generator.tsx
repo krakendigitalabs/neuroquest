@@ -20,8 +20,8 @@ import { normalizeThoughtRecords } from '@/lib/thought-records';
 type PersonalizedMission = {
   title: string;
   description: string;
-  type: string;
-  difficulty: string;
+  type: 'observer' | 'exposure' | 'regulation' | 'reprogram';
+  difficulty: 'easy' | 'medium' | 'hard';
   xpReward: number;
   targetBehavior?: string;
   resistanceTarget?: string;
@@ -39,8 +39,43 @@ type State = {
 
 const initialState: State = {};
 
+const getMissionTypeKey = (type: PersonalizedMission['type']) => {
+  switch (type) {
+    case 'observer':
+      return 'missionTypes.observer';
+    case 'exposure':
+      return 'missionTypes.exposure';
+    case 'regulation':
+      return 'missionTypes.regulation';
+    case 'reprogram':
+      return 'missionTypes.reprogram';
+  }
+};
+
+const getDifficultyLevel = (difficulty: PersonalizedMission['difficulty']) => {
+  switch (difficulty) {
+    case 'easy':
+      return 3;
+    case 'medium':
+      return 6;
+    case 'hard':
+      return 9;
+  }
+};
+
+const getDifficultyKey = (difficulty: PersonalizedMission['difficulty']) => {
+  switch (difficulty) {
+    case 'easy':
+      return 'exposure.difficultyEasy';
+    case 'medium':
+      return 'exposure.difficultyMedium';
+    case 'hard':
+      return 'exposure.difficultyHard';
+  }
+};
+
 const generateMissionAction = async (prevState: State, formData: FormData): Promise<State> => {
-  const { thoughtRecords, userLevel } = JSON.parse(formData.get('context') as string);
+  const { thoughtRecords, userLevel, locale } = JSON.parse(formData.get('context') as string);
   try {
      const missionInput = {
       thoughtRecords: thoughtRecords.map((r: any) => ({
@@ -51,6 +86,7 @@ const generateMissionAction = async (prevState: State, formData: FormData): Prom
       anxietyLogs: [], // Not implemented yet in the app
       compulsionRecords: [], // Not implemented yet in the app
       userLevel: `Level ${userLevel}`,
+      locale,
     };
     const result = await generatePersonalizedMission(missionInput);
     return result;
@@ -76,7 +112,7 @@ function GenerateButton() {
 export function PersonalizedMissionGenerator() {
   const [state, formAction] = useActionState(generateMissionAction, initialState);
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { firestore, user } = useFirebase();
   const { userProfile } = useUserProfile();
   const [missionAccepted, setMissionAccepted] = useState(false);
@@ -115,7 +151,7 @@ export function PersonalizedMissionGenerator() {
         title,
         description,
         missionType: type,
-        difficultyLevel: difficulty === 'Fácil' ? 3 : difficulty === 'Media' ? 6 : 9,
+        difficultyLevel: getDifficultyLevel(difficulty),
         xpReward,
         userId: user.uid,
         status: 'active',
@@ -140,6 +176,7 @@ export function PersonalizedMissionGenerator() {
   const formInputContext = JSON.stringify({
     thoughtRecords: normalizedThoughtHistory,
     userLevel: userProfile?.level || 1,
+    locale,
   });
 
   return (
@@ -162,8 +199,8 @@ export function PersonalizedMissionGenerator() {
                     </CardHeader>
                     <CardFooter className="flex justify-between items-center">
                         <div className="flex gap-2">
-                            <Badge variant="secondary">{state.personalizedMission.type}</Badge>
-                            <Badge variant="outline">{state.personalizedMission.difficulty}</Badge>
+                            <Badge variant="secondary">{t(getMissionTypeKey(state.personalizedMission.type))}</Badge>
+                            <Badge variant="outline">{t(getDifficultyKey(state.personalizedMission.difficulty))}</Badge>
                         </div>
                         <Button onClick={handleAcceptMission}>
                             <PlusCircle className="mr-2 h-4 w-4" />

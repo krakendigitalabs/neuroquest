@@ -28,15 +28,15 @@ import { Logo } from '@/components/logo';
 import { UserProgress } from '@/components/user-progress';
 import { CrisisButton } from '@/components/crisis-button';
 import { useTranslation } from '@/context/language-provider';
-import { Button } from './ui/button';
 import { useFirebase } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { UserAvatar } from './user-avatar';
+import { LanguageSwitcher } from '@/components/language-switcher';
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const { t, locale, setLocale } = useTranslation();
+  const { t } = useTranslation();
   const { auth, user } = useFirebase();
   const { userProfile, isLoading: isProfileLoading } = useUserProfile();
 
@@ -118,31 +118,7 @@ export function AppSidebar() {
 
         <SidebarSeparator />
 
-        <div className="p-2 flex gap-1 group-data-[collapsible=icon]:flex-col">
-          <Button
-            variant={locale === 'en' ? 'secondary' : 'ghost'}
-            size="sm"
-            className="flex-1 justify-start"
-            onClick={() => setLocale('en')}
-          >
-            <span className="w-6 h-6 flex items-center justify-center">EN</span>
-            <span className="group-data-[collapsible=icon]:hidden">
-              {t('languageSwitcher.english')}
-            </span>
-          </Button>
-
-          <Button
-            variant={locale === 'es' ? 'secondary' : 'ghost'}
-            size="sm"
-            className="flex-1 justify-start"
-            onClick={() => setLocale('es')}
-          >
-            <span className="w-6 h-6 flex items-center justify-center">ES</span>
-            <span className="group-data-[collapsible=icon]:hidden">
-              {t('languageSwitcher.spanish')}
-            </span>
-          </Button>
-        </div>
+        <LanguageSwitcher className="p-2 group-data-[collapsible=icon]:flex-col" />
 
         <SidebarSeparator />
 

@@ -23,21 +23,6 @@ type State = {
 
 const initialState: State = {};
 
-const reprogramAction = async (prevState: State, formData: FormData): Promise<State> => {
-  const thought = formData.get('thought') as string;
-  if (!thought || thought.trim().length < 5) {
-    return { error: 'cognitiveReprogrammer.validationError' };
-  }
-
-  try {
-    const result = await cognitiveReprogramming({ thought });
-    return result;
-  } catch (error) {
-    console.error(error);
-    return { error: 'cognitiveReprogrammer.genericError' };
-  }
-};
-
 function ReprogramButton() {
   const { pending } = useFormStatus();
   const { t } = useTranslation();
@@ -50,22 +35,36 @@ function ReprogramButton() {
 }
 
 export function CognitiveReprogrammer() {
-  const [state, formAction] = useActionState(reprogramAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
-  const { t } = useTranslation();
-  
+  const { t, locale } = useTranslation();
+
+  const localizedReprogramAction = async (prevState: State, formData: FormData): Promise<State> => {
+    const thought = formData.get('thought') as string;
+    if (!thought || thought.trim().length < 5) {
+      return { error: 'cognitiveReprogrammer.validationError' };
+    }
+
+    try {
+      return await cognitiveReprogramming({ thought, locale });
+    } catch (error) {
+      console.error(error);
+      return { error: 'cognitiveReprogrammer.genericError' };
+    }
+  };
+  const [localizedState, localizedFormAction] = useActionState(localizedReprogramAction, initialState);
+
   useEffect(() => {
-    if (state.error) {
+    if (localizedState.error) {
       toast({
           variant: "destructive",
           title: t('cognitiveReprogrammer.processingFailed'),
-          description: t(state.error),
+          description: t(localizedState.error),
       });
-    } else if (state.initialThought) {
+    } else if (localizedState.initialThought) {
       formRef.current?.reset();
     }
-  }, [state, toast, t]);
+  }, [localizedState, toast, t]);
 
   return (
     <Card className="w-full">
@@ -73,7 +72,7 @@ export function CognitiveReprogrammer() {
         <CardTitle>{t('cognitiveReprogrammer.title')}</CardTitle>
         <CardDescription>{t('cognitiveReprogrammer.description')}</CardDescription>
       </CardHeader>
-      <form ref={formRef} action={formAction}>
+      <form ref={formRef} action={localizedFormAction}>
         <CardContent>
           <Textarea
             name="thought"
@@ -88,7 +87,7 @@ export function CognitiveReprogrammer() {
         </CardFooter>
       </form>
       
-      {state.initialThought && !state.error &&(
+      {localizedState.initialThought && !localizedState.error &&(
         <CardContent>
           <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
             <AccordionItem value="item-1">
@@ -99,21 +98,21 @@ export function CognitiveReprogrammer() {
                 </div>
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground italic">
-                &quot;{state.initialThought}&quot;
+                &quot;{localizedState.initialThought}&quot;
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2">
               <AccordionTrigger>{t('cognitiveReprogrammer.probabilityAssessment')}</AccordionTrigger>
               <AccordionContent>
-                <p><strong>{t('cognitiveReprogrammer.identifiedDistortion')}</strong> {state.cognitiveDistortion}</p>
-                <p className="mt-2 text-muted-foreground">{state.probabilityAssessment}</p>
+                <p><strong>{t('cognitiveReprogrammer.identifiedDistortion')}</strong> {localizedState.cognitiveDistortion}</p>
+                <p className="mt-2 text-muted-foreground">{localizedState.probabilityAssessment}</p>
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-3">
               <AccordionTrigger>{t('cognitiveReprogrammer.challengeQuestions')}</AccordionTrigger>
               <AccordionContent>
                 <ul className="list-disc list-inside space-y-2">
-                  {state.challengeQuestions?.map((q, i) => <li key={i}>{q}</li>)}
+                  {localizedState.challengeQuestions?.map((q, i) => <li key={i}>{q}</li>)}
                 </ul>
               </AccordionContent>
             </AccordionItem>
@@ -125,8 +124,8 @@ export function CognitiveReprogrammer() {
                 </div>
               </AccordionTrigger>
               <AccordionContent className="font-semibold">
-                &quot;{state.reprogrammedThought}&quot;
-                 <p className="mt-4 font-normal text-muted-foreground">{state.conclusion}</p>
+                &quot;{localizedState.reprogrammedThought}&quot;
+                 <p className="mt-4 font-normal text-muted-foreground">{localizedState.conclusion}</p>
               </AccordionContent>
             </AccordionItem>
           </Accordion>

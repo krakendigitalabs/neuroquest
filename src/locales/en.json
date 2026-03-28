@@ -64,81 +64,344 @@
     "english": "English",
     "spanish": "Spanish"
   },
+  "ui": {
+    "close": "Close",
+    "previousSlide": "Previous slide",
+    "nextSlide": "Next slide",
+    "toggleSidebar": "Toggle sidebar"
+  },
   "landing": {
-    "badge": "Health-tech for real clinical follow-up",
-    "therapistPortal": "Therapist Portal",
-    "launchApp": "Launch App",
-    "headline": "Clear clinical tracking for OCD, anxiety, and therapy powered by real data.",
-    "subheadline": "NeuroQuest connects check-ins, observer, progress, and therapist workflows in a clean health-tech experience built for real clinical follow-up.",
-    "secondaryCta": "View clinical modules",
-    "highlight1Title": "Real check-ins",
-    "highlight1Description": "Score, severity, and denormalized user updates stored in Firestore.",
-    "highlight2Title": "Printable reports",
-    "highlight2Description": "Progress and Medical Support generate summaries ready for follow-up.",
-    "highlight3Title": "Therapist view",
-    "highlight3Description": "Real patients, clinical detail, and recent signals per case.",
-    "panelBadge": "Clinical MVP",
-    "panelTitle": "A serious visual layer for a therapy flow that actually closes.",
-    "panelDescription": "The platform prioritizes trust, clarity, and clinical traceability: real history, consistent severity, and therapist support connected to patient state.",
-    "panelMetric1Label": "Latest check-in",
-    "panelMetric1Value": "Real time",
-    "panelMetric1Description": "The dashboard and clinical follow-up use the user's latest denormalized state.",
-    "panelMetric2Label": "Therapist detail",
-    "panelMetric2Value": "Patient by patient",
-    "panelMetric2Description": "Therapists can review check-ins, thoughts, missions, and basic risk directly from Firestore.",
-    "panelFooterLabel": "Designed for clinical trust",
-    "panelFooterDescription": "White, medical-blue, and gold accents create a more professional and less generic presence.",
-    "pathwaysBadge": "How it works",
-    "pathwaysTitle": "An informative journey for users, therapists, and clinical follow-up.",
-    "pathwaysDescription": "The public experience can now explain what the product does, how support looks, and what kind of clinical signals are organized inside the MVP.",
-    "pathway1Title": "Structured logging",
-    "pathway1Description": "Users move from a guided check-in into observer flows with context, without losing score, severity, or important note traceability.",
-    "pathway2Title": "Visible guidance",
-    "pathway2Description": "Medical Support and Crisis Support present understandable recommendations based on the latest recorded clinical state.",
-    "pathway3Title": "Actionable follow-up",
-    "pathway3Description": "Progress and Therapist turn history, trend, and recent activity into practical follow-up insight.",
-    "sliderBadge": "Interactive slider",
-    "sliderTitle": "Visual references for a more human mental health experience.",
-    "previousSlide": "Previous image",
-    "nextSlide": "Next image",
-    "slide1Tag": "Calm",
-    "slide1Title": "Spaces that reduce activation and restore clarity.",
-    "slide1Description": "A useful visual reference for regulation, breathing work, and nervous-system recovery.",
-    "slide2Tag": "Support",
-    "slide2Title": "Human accompaniment and low-friction listening.",
-    "slide2Description": "The product can express a real support dimension, not just questionnaires, when the user needs containment.",
-    "slide3Tag": "Mindfulness",
-    "slide3Title": "Presence practices that cut through mental noise.",
-    "slide3Description": "Ideal for communicating short grounding, observation, and emotional regulation exercises.",
-    "slide4Tag": "Journaling",
-    "slide4Title": "Thought logging is also an intervention.",
-    "slide4Description": "This image reinforces observer flows, pattern analysis, and writing as a clinical follow-up tool.",
-    "slide5Tag": "Well-being",
-    "slide5Title": "Mental health as an ongoing process, not an isolated event.",
-    "slide5Description": "Useful to close the home narrative with a broader view of care, habits, and sustained follow-up.",
-    "infoBadge": "Useful information",
-    "infoTitle": "What NeuroQuest solves inside the current MVP.",
-    "infoDescription": "The current version already supports a clear story: assessment, follow-up, reporting, and therapist visibility over real Firestore-backed data.",
-    "infoCard1Title": "For users",
-    "infoCard1Description": "The home now explains more clearly that the product already includes check-in, progress, observer, and contextual clinical support based on severity.",
-    "infoCard2Title": "For therapists",
-    "infoCard2Description": "It also communicates that there is a patient view with recent history, thoughts, missions, and a basic risk signal.",
-    "infoCard3Title": "For demo or sales",
-    "infoCard3Description": "These new sections make the software easier to present with a more serious, informative, and visually memorable narrative.",
-    "keyFeatures": "Key Features",
-    "approachTitle": "Real modules, not placeholders",
-    "approachDescription": "The visible MVP focuses on live clinical modules already in operation: measurement, follow-up, observer workflows, and therapist support backed by real data.",
-    "feature1Title": "Clinical Mental Check-In",
-    "feature1Description": "A real 10-question flow with 0-40 scoring, severity classification, and consistent clinical note storage.",
-    "feature2Title": "Progress from real history",
-    "feature2Description": "Recent average, trend, latest level, and chart driven by authentic check-in history.",
-    "feature3Title": "Observer with context",
-    "feature3Description": "Thoughts are saved with situation, trigger, intensity, and compulsion urge for meaningful analysis.",
-    "feature4Title": "Operational Therapist portal",
-    "feature4Description": "Real patient lists, patient detail, and compatibility with hardened Firestore rules.",
-    "footerRightsPrefix": "© 2026 NeuroQuest. All rights reserved by",
-    "footerOwnerName": "Yessy Alejandro Lotero Hernandez",
-    "footerDisclaimer": "This system does not replace clinical therapy."
+    "brand": {
+      "tagline": "Health-tech / mental health SaaS"
+    },
+    "nav": {
+      "howItWorks": "How it works",
+      "modules": "Real modules",
+      "science": "Clinical basis",
+      "therapist": "Therapist portal",
+      "cta": "Open the app"
+    },
+    "hero": {
+      "badge": "A mental-health tracking platform with clinical structure",
+      "title": "Your mind, supported every day",
+      "description": "Understand how you feel, record what you think, and follow your progress with clarity.",
+      "primaryCta": "Start now",
+      "secondaryCta": "See how it works",
+      "trustPoints": [
+        "How you feel today",
+        "What you are thinking",
+        "How you have evolved"
+      ],
+      "productViewEyebrow": "Immersive product view",
+      "productViewTitle": "NeuroQuest MVP",
+      "previewTabs": [
+        {
+          "value": "dashboard",
+          "label": "Dashboard",
+          "badge": "Real dashboard",
+          "title": "Immediate visibility into current state",
+          "body": "Users see their latest check-in, level, XP, active mission, and a short summary that clarifies the next step.",
+          "chips": [
+            "Latest check-in",
+            "XP",
+            "Active mission"
+          ],
+          "metrics": [
+            {
+              "label": "Current state",
+              "value": "Moderate",
+              "tone": "67%"
+            },
+            {
+              "label": "Accumulated XP",
+              "value": "1,280",
+              "tone": "82%"
+            },
+            {
+              "label": "Active mission",
+              "value": "Guided ERP",
+              "tone": "74%"
+            }
+          ]
+        },
+        {
+          "value": "checkin",
+          "label": "Check-In",
+          "badge": "Clinical check-in",
+          "title": "10 questions, real scoring, complete flow closure",
+          "body": "Every answer feeds healthy, mild, moderate, or severe classification and updates denormalized user fields.",
+          "chips": [
+            "10 questions",
+            "0-4",
+            "Severity"
+          ],
+          "metrics": [
+            {
+              "label": "Total score",
+              "value": "0-40",
+              "tone": "90%"
+            },
+            {
+              "label": "Clinical levels",
+              "value": "4",
+              "tone": "68%"
+            },
+            {
+              "label": "Persistence",
+              "value": "Firestore",
+              "tone": "88%"
+            }
+          ]
+        },
+        {
+          "value": "therapist",
+          "label": "Therapist",
+          "badge": "Therapist portal",
+          "title": "Per-patient review with useful context",
+          "body": "Therapists can review check-ins, thoughts, missions, and a basic risk signal within the same workflow.",
+          "chips": [
+            "Real patients",
+            "Clinical detail",
+            "Basic risk"
+          ],
+          "metrics": [
+            {
+              "label": "Real source",
+              "value": "users",
+              "tone": "70%"
+            },
+            {
+              "label": "Thoughts",
+              "value": "Observer",
+              "tone": "83%"
+            },
+            {
+              "label": "Follow-up",
+              "value": "Longitudinal",
+              "tone": "76%"
+            }
+          ]
+        }
+      ],
+      "followUpEyebrow": "Longitudinal follow-up",
+      "followUpTitle": "Clinical state remains legible between sessions.",
+      "guardrailsEyebrow": "Clinical guardrails",
+      "highlights": [
+        {
+          "title": "Clinical flow with real closure",
+          "body": "Check-in, observer, progress, and support work as one connected system."
+        },
+        {
+          "title": "Visual baseline",
+          "body": "White, clinical blue, soft gray, and restrained gold accents with light depth."
+        },
+        {
+          "title": "Calm clinical motion",
+          "body": "Subtle, organic, performant motion inspired by Three.js without overload."
+        }
+      ]
+    },
+    "proof": {
+      "badge": "Concrete MVP signals",
+      "title": "Clinical visibility, continuity, and flow closure inside one system.",
+      "stats": [
+        [
+          "10",
+          "clinical questions per check-in",
+          "Real Mental Check-In with 0-4 answers and total 0-40 scoring."
+        ],
+        [
+          "4",
+          "severity levels",
+          "Healthy, mild, moderate, and severe with proportional reading."
+        ],
+        [
+          "6",
+          "connected functional modules",
+          "Dashboard, Check-In, Progress, Observer, Therapist, and Medical Support."
+        ]
+      ],
+      "trustStrip": [
+        "CBT",
+        "ERP",
+        "Firestore",
+        "Longitudinal history",
+        "Printable summary",
+        "Medellin Crisis Support"
+      ]
+    },
+    "why": {
+      "badge": "What NeuroQuest does",
+      "title": "NeuroQuest supports you between sessions so you do not lose the thread of your process.",
+      "description": "NeuroQuest helps you make sense of your mental state in a simple and continuous way. It turns what you feel and think into clearer information so you can understand yourself better and move forward step by step. It does not replace your therapist. It helps you arrive better prepared and with more clarity.",
+      "cards": [
+        {
+          "title": "Clear current state",
+          "description": "See how you are today without getting lost in confusing data or crowded screens."
+        },
+        {
+          "title": "Progress over time",
+          "description": "Follow changes, gains, and variations across the process with real context."
+        },
+        {
+          "title": "Patterns and signals",
+          "description": "Identify repeated thoughts, important signals, and moments worth reviewing."
+        }
+      ],
+      "caseReadingEyebrow": "Case reading",
+      "caseReadingTitle": "One view integrates recent severity, observer, progress, and active tasks."
+    },
+    "modules": {
+      "badge": "What you can see",
+      "title": "Clear information to understand what is happening to you",
+      "description": "NeuroQuest organizes your information so you can see it more clearly and act in time.",
+      "cards": [
+        [
+          "checkin",
+          "Clear current state",
+          "Understand how you feel today with a simple structured view."
+        ],
+        [
+          "progress",
+          "Progress over time",
+          "See changes and real evolution without losing continuity."
+        ],
+        [
+          "observer",
+          "Thought patterns",
+          "Record thoughts and context to recognize recurring patterns."
+        ],
+        [
+          "support",
+          "Important signals",
+          "Identify moments when it is worth acting or asking for support."
+        ]
+      ]
+    },
+    "journey": {
+      "badge": "How it works",
+      "title": "A simple flow to understand yourself better, step by step.",
+      "steps": [
+        {
+          "step": "01",
+          "title": "Assess yourself in minutes",
+          "description": "Answer a simple check-in to understand how you are today."
+        },
+        {
+          "step": "02",
+          "title": "Record what is on your mind",
+          "description": "Save thoughts, situations, and meaningful emotions."
+        },
+        {
+          "step": "03",
+          "title": "Visualize your progress",
+          "description": "See how you change over time without losing context."
+        },
+        {
+          "step": "04",
+          "title": "Share with your therapist",
+          "description": "Your process becomes clearer and more useful in each session."
+        }
+      ]
+    },
+    "therapistDemo": {
+      "badge": "For therapists",
+      "title": "A clearer way to understand each patient between sessions.",
+      "description": "NeuroQuest offers a clearer view of the patient process to support clinical decision-making.",
+      "panelTitle": "Therapist view",
+      "panelHeading": "Patient overview",
+      "panelSummary": "Access real patient evolution, emotional context, and visible signals to intervene with more clarity.",
+      "latestCheckInLabel": "Latest check-in",
+      "latestCheckInValue": "Moderate · 24/40",
+      "latestCheckInRelative": "2 days ago",
+      "observerLabel": "Recent observer",
+      "observerBody": "Trigger: contamination. Compulsion urge: high. Recent situation documented.",
+      "activityLabel": "Recent activity",
+      "activityBody": "Active ERP mission, longitudinal progress available, and basic risk visible.",
+      "timeline": [
+        [
+          "Patient evolution",
+          "Real follow-up of changes and continuity between sessions."
+        ],
+        [
+          "Clear clinical context",
+          "Thoughts, emotions, and relevant situations in one place."
+        ],
+        [
+          "Risk signals",
+          "Visible indicators to support timely clinical decisions."
+        ]
+      ]
+    },
+    "audiences": {
+      "badge": "Patients and therapists",
+      "title": "One platform, with useful views for patients and professionals.",
+      "patientTitle": "For patients",
+      "therapistTitle": "For therapists",
+      "patientIntro": "A clearer experience to understand mental state, sustain adherence, and lower follow-up friction.",
+      "therapistIntro": "A faster clinical reading of what happened between sessions, without reconstructing everything manually.",
+      "patientItems": [
+        "Understand current state with a check-in that is clear and measurable.",
+        "Record thoughts, context, and repeated signals without losing continuity.",
+        "See progress, trends, and active tasks with less noise.",
+        "Receive contextual support and crisis routes when needed."
+      ],
+      "therapistItems": [
+        "Review real patients directly from Firestore.",
+        "Read the latest check-in, recent history, and case thoughts.",
+        "Observe recent missions and a basic clinical risk signal.",
+        "Get faster visibility into what happened between sessions."
+      ]
+    },
+    "science": {
+      "badge": "Safety and care",
+      "title": "A tool designed to support, not replace professional care.",
+      "description": "NeuroQuest works as a support tool for follow-up and emotional understanding. It keeps clear limits and does not replace clinical care.",
+      "pillars": [
+        [
+          "Continuous support",
+          "It accompanies you between sessions so you arrive with more clarity to each therapeutic space."
+        ],
+        [
+          "Process traceability",
+          "It organizes your evolution so you do not lose context over time."
+        ],
+        [
+          "Explicit safety",
+          "It does not replace professional care or perform medical diagnosis."
+        ]
+      ],
+      "safetyTitle": "Visible guardrails",
+      "safetyIntro": "The public narrative also keeps explicit clinical limits.",
+      "safetyItems": [
+        "NeuroQuest is a support tool.",
+        "It does not replace professional care or perform medical diagnosis.",
+        "It keeps clear messaging when a situation requires more support.",
+        "It preserves a calm and useful reading of the process."
+      ]
+    },
+    "finalCta": {
+      "badge": "Start today",
+      "title": "Start understanding your mind with more clarity, without doing it alone.",
+      "description": "A simple and continuous space to understand how you feel, record what you think, and follow your progress.",
+      "primaryCta": "Start",
+      "secondaryCta": "Explore modules"
+    },
+    "footer": {
+      "productDescription": "Mental-health follow-up with clinical structure, therapeutic gamification, and contextual support for patients and therapists.",
+      "linksTitle": "Sections",
+      "links": [
+        "How it works",
+        "Real modules",
+        "Clinical basis",
+        "Therapist portal"
+      ],
+      "safetyTitle": "Important",
+      "safetyDescription": "NeuroQuest is a support and follow-up tool. It does not replace professional treatment or medical instruction.",
+      "rightsPrefix": "© 2026 NeuroQuest. All rights reserved by",
+      "ownerName": "Yessy Alejandro Lotero Hernandez",
+      "disclaimer": "No self-medication. No dose prescribing. Guidance proportional to risk."
+    }
   },
   "personalizedMissionGenerator": {
     "generating": "Generating...",
@@ -560,6 +823,10 @@
   },
   "loading": "Loading...",
   "missionTypes": {
+    "observer": "Mental Observer",
+    "exposure": "Exposure",
+    "regulation": "Emotional Regulation",
+    "reprogram": "Cognitive Reprogramming",
     "observador_mental": "Mental Observer",
     "exposición": "Exposure",
     "regulación_emocional": "Emotional Regulation",
