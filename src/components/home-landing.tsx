@@ -15,11 +15,8 @@ import { useTherapistAccess } from '@/hooks/use-therapist-access';
 import { useUser } from '@/firebase';
 import { BRAND_SYMBOL } from '@/components/home/brand';
 import { HeroNeuralCanvas } from '@/components/home/hero-neural-canvas';
-import { InteractiveBlobLogo } from '@/components/home/interactive-blob-logo';
 import { audienceIcons, getModuleIcon, ShieldCheck, whyIcons } from '@/components/home/landing-icons';
 import { LanguageSwitcher } from '@/components/language-switcher';
-
-const WORDMARK_LOGO = 'https://res.cloudinary.com/dr50ioh9h/image/upload/v1774633855/logo_neuro_quest_lleuvw.png';
 
 type LandingMetric = {
   label: string;
@@ -66,12 +63,6 @@ type LandingCopy = {
     title: string;
     stats: [string, string, string][];
     trustStrip: string[];
-  };
-  logoExperience: {
-    badge: string;
-    title: string;
-    description: string;
-    caption: string;
   };
   why: {
     badge: string;
@@ -322,23 +313,6 @@ export function HomeLanding() {
                 <div className="grid gap-4 md:grid-cols-3">{copy.proof.stats.map((stat) => <div key={stat[1]} className="animate-fade-up rounded-[1.5rem] border border-[#E6C768]/18 bg-[linear-gradient(180deg,#FFFFFF,#F7F9FC)] p-5"><p className="text-4xl font-semibold tracking-tight text-[#1B2A41]">{stat[0]}</p><p className="mt-2 text-sm font-medium text-[#B8962E]">{stat[1]}</p><p className="mt-3 text-sm leading-7 text-[#5B6474]">{stat[2]}</p></div>)}</div>
               </div>
               <div className="mt-6 flex flex-wrap gap-3 border-t border-[#E6C768]/16 pt-6">{copy.proof.trustStrip.map((item) => <div key={item} className="rounded-full border border-[#1B2A41]/10 bg-[#F7F9FC] px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#3A4A63]">{item}</div>)}</div>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-6 md:py-10">
-          <div className="container px-4 md:px-6">
-            <div className="grid gap-8 rounded-[2rem] border border-white/80 bg-white/70 p-6 shadow-[0_18px_45px_rgba(15,23,42,0.06)] backdrop-blur-2xl md:p-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-              <div>
-                <Badge variant="outline" className="border-[#E6C768]/40 bg-white/80 px-4 py-2 text-sm text-[#1B2A41]">{copy.logoExperience.badge}</Badge>
-                <h2 className="mt-5 text-3xl font-semibold tracking-tight text-[#0F172A] sm:text-4xl">{copy.logoExperience.title}</h2>
-                <p className="mt-5 max-w-[640px] text-lg leading-8 text-[#4B5563]">{copy.logoExperience.description}</p>
-                <div className="mt-6 inline-flex rounded-[1.5rem] border border-white/80 bg-white/80 p-4 shadow-[0_16px_40px_rgba(15,23,42,0.05)]">
-                  <Image src={WORDMARK_LOGO} alt="NeuroQuest logo reference" width={280} height={72} className="h-12 w-auto object-contain" />
-                </div>
-                <p className="mt-4 text-sm text-[#6B7280]">{copy.logoExperience.caption}</p>
-              </div>
-              <InteractiveBlobLogo />
             </div>
           </div>
         </section>
