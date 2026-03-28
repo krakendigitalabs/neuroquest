@@ -193,7 +193,7 @@ export function HomeLanding() {
       </header>
 
       <main>
-        <section className="relative overflow-hidden py-16 md:py-24 lg:py-28">
+        <section className="relative overflow-hidden py-10 md:py-24 lg:py-28">
           <div className="container grid gap-14 px-4 md:px-6 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
             <div className="space-y-8">
               <Badge className="animate-fade-up w-fit border-[#E6C768]/40 bg-[#FFF7DA]/92 px-4 py-2 text-sm text-[#1B2A41] shadow-[0_12px_24px_rgba(212,175,55,0.12)] hover:bg-[#FFF7DA]">{copy.hero.badge}</Badge>
@@ -225,33 +225,33 @@ export function HomeLanding() {
               </div>
             </div>
 
-            <div className="relative animate-fade-up-delay-2 min-h-[680px]">
+            <div className="relative animate-fade-up-delay-2 min-h-[100svh] sm:min-h-[720px] lg:min-h-[680px]">
               <div className="animate-soft-float absolute -left-10 top-10 h-52 w-52 rounded-full bg-[#FFF3C4]/70 blur-3xl" />
               <div className="absolute -right-12 top-8 h-56 w-56 rounded-full bg-[#1B2A41]/10 blur-3xl" />
               <HeroNeuralCanvas />
-              <div className="relative z-10 flex h-full flex-col justify-between gap-5 px-4 py-4 md:px-7 md:py-7">
-                <div className="grid gap-4 md:grid-cols-[0.64fr_0.36fr]">
-                  <div className="clinical-glass animate-breathe rounded-[2rem] p-5">
+              <div className="relative z-10 flex h-full flex-col justify-between gap-4 px-3 py-3 sm:px-4 sm:py-4 md:gap-5 md:px-7 md:py-7">
+                <div className="grid gap-4 xl:grid-cols-[0.64fr_0.36fr]">
+                  <div className="clinical-glass animate-breathe rounded-[1.5rem] p-4 sm:rounded-[2rem] sm:p-5">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-xs uppercase tracking-[0.24em] text-[#B8962E]">{copy.hero.productViewEyebrow}</p>
-                        <p className="mt-2 text-2xl font-semibold text-[#1B2A41]">{copy.hero.productViewTitle}</p>
+                        <p className="mt-2 text-xl font-semibold text-[#1B2A41] sm:text-2xl">{copy.hero.productViewTitle}</p>
                       </div>
                       <div className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#D4AF37]" /><span className="h-2.5 w-2.5 rounded-full bg-[#1B2A41]/18" /><span className="h-2.5 w-2.5 rounded-full bg-[#1B2A41]/10" /></div>
                     </div>
                     <Tabs defaultValue="dashboard" className="mt-6">
-                      <TabsList className="grid h-auto grid-cols-3 rounded-2xl border border-white/55 bg-white/45 p-1 text-[#3A4A63] backdrop-blur-xl">
-                        {copy.hero.previewTabs.map((tab) => <TabsTrigger key={tab.value} value={tab.value} className="rounded-xl px-4 py-3 text-sm data-[state=active]:bg-[#1B2A41] data-[state=active]:text-white">{tab.label}</TabsTrigger>)}
+                      <TabsList className="grid h-auto grid-cols-1 rounded-2xl border border-white/55 bg-white/45 p-1 text-[#3A4A63] backdrop-blur-xl sm:grid-cols-3">
+                        {copy.hero.previewTabs.map((tab) => <TabsTrigger key={tab.value} value={tab.value} className="rounded-xl px-3 py-3 text-sm data-[state=active]:bg-[#1B2A41] data-[state=active]:text-white sm:px-4">{tab.label}</TabsTrigger>)}
                       </TabsList>
                       {copy.hero.previewTabs.map((tab) => (
                         <TabsContent key={tab.value} value={tab.value} className="mt-5">
-                          <div className="rounded-[1.75rem] border border-white/60 bg-[linear-gradient(145deg,rgba(255,255,255,0.84),rgba(247,249,252,0.62))] p-5 backdrop-blur-2xl">
-                            <div className="flex items-center justify-between gap-4">
+                          <div className="rounded-[1.5rem] border border-white/60 bg-[linear-gradient(145deg,rgba(255,255,255,0.84),rgba(247,249,252,0.62))] p-4 backdrop-blur-2xl sm:rounded-[1.75rem] sm:p-5">
+                            <div className="flex items-start justify-between gap-4">
                               <div>
                                 <p className="text-xs uppercase tracking-[0.22em] text-[#B8962E]">{tab.badge}</p>
-                                <h3 className="mt-2 text-2xl font-semibold text-[#1B2A41]">{tab.title}</h3>
+                                <h3 className="mt-2 text-xl font-semibold text-[#1B2A41] sm:text-2xl">{tab.title}</h3>
                               </div>
-                              <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/65 bg-white/75">
+                              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-white/65 bg-white/75 sm:h-16 sm:w-16">
                                 <Image src={BRAND_SYMBOL} alt="NeuroQuest symbol" width={28} height={28} className="h-7 w-7 object-contain" />
                               </div>
                             </div>
@@ -271,12 +271,12 @@ export function HomeLanding() {
                     </Tabs>
                   </div>
                   <div className="grid gap-4">
-                    <div className="clinical-glass-soft rounded-[1.75rem] p-5">
+                    <div className="clinical-glass-soft rounded-[1.5rem] p-4 sm:rounded-[1.75rem] sm:p-5">
                       <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#1B2A41] text-[#F2D16B]"><BrainCircuit className="h-5 w-5" /></div>
                       <p className="mt-4 text-sm uppercase tracking-[0.22em] text-[#B8962E]">{copy.hero.followUpEyebrow}</p>
                       <p className="mt-3 text-lg font-semibold leading-7 text-[#1B2A41]">{copy.hero.followUpTitle}</p>
                     </div>
-                    <div className="clinical-dark-panel rounded-[1.75rem] p-5 text-white">
+                    <div className="clinical-dark-panel rounded-[1.5rem] p-4 text-white sm:rounded-[1.75rem] sm:p-5">
                       <div className="flex items-center justify-between">
                         <p className="text-xs uppercase tracking-[0.22em] text-[#F2D16B]">{copy.hero.guardrailsEyebrow}</p>
                         <ShieldPlus className="h-5 w-5 text-[#F2D16B]" />

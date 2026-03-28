@@ -16,6 +16,8 @@ export function HeroNeuralCanvas() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const container = canvas.parentElement;
+    if (!container) return;
 
     const context = canvas.getContext('2d');
     if (!context) return;
@@ -24,8 +26,10 @@ export function HeroNeuralCanvas() {
     const isReducedMotion = media.matches;
 
     let animationFrame = 0;
+    let resizeFrame = 0;
     let particles: Particle[] = [];
     const pointer = { x: 0.5, y: 0.5, active: false };
+    const viewport = { width: 0, height: 0, dpr: 1 };
 
     const buildParticles = (width: number, height: number) => {
       const area = width * height;
@@ -41,12 +45,37 @@ export function HeroNeuralCanvas() {
 
     const resize = () => {
       const bounds = canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.floor(bounds.width * dpr);
-      canvas.height = Math.floor(bounds.height * dpr);
+      const width = Math.max(1, Math.floor(bounds.width));
+      const height = Math.max(1, Math.floor(bounds.height));
+      const isSmallScreen = window.innerWidth < 768;
+      const dpr = Math.min(window.devicePixelRatio || 1, isSmallScreen ? 1.5 : 2);
+
+      if (viewport.width === width && viewport.height === height && viewport.dpr === dpr) {
+        return;
+      }
+
+      viewport.width = width;
+      viewport.height = height;
+      viewport.dpr = dpr;
+
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
       context.setTransform(1, 0, 0, 1, 0, 0);
       context.scale(dpr, dpr);
-      buildParticles(bounds.width, bounds.height);
+      buildParticles(width, height);
+    };
+
+    const scheduleResize = () => {
+      if (resizeFrame) {
+        window.cancelAnimationFrame(resizeFrame);
+      }
+
+      resizeFrame = window.requestAnimationFrame(() => {
+        resizeFrame = 0;
+        resize();
+      });
     };
 
     const drawBackdrop = (width: number, height: number, phase: number) => {
@@ -90,9 +119,14 @@ export function HeroNeuralCanvas() {
     };
 
     const draw = (time: number) => {
-      const bounds = canvas.getBoundingClientRect();
-      const width = bounds.width;
-      const height = bounds.height;
+      const width = viewport.width;
+      const height = viewport.height;
+
+      if (!width || !height) {
+        animationFrame = window.requestAnimationFrame(draw);
+        return;
+      }
+
       const phase = time * 0.00022;
 
       context.clearRect(0, 0, width, height);
@@ -164,8 +198,13 @@ export function HeroNeuralCanvas() {
       pointer.y = 0.5;
     };
 
-    resize();
-    window.addEventListener('resize', resize);
+    const resizeObserver = new ResizeObserver(() => {
+      scheduleResize();
+    });
+    resizeObserver.observe(container);
+    resizeObserver.observe(canvas);
+
+    scheduleResize();
     canvas.addEventListener('pointermove', handlePointerMove);
     canvas.addEventListener('pointerleave', handlePointerLeave);
 
@@ -176,9 +215,10 @@ export function HeroNeuralCanvas() {
     }
 
     return () => {
-      window.removeEventListener('resize', resize);
+      resizeObserver.disconnect();
       canvas.removeEventListener('pointermove', handlePointerMove);
       canvas.removeEventListener('pointerleave', handlePointerLeave);
+      window.cancelAnimationFrame(resizeFrame);
       window.cancelAnimationFrame(animationFrame);
     };
   }, []);
@@ -186,7 +226,7 @@ export function HeroNeuralCanvas() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 overflow-hidden rounded-[2.5rem] border border-white/55 bg-[linear-gradient(145deg,rgba(255,255,255,0.56),rgba(255,255,255,0.18))] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] backdrop-blur-xl"
+      className="pointer-events-none absolute inset-0 overflow-hidden rounded-[2rem] border border-white/55 bg-[linear-gradient(145deg,rgba(255,255,255,0.56),rgba(255,255,255,0.18))] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] backdrop-blur-xl sm:rounded-[2.5rem]"
     >
       <canvas ref={canvasRef} className="pointer-events-auto h-full w-full" />
     </div>

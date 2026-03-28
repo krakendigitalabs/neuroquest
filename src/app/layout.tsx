@@ -26,6 +26,10 @@ function AppBody({ children }: { children: React.ReactNode }) {
       <head>
         <title>{title}</title>
         <meta name="description" content={description} />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+        />
         <link
           rel="icon"
           href="https://res.cloudinary.com/dr50ioh9h/image/upload/v1774648742/simbolo_nq_okc053.png?v=20260327"
