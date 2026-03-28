@@ -32,7 +32,8 @@ describe('thought record persistence', () => {
     collectionMock.mockReturnValue({ path: 'users/user-1/thoughtRecords' });
     docMock
       .mockReturnValueOnce({ path: 'users/user-1/thoughtRecords/generated-id' })
-      .mockReturnValueOnce({ path: 'users/user-1' });
+      .mockReturnValueOnce({ path: 'users/user-1' })
+      .mockReturnValueOnce({ path: 'users/user-1/progressEvents/generated-id' });
   });
 
   it('persists the thought and profile summary in a single batch', async () => {
@@ -54,7 +55,7 @@ describe('thought record persistence', () => {
       },
     });
 
-    expect(batch.set).toHaveBeenCalledOnce();
+    expect(batch.set).toHaveBeenCalledTimes(2);
     expect(batch.update).toHaveBeenCalledWith(
       { path: 'users/user-1' },
       expect.objectContaining({
@@ -75,6 +76,13 @@ describe('thought record persistence', () => {
         isThoughtNotFact: true,
         compulsionUrge: 7,
         source: 'observer',
+      }),
+    );
+    expect(batch.set.mock.calls[1]?.[1]).toEqual(
+      expect.objectContaining({
+        userId: 'user-1',
+        module: 'observer',
+        type: 'saved',
       }),
     );
   });

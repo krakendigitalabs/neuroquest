@@ -2,9 +2,15 @@
 
 import { CognitiveReprogrammer } from "./_components/cognitive-reprogrammer";
 import { useTranslation } from "@/context/language-provider";
+import { useFirebase } from '@/firebase';
+import { useTrackModuleActivity } from '@/hooks/use-track-module-activity';
 
 export default function ReprogramPage() {
   const { t } = useTranslation();
+  const { firestore, user } = useFirebase();
+
+  useTrackModuleActivity({ firestore, userId: user?.uid, module: 'reprogram' });
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">

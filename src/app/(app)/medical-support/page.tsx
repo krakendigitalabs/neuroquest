@@ -10,6 +10,7 @@ import { useFirebase } from '@/firebase';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { PatientReportActions } from '@/components/patient-report-actions';
 import { buildPatientReportText } from '@/lib/patient-report';
+import { useTrackModuleActivity } from '@/hooks/use-track-module-activity';
 
 function toDate(value: unknown): Date | null {
   if (!value) return null;
@@ -26,8 +27,10 @@ function toDate(value: unknown): Date | null {
 
 export default function MedicalSupportPage() {
   const { t, locale } = useTranslation();
-  const { user } = useFirebase();
+  const { user, firestore } = useFirebase();
   const { userProfile, isLoading } = useUserProfile();
+
+  useTrackModuleActivity({ firestore, userId: user?.uid, module: 'medical-support' });
 
   const latestDate = toDate(userProfile?.latestCheckInAt);
   const hasLatestCheckIn = !!latestDate;

@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTranslation } from '@/context/language-provider';
+import { useFirebase } from '@/firebase';
+import { useTrackModuleActivity } from '@/hooks/use-track-module-activity';
 
 type WellnessSection = {
   id: string;
@@ -404,7 +406,10 @@ const WELLNESS_COPY: Record<'es' | 'en', WellnessCopy> = {
 
 export default function WellnessPage() {
   const { locale } = useTranslation();
+  const { firestore, user } = useFirebase();
   const copy = WELLNESS_COPY[locale === 'es' ? 'es' : 'en'];
+
+  useTrackModuleActivity({ firestore, userId: user?.uid, module: 'wellness' });
 
   return (
     <div className="flex-1 space-y-6 p-4 pt-6 md:p-8">

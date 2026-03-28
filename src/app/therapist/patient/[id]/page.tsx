@@ -98,15 +98,15 @@ export default function TherapistPatientDetailPage() {
   const lastActivityDate = patient ? getLatestPatientActivityDate(patient) : null;
   const lastActivity = lastActivityDate ? lastActivityDate.toLocaleDateString(locale) : t('therapist.noRecentActivity');
   const generatedAt = useMemo(() => new Date(), []);
-  const patientLabel = patient.displayName || patient.email || t('therapist.patientDetail');
+  const patientLabel = patient?.displayName || patient?.email || t('therapist.patientDetail');
   const currentRisk = sortedThoughts[0]
     ? t(`observer.riskLevels.${getThoughtRiskLevel(sortedThoughts[0])}`)
     : hasLatestCheckIn
-      ? patient.latestCheckInLevel ?? t('therapist.noCheckInYet')
+      ? patient?.latestCheckInLevel ?? t('therapist.noCheckInYet')
       : t('therapist.noCheckInYet');
   const therapistReportSummary = t('therapist.reportClinicalSummary', {
-    level: patient.latestCheckInLevel ?? t('therapist.noCheckInYet'),
-    score: typeof patient.latestCheckInScore === 'number' ? `${patient.latestCheckInScore}/${CHECK_IN_MAX_SCORE}` : t('therapist.noCheckInYet'),
+    level: patient?.latestCheckInLevel ?? t('therapist.noCheckInYet'),
+    score: typeof patient?.latestCheckInScore === 'number' ? `${patient.latestCheckInScore}/${CHECK_IN_MAX_SCORE}` : t('therapist.noCheckInYet'),
     risk: currentRisk,
     activity: lastActivity,
   });

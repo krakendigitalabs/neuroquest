@@ -1,6 +1,7 @@
 import { collection, doc, serverTimestamp, writeBatch, type Firestore } from 'firebase/firestore';
 import type { ThoughtAnalysisOutput } from '@/ai/flows/thought-analysis-and-coaching-flow';
 import type { ThoughtRecord } from '@/models/thought-record';
+import { addProgressEventToBatch } from '@/lib/progress-events';
 
 function clamp(value: unknown, min: number, max: number, fallback: number) {
   if (typeof value !== 'number' || Number.isNaN(value)) return fallback;
@@ -93,6 +94,12 @@ export async function persistThoughtRecord({
   };
 
   batch.set(thoughtDocRef, thoughtRecord);
+  addProgressEventToBatch(batch, firestore, {
+    userId,
+    module: 'observer',
+    type: 'saved',
+    detail: thought.trim().slice(0, 120),
+  });
   batch.update(userRef, {
     latestThoughtAt: serverTimestamp(),
     latestThoughtEmotion: emotion,

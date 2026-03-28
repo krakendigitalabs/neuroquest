@@ -13,6 +13,7 @@ import { useUserProfile } from '@/hooks/use-user-profile';
 import type { MentalCheckup } from '@/models/mental-checkup';
 import type { ThoughtRecord } from '@/models/thought-record';
 import type { ExposureMission } from '@/models/exposure-mission';
+import type { ProgressEvent, ProgressModuleKey } from '@/models/progress-event';
 import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import type { TooltipProps } from 'recharts';
 import { getProgressMetrics, normalizeProgressCheckups } from '@/lib/progress-checkups';
@@ -59,6 +60,11 @@ export default function ProgressPage() {
     return collection(firestore, 'users', user.uid, 'exposureMissions');
   }, [firestore, user]);
   const { data: missions } = useCollection<ExposureMission>(missionsQuery);
+  const activityQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return collection(firestore, 'users', user.uid, 'progressEvents');
+  }, [firestore, user]);
+  const { data: activityEvents } = useCollection<ProgressEvent>(activityQuery);
 
   const sortedCheckups = useMemo(() => normalizeProgressCheckups(checkups), [checkups]);
   const metrics = useMemo(() => getProgressMetrics(sortedCheckups), [sortedCheckups]);
@@ -85,6 +91,24 @@ export default function ProgressPage() {
     const total = sortedThoughts.reduce((sum, thought) => sum + thought.intensity, 0);
     return Math.round((total / sortedThoughts.length) * 10) / 10;
   }, [sortedThoughts]);
+  const sortedActivityEvents = useMemo(
+    () =>
+      [...(activityEvents ?? [])].sort(
+        (a, b) => (toDate(b.createdAt)?.getTime() ?? 0) - (toDate(a.createdAt)?.getTime() ?? 0)
+      ),
+    [activityEvents]
+  );
+  const activeModuleCount = useMemo(
+    () => new Set(sortedActivityEvents.map((event) => event.module)).size,
+    [sortedActivityEvents]
+  );
+  const recentActivityCount = sortedActivityEvents.length;
+  const moduleCounts = useMemo(() => {
+    return sortedActivityEvents.reduce<Record<string, number>>((accumulator, event) => {
+      accumulator[event.module] = (accumulator[event.module] ?? 0) + 1;
+      return accumulator;
+    }, {});
+  }, [sortedActivityEvents]);
   const thoughtTrendData = useMemo(
     () =>
       sortedThoughts
@@ -115,6 +139,42 @@ export default function ProgressPage() {
   const chartConfig = {
     score: { label: t('progress.checkInScore'), color: 'hsl(var(--destructive))' },
     intensity: { label: t('observer.intensity'), color: 'hsl(var(--primary))' },
+  };
+  const moduleLabel = (module: ProgressModuleKey) => {
+    switch (module) {
+      case 'check-in':
+        return t('nav.checkIn');
+      case 'observer':
+        return t('nav.observer');
+      case 'exposure':
+        return t('nav.exposure');
+      case 'medical-support':
+        return t('medical.title');
+      case 'grounding':
+        return t('nav.grounding');
+      case 'regulation':
+        return t('nav.regulation');
+      case 'reprogram':
+        return t('nav.reprogram');
+      case 'wellness':
+        return t('nav.wellness');
+      default:
+        return module;
+    }
+  };
+  const activityLabel = (event: ProgressEvent) => {
+    switch (event.type) {
+      case 'saved':
+        return locale === 'es' ? 'Registro guardado' : 'Saved entry';
+      case 'created':
+        return locale === 'es' ? 'Creado' : 'Created';
+      case 'completed':
+        return locale === 'es' ? 'Completado' : 'Completed';
+      case 'opened':
+        return locale === 'es' ? 'Módulo usado' : 'Module opened';
+      default:
+        return event.type;
+    }
   };
   const generatedAt = useMemo(() => new Date(), []);
   const reportPatient = userProfile?.displayName || user?.displayName || user?.email || t('sidebar.guestUser');
@@ -178,10 +238,20 @@ export default function ProgressPage() {
           ? sortedMissions.slice(0, 5).map((mission) => `${mission.title} · ${t(`progress.${mission.status}`)} · XP ${mission.xpReward}`)
           : [t('progress.noMissionsYet')],
       },
+      {
+        title: locale === 'es' ? 'Actividad por módulos' : 'Module activity',
+        lines: sortedActivityEvents.length
+          ? sortedActivityEvents.slice(0, 8).map((event) => {
+              const eventDate = toDate(event.createdAt)?.toLocaleString(locale) ?? t('progress.unknownDate');
+              const detail = event.detail ? ` · ${event.detail}` : '';
+              return `${eventDate} · ${moduleLabel(event.module)} · ${activityLabel(event)}${detail}`;
+            })
+          : [locale === 'es' ? 'Aún no hay actividad registrada.' : 'No activity has been recorded yet.'],
+      },
     ],
     patientSignatureLabel: t('progress.reportPatientSignature'),
     therapistSignatureLabel: t('progress.reportTherapistSignature'),
-  }), [generatedAt, locale, metrics.latestFive, metrics.trendDelta, metrics.trendDirection, reportClinicalSummary, reportPatient, t]);
+  }), [activityEvents, generatedAt, locale, metrics.latestFive, metrics.trendDelta, metrics.trendDirection, reportClinicalSummary, reportPatient, sortedActivityEvents, sortedMissions, sortedThoughts, t]);
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -262,6 +332,38 @@ export default function ProgressPage() {
             <p className="text-xs text-muted-foreground">{t('progress.missionsSummaryDescription')}</p>
           </CardContent>
         </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              {locale === 'es' ? 'Módulos activos' : 'Active modules'}
+            </CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{activeModuleCount.toLocaleString(locale)}</div>
+            <p className="text-xs text-muted-foreground">
+              {locale === 'es'
+                ? 'Módulos que ya reflejan actividad en tiempo real.'
+                : 'Modules already reflecting real-time activity.'}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              {locale === 'es' ? 'Actividad registrada' : 'Recorded activity'}
+            </CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{recentActivityCount.toLocaleString(locale)}</div>
+            <p className="text-xs text-muted-foreground">
+              {locale === 'es'
+                ? 'Eventos compartidos entre módulos del usuario.'
+                : 'Shared events across user modules.'}
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -316,6 +418,66 @@ export default function ProgressPage() {
                 </p>
               </div>
             ))}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>{locale === 'es' ? 'Actividad reciente de módulos' : 'Recent module activity'}</CardTitle>
+            <CardDescription>
+              {locale === 'es'
+                ? 'Se actualiza en tiempo real cuando un módulo guarda o registra uso.'
+                : 'Updates in real time when a module saves data or logs usage.'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {sortedActivityEvents.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                {locale === 'es' ? 'Aún no hay actividad registrada.' : 'No activity has been recorded yet.'}
+              </p>
+            ) : (
+              sortedActivityEvents.slice(0, 8).map((event) => (
+                <div key={event.id} className="rounded-lg border p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-medium">{moduleLabel(event.module)}</p>
+                    <Badge variant="outline">{activityLabel(event)}</Badge>
+                  </div>
+                  {event.detail ? <p className="mt-2 text-sm text-muted-foreground">{event.detail}</p> : null}
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {toDate(event.createdAt)?.toLocaleString(locale) ?? t('progress.unknownDate')}
+                  </p>
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{locale === 'es' ? 'Cobertura por módulo' : 'Module coverage'}</CardTitle>
+            <CardDescription>
+              {locale === 'es'
+                ? 'Resumen acumulado de actividad registrada por módulo.'
+                : 'Cumulative summary of recorded activity by module.'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {Object.keys(moduleCounts).length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                {locale === 'es' ? 'Aún no hay actividad registrada.' : 'No activity has been recorded yet.'}
+              </p>
+            ) : (
+              (Object.entries(moduleCounts) as Array<[ProgressModuleKey, number]>)
+                .sort((a, b) => b[1] - a[1])
+                .map(([module, count]) => (
+                  <div key={module} className="flex items-center justify-between rounded-lg border p-3 text-sm">
+                    <span>{moduleLabel(module)}</span>
+                    <Badge variant="secondary">{count.toLocaleString(locale)}</Badge>
+                  </div>
+                ))
+            )}
           </CardContent>
         </Card>
       </div>

@@ -30,7 +30,8 @@ describe('mental check-in persistence', () => {
     collectionMock.mockReturnValue({ path: 'users/user-1/mental_checkups' });
     docMock
       .mockReturnValueOnce({ path: 'users/user-1/mental_checkups/generated-id' })
-      .mockReturnValueOnce({ path: 'users/user-1' });
+      .mockReturnValueOnce({ path: 'users/user-1' })
+      .mockReturnValueOnce({ path: 'users/user-1/progressEvents/generated-id' });
   });
 
   it('persists the check-in log and denormalized user summary atomically', async () => {
@@ -66,7 +67,7 @@ describe('mental check-in persistence', () => {
       professionalNote: 'Monitor symptoms',
     });
 
-    expect(batch.set).toHaveBeenCalledTimes(2);
+    expect(batch.set).toHaveBeenCalledTimes(3);
     expect(batch.set.mock.calls[0]?.[1]).toEqual(
       expect.objectContaining({
         userId: 'user-1',
@@ -78,12 +79,19 @@ describe('mental check-in persistence', () => {
     );
     expect(batch.set.mock.calls[1]?.[1]).toEqual(
       expect.objectContaining({
+        userId: 'user-1',
+        module: 'check-in',
+        type: 'saved',
+      }),
+    );
+    expect(batch.set.mock.calls[2]?.[1]).toEqual(
+      expect.objectContaining({
         latestCheckInScore: 18,
         latestCheckInLevel: 'moderate',
         latestCheckInNote: 'Monitor symptoms',
       }),
     );
-    expect(batch.set.mock.calls[1]?.[2]).toEqual({ merge: true });
+    expect(batch.set.mock.calls[2]?.[2]).toEqual({ merge: true });
     expect(batch.commit).toHaveBeenCalledOnce();
   });
 });

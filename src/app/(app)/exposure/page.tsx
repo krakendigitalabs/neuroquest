@@ -18,6 +18,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { PatientReportActions } from '@/components/patient-report-actions';
 import { buildPatientReportText } from '@/lib/patient-report';
 import { toDate } from '@/lib/thought-insights';
+import { logProgressEventNonBlocking } from '@/lib/progress-events';
+import { useTrackModuleActivity } from '@/hooks/use-track-module-activity';
 
 const MissionCard = ({ mission, onComplete }: { mission: WithId<ExposureMission>, onComplete: (missionId: string, xp: number) => void }) => {
   const { t } = useTranslation();
@@ -88,6 +90,8 @@ export default function ExposurePage() {
   const [resistanceTarget, setResistanceTarget] = useState('');
   const [isSavingMission, setIsSavingMission] = useState(false);
 
+  useTrackModuleActivity({ firestore, userId: user?.uid, module: 'exposure' });
+
   const missionsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
     return collection(firestore, 'users', user.uid, 'exposureMissions');
@@ -143,6 +147,12 @@ export default function ExposurePage() {
         title: t('exposure.missionCompletedToast'),
         description: t('exposure.missionCompletedToastDesc', { xp }),
       });
+      logProgressEventNonBlocking(firestore, {
+        userId: user.uid,
+        module: 'exposure',
+        type: 'completed',
+        detail: `XP ${xp}`,
+      });
     } catch (e) {
       console.error("Transaction failed: ", e);
       toast({
@@ -169,7 +179,7 @@ export default function ExposurePage() {
       const parsedDifficulty = Number(difficultyLevel);
       const xpReward = 20 + parsedDifficulty * 5;
 
-      await addDoc(collection(firestore, 'users', user.uid, 'exposureMissions'), {
+      const missionPayload = {
         userId: user.uid,
         title: missionTitle.trim(),
         description: missionDescription.trim(),
@@ -182,7 +192,15 @@ export default function ExposurePage() {
         isAiGenerated: false,
         missionType: 'exposición',
         createdAt: serverTimestamp(),
-      } satisfies Omit<ExposureMission, 'id'>);
+      } satisfies Omit<ExposureMission, 'id'>;
+
+      await addDoc(collection(firestore, 'users', user.uid, 'exposureMissions'), missionPayload);
+      logProgressEventNonBlocking(firestore, {
+        userId: user.uid,
+        module: 'exposure',
+        type: 'created',
+        detail: missionPayload.title,
+      });
 
       toast({
         title: t('exposure.customMissionCreatedTitle'),

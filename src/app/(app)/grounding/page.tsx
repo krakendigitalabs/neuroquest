@@ -3,6 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from '@/context/language-provider';
 import { Zap } from 'lucide-react';
+import { useFirebase } from '@/firebase';
+import { useTrackModuleActivity } from '@/hooks/use-track-module-activity';
 
 const ExerciseCard = ({ title, description }: { title: string; description: string }) => (
     <Card>
@@ -18,6 +20,9 @@ const ExerciseCard = ({ title, description }: { title: string; description: stri
 
 export default function GroundingPage() {
   const { t } = useTranslation();
+  const { firestore, user } = useFirebase();
+
+  useTrackModuleActivity({ firestore, userId: user?.uid, module: 'grounding' });
 
   const mildExercises = [
     { id: 'mild1', title: t('grounding.mild.ex1.title'), description: t('grounding.mild.ex1.desc') },

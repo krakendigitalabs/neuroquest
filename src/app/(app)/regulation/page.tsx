@@ -3,9 +3,14 @@
 import { Wind, Waves } from 'lucide-react';
 import { BreathingExercise } from './_components/breathing-exercise';
 import { useTranslation } from '@/context/language-provider';
+import { useFirebase } from '@/firebase';
+import { useTrackModuleActivity } from '@/hooks/use-track-module-activity';
 
 export default function RegulationPage() {
   const { t } = useTranslation();
+  const { firestore, user } = useFirebase();
+
+  useTrackModuleActivity({ firestore, userId: user?.uid, module: 'regulation' });
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">

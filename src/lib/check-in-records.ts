@@ -1,6 +1,7 @@
 import { collection, doc, serverTimestamp, writeBatch, type Firestore } from 'firebase/firestore';
 import type { MentalCheckInLevel } from '@/lib/mental-check-in';
 import type { CheckupAnswer, MentalCheckup, Recommendations, RiskFlags } from '@/models/mental-checkup';
+import { addProgressEventToBatch } from '@/lib/progress-events';
 
 type PersistMentalCheckInInput = {
   firestore: Firestore;
@@ -56,6 +57,12 @@ export async function persistMentalCheckIn({
   };
 
   batch.set(checkupDocRef, payload);
+  addProgressEventToBatch(batch, firestore, {
+    userId,
+    module: 'check-in',
+    type: 'saved',
+    detail: `${resultTitle} · ${score}/${maxScore}`,
+  });
   batch.set(
     userRef,
     {
