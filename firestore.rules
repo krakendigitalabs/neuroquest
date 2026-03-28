@@ -219,6 +219,21 @@ service cloud.firestore {
     }
 
     /**
+     * @description Stores lightweight activity events used to build a shared real-time
+     *              progress feed across modules.
+     * @path /users/{userId}/progressEvents/{eventId}
+     * @principle Keeps activity scoped to the patient while allowing assigned therapists
+     *            and admins to review longitudinal engagement.
+     */
+    match /users/{userId}/progressEvents/{eventId} {
+      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
+      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
+      allow create: if isOwner(userId) && incomingDataMatchesOwner(userId);
+      allow update: if isExistingOwner(userId) && ownerIsImmutable();
+      allow delete: if isExistingOwner(userId) || isAdmin();
+    }
+
+    /**
      * @description Stores clinician-guided medical support plans for a user.
      *              Plans may be authored by the user or by their assigned therapist.
      * @path /users/{userId}/medicalSupportPlans/{planId}
