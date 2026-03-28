@@ -1,13 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { AlertTriangle, HeartPulse, Printer, ShieldAlert, Stethoscope } from 'lucide-react';
+import { AlertTriangle, HeartPulse, ShieldAlert, Stethoscope } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from '@/context/language-provider';
 import { useFirebase } from '@/firebase';
 import { useUserProfile } from '@/hooks/use-user-profile';
+import { PatientReportActions } from '@/components/patient-report-actions';
+import { buildPatientReportText } from '@/lib/patient-report';
 
 function toDate(value: unknown): Date | null {
   if (!value) return null;
@@ -44,18 +46,31 @@ export default function MedicalSupportPage() {
       })
     : t('medical.reportClinicalSummaryEmpty');
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const reportText = buildPatientReportText({
+    title: t('medical.reportTitle'),
+    patientLabel: t('medical.reportPatientLabel'),
+    patient: reportPatient,
+    generatedAtLabel: t('medical.reportGeneratedAtLabel'),
+    generatedAt: generatedAt?.toLocaleString(locale) ?? t('progress.unknownDate'),
+    summaryTitle: t('medical.reportClinicalSummaryTitle'),
+    summary: reportClinicalSummary,
+    sections: [
+      {
+        title: t('medical.guidanceTitle'),
+        lines: latestLevel
+          ? [t(`medical.dynamic.${latestLevel}.title`), ...currentItems]
+          : [t('medical.completeCheckInFirst')],
+      },
+    ],
+    patientSignatureLabel: t('medical.reportPatientSignature'),
+    therapistSignatureLabel: t('medical.reportTherapistSignature'),
+  });
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
         <h1 className="text-3xl font-bold tracking-tight font-headline">{t('medical.title')}</h1>
-        <Button type="button" variant="outline" className="print:hidden" onClick={handlePrint}>
-          <Printer className="h-4 w-4" />
-          {t('medical.printReport')}
-        </Button>
+        <PatientReportActions reportTitle={t('medical.reportTitle')} reportText={reportText} />
       </div>
       <p className="text-muted-foreground">{t('medical.description')}</p>
 

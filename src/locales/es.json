@@ -70,6 +70,12 @@
     "nextSlide": "Imagen siguiente",
     "toggleSidebar": "Alternar barra lateral"
   },
+  "reports": {
+    "printPdf": "Imprimir / PDF",
+    "sendWhatsApp": "Enviar por WhatsApp",
+    "sendEmail": "Enviar por correo",
+    "emailSubjectPrefix": "Reporte NeuroQuest"
+  },
   "landing": {
     "brand": {
       "tagline": "Health-tech / mental health SaaS"

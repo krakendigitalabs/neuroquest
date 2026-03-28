@@ -24,7 +24,10 @@ vi.mock('@/context/language-provider', () => ({
     t: (key: string, values?: Record<string, string | number>) => {
       if (key === 'medical.title') return 'Medical Support';
       if (key === 'medical.description') return 'Medical description';
-      if (key === 'medical.printReport') return 'Print report';
+      if (key === 'reports.printPdf') return 'Print / PDF';
+      if (key === 'reports.sendWhatsApp') return 'Send by WhatsApp';
+      if (key === 'reports.sendEmail') return 'Send by email';
+      if (key === 'reports.emailSubjectPrefix') return 'NeuroQuest report';
       if (key === 'medical.disclaimerTitle') return 'Disclaimer';
       if (key === 'medical.disclaimerDescription') return 'Disclaimer text';
       if (key === 'medical.latestCheckInTitle') return 'Latest available check-in';
@@ -103,5 +106,8 @@ describe('MedicalSupportPage', () => {
     expect(screen.getAllByText('medical.dynamic.severe.description').length).toBeGreaterThan(0);
     expect(screen.getAllByText('sidebar.crisisSupport').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Recorded score: 31').length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('button', { name: 'Print / PDF' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('button', { name: 'Send by WhatsApp' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('button', { name: 'Send by email' }).length).toBeGreaterThan(0);
   });
 });

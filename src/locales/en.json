@@ -70,6 +70,12 @@
     "nextSlide": "Next slide",
     "toggleSidebar": "Toggle sidebar"
   },
+  "reports": {
+    "printPdf": "Print / PDF",
+    "sendWhatsApp": "Send by WhatsApp",
+    "sendEmail": "Send by email",
+    "emailSubjectPrefix": "NeuroQuest report"
+  },
   "landing": {
     "brand": {
       "tagline": "Health-tech / mental health SaaS"

@@ -1,10 +1,9 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Activity, LineChart, Printer, ShieldAlert, TrendingDown, TrendingUp } from 'lucide-react';
+import { Activity, LineChart, ShieldAlert, TrendingDown, TrendingUp } from 'lucide-react';
 import { CartesianGrid, ComposedChart, Line, XAxis, YAxis } from 'recharts';
 import { collection } from 'firebase/firestore';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
@@ -15,6 +14,8 @@ import type { MentalCheckup } from '@/models/mental-checkup';
 import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import type { TooltipProps } from 'recharts';
 import { getProgressMetrics, normalizeProgressCheckups } from '@/lib/progress-checkups';
+import { PatientReportActions } from '@/components/patient-report-actions';
+import { buildPatientReportText } from '@/lib/patient-report';
 
 const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
   if (active && payload && payload.length) {
@@ -84,18 +85,43 @@ export default function ProgressPage() {
     });
   }, [locale, metrics.latestLevel, metrics.trendDelta, metrics.trendDirection, t]);
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const reportText = useMemo(() => buildPatientReportText({
+    title: t('progress.reportTitle'),
+    patientLabel: t('progress.reportPatientLabel'),
+    patient: reportPatient,
+    generatedAtLabel: t('progress.reportGeneratedAtLabel'),
+    generatedAt: generatedAt.toLocaleString(locale),
+    summaryTitle: t('progress.reportClinicalSummaryTitle'),
+    summary: reportClinicalSummary,
+    sections: [
+      {
+        title: t('progress.reportRecentHistoryTitle'),
+        lines: metrics.latestFive.length === 0
+          ? [t('progress.noCheckInsYet')]
+          : metrics.latestFive.map((checkup) => [
+              checkup.createdAt?.toLocaleString(locale) ?? t('progress.unknownDate'),
+              `${t('progress.checkInScore')}: ${checkup.score}/${checkup.maxScore || '—'}`,
+              t(`checkIn.results.${checkup.level}.category`),
+            ].join(' · ')),
+      },
+      {
+        title: t('progress.trendTitle'),
+        lines: [
+          metrics.trendDirection && metrics.trendDelta !== null
+            ? `${t(`progress.trendStates.${metrics.trendDirection}`)} (${metrics.trendDelta.toLocaleString(locale)})`
+            : t('progress.trendUnavailableDescription'),
+        ],
+      },
+    ],
+    patientSignatureLabel: t('progress.reportPatientSignature'),
+    therapistSignatureLabel: t('progress.reportTherapistSignature'),
+  }), [generatedAt, locale, metrics.latestFive, metrics.trendDelta, metrics.trendDirection, reportClinicalSummary, reportPatient, t]);
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
         <h1 className="text-3xl font-bold tracking-tight font-headline">{t('progress.title')}</h1>
-        <Button type="button" variant="outline" className="print:hidden" onClick={handlePrint}>
-          <Printer className="h-4 w-4" />
-          {t('progress.printReport')}
-        </Button>
+        <PatientReportActions reportTitle={t('progress.reportTitle')} reportText={reportText} />
       </div>
       <p className="text-muted-foreground">{t('progress.description')}</p>
 

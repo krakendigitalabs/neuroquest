@@ -27,7 +27,10 @@ vi.mock('@/context/language-provider', () => ({
     t: (key: string, values?: Record<string, string | number>) => {
       if (key === 'progress.title') return 'Your Progress';
       if (key === 'progress.description') return 'Progress description';
-      if (key === 'progress.printReport') return 'Print report';
+      if (key === 'reports.printPdf') return 'Print / PDF';
+      if (key === 'reports.sendWhatsApp') return 'Send by WhatsApp';
+      if (key === 'reports.sendEmail') return 'Send by email';
+      if (key === 'reports.emailSubjectPrefix') return 'NeuroQuest report';
       if (key === 'progress.averageScoreTitle') return 'Recent average';
       if (key === 'progress.averageScoreDescription') return 'Average description';
       if (key === 'progress.trendTitle') return 'Trend';
@@ -104,5 +107,8 @@ describe('ProgressPage', () => {
     expect(screen.getAllByText('Not enough history').length).toBeGreaterThan(0);
     expect(screen.getAllByText('At least two blocks of check-ins are required to calculate a real trend.').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Moderate Level').length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: 'Print / PDF' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Send by WhatsApp' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Send by email' })).toBeInTheDocument();
   });
 });
