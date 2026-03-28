@@ -66,6 +66,16 @@ export function getLandingCopy(locale: string) {
           },
         ],
       },
+      proof: {
+        badge: 'Señales concretas del MVP',
+        title: 'Visibilidad clínica, continuidad y cierre de flujo en un solo sistema.',
+        stats: [
+          ['10', 'preguntas clínicas por check-in', 'Mental Check-In real con respuestas 0-4 y score total 0-40.'],
+          ['4', 'niveles de severidad', 'Healthy, mild, moderate y severe con lectura proporcional.'],
+          ['6', 'módulos funcionales conectados', 'Dashboard, Check-In, Progress, Observer, Therapist y Medical Support.'],
+        ],
+        trustStrip: ['CBT', 'ERP', 'Firestore', 'Historial longitudinal', 'Resumen imprimible', 'Crisis Support Medellín'],
+      },
       why: {
         badge: 'Por qué NeuroQuest',
         title: 'Una interfaz amable, pero diseñada para trabajo clínico real.',
@@ -131,6 +141,20 @@ export function getLandingCopy(locale: string) {
           ['therapist', 'Therapist', 'Lista de pacientes reales y detalle por paciente con check-ins, pensamientos, misiones y riesgo básico.'],
           ['support', 'Medical Support', 'Contenido dinámico según severidad real, sin dosis automáticas y con disclaimer médico visible.'],
           ['crisis', 'Crisis Support', 'Rutas de ayuda reales para Medellín cuando el caso es severo o requiere apoyo urgente.'],
+        ],
+      },
+      therapistDemo: {
+        badge: 'Demo terapéutica',
+        title: 'El portal terapeuta resume lo importante sin perder contexto clínico.',
+        description:
+          'La lectura por paciente integra perfil básico, último check-in, historial reciente, pensamientos observados, misiones recientes e indicador básico de riesgo.',
+        panelTitle: 'Vista del terapeuta',
+        panelSummary:
+          'Una sola lectura concentra continuidad clínica, señales recientes y elementos accionables entre sesiones.',
+        timeline: [
+          ['Último check-in', 'Score, severidad y fecha del registro más reciente.'],
+          ['Observer reciente', 'Pensamientos, trigger, situación y urgencia compulsiva cuando existen.'],
+          ['Actividad y riesgo', 'Misiones recientes y una señal básica para priorizar seguimiento.'],
         ],
       },
       audiences: {
@@ -259,6 +283,16 @@ export function getLandingCopy(locale: string) {
         },
       ],
     },
+    proof: {
+      badge: 'Concrete MVP signals',
+      title: 'Clinical visibility, continuity, and flow closure inside one system.',
+      stats: [
+        ['10', 'clinical questions per check-in', 'Real Mental Check-In with 0-4 answers and total 0-40 scoring.'],
+        ['4', 'severity levels', 'Healthy, mild, moderate, and severe with proportional reading.'],
+        ['6', 'connected functional modules', 'Dashboard, Check-In, Progress, Observer, Therapist, and Medical Support.'],
+      ],
+      trustStrip: ['CBT', 'ERP', 'Firestore', 'Longitudinal history', 'Printable summary', 'Medellin Crisis Support'],
+    },
     why: {
       badge: 'Why NeuroQuest',
       title: 'A warmer interface, built for real clinical work.',
@@ -291,6 +325,20 @@ export function getLandingCopy(locale: string) {
         ['therapist', 'Therapist', 'Real patient lists and per-patient detail including check-ins, thoughts, missions, and basic risk.'],
         ['support', 'Medical Support', 'Dynamic content according to real severity, without automatic dosing and with explicit disclaimer.'],
         ['crisis', 'Crisis Support', 'Real Medellin help routes when the case is severe or urgent support is needed.'],
+      ],
+    },
+    therapistDemo: {
+      badge: 'Therapist demo',
+      title: 'The therapist portal surfaces what matters without losing clinical context.',
+      description:
+        'Per-patient review integrates basic profile, latest check-in, recent history, observed thoughts, recent missions, and a basic risk indicator.',
+      panelTitle: 'Therapist view',
+      panelSummary:
+        'One reading concentrates clinical continuity, recent signals, and actionable elements between sessions.',
+      timeline: [
+        ['Latest check-in', 'Score, severity, and date of the most recent record.'],
+        ['Recent observer data', 'Thoughts, trigger, situation, and compulsion urge when available.'],
+        ['Activity and risk', 'Recent missions and a basic signal to prioritize follow-up.'],
       ],
     },
     audiences: {

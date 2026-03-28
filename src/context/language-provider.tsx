@@ -18,13 +18,11 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [locale, setLocale] = useState<Locale>(() => {
-    if (typeof window === 'undefined') return 'en';
+    if (typeof window === 'undefined') return 'es';
 
     const storedLocale = window.localStorage.getItem('neuroquest-locale');
     if (storedLocale === 'en' || storedLocale === 'es') return storedLocale;
-
-    const browserLocale = window.navigator.language.toLowerCase();
-    return browserLocale.startsWith('es') ? 'es' : 'en';
+    return 'es';
   });
 
   useEffect(() => {

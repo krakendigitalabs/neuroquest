@@ -111,3 +111,74 @@ body {
     min-height: 100vh;
   }
 }
+
+@layer utilities {
+  .animate-fade-up {
+    animation: fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .animate-fade-up-delay-1 {
+    animation: fade-up 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+  }
+
+  .animate-fade-up-delay-2 {
+    animation: fade-up 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both;
+  }
+
+  .animate-fade-up-delay-3 {
+    animation: fade-up 1.15s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both;
+  }
+
+  .animate-soft-float {
+    animation: soft-float 6s ease-in-out infinite;
+  }
+
+  .animate-soft-glow {
+    animation: soft-glow 4.5s ease-in-out infinite;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes soft-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -10px, 0);
+  }
+}
+
+@keyframes soft-glow {
+  0%,
+  100% {
+    box-shadow: 0 28px 80px rgba(15, 23, 42, 0.18);
+  }
+
+  50% {
+    box-shadow: 0 34px 90px rgba(15, 23, 42, 0.24);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-fade-up-delay-1,
+  .animate-fade-up-delay-2,
+  .animate-fade-up-delay-3,
+  .animate-soft-float,
+  .animate-soft-glow {
+    animation: none !important;
+  }
+}

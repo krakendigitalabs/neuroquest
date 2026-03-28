@@ -124,18 +124,18 @@ export function HomeLanding() {
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_right,rgba(27,42,65,0.08),transparent_32%)]" />
           <div className="container relative grid gap-14 px-4 md:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
             <div className="space-y-8">
-              <Badge className="w-fit border-[#E6C768]/40 bg-[#FFF7DA] px-4 py-2 text-sm text-[#1B2A41] hover:bg-[#FFF7DA]">{copy.hero.badge}</Badge>
+              <Badge className="animate-fade-up w-fit border-[#E6C768]/40 bg-[#FFF7DA] px-4 py-2 text-sm text-[#1B2A41] hover:bg-[#FFF7DA]">{copy.hero.badge}</Badge>
               <div className="space-y-5">
-                <div className="flex items-center gap-4">
+                <div className="animate-fade-up-delay-1 flex items-center gap-4">
                   <div className="hidden rounded-[1.5rem] border border-[#E6C768]/35 bg-white p-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:flex">
                     <Image src={BRAND_SYMBOL} alt="NeuroQuest symbol" width={52} height={52} className="h-12 w-12 object-contain" />
                   </div>
                   <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#B8962E]">NeuroQuest</p>
                 </div>
-                <h1 className="max-w-4xl text-4xl font-semibold leading-tight tracking-tight text-[#0F172A] sm:text-5xl xl:text-6xl">{copy.hero.title}</h1>
-                <p className="max-w-[780px] text-lg leading-8 text-[#4B5563] md:text-xl">{copy.hero.description}</p>
+                <h1 className="animate-fade-up-delay-2 max-w-4xl text-4xl font-semibold leading-tight tracking-tight text-[#0F172A] sm:text-5xl xl:text-6xl">{copy.hero.title}</h1>
+                <p className="animate-fade-up-delay-3 max-w-[780px] text-lg leading-8 text-[#4B5563] md:text-xl">{copy.hero.description}</p>
               </div>
-              <div className="flex flex-col gap-3 sm:flex-row">
+              <div className="animate-fade-up-delay-3 flex flex-col gap-3 sm:flex-row">
                 <Button size="lg" asChild className="border-0 bg-[#D4AF37] text-white shadow-[0_14px_32px_rgba(212,175,55,0.28)] hover:bg-[#C49B2C]">
                   <Link href={user ? '/dashboard' : '/login'} className="flex items-center gap-2">
                     {copy.hero.primaryCta} <ArrowRight className="h-5 w-5" />
@@ -145,7 +145,7 @@ export function HomeLanding() {
                   <a href="#como-funciona">{copy.hero.secondaryCta}</a>
                 </Button>
               </div>
-              <div className="grid gap-3 pt-2">
+              <div className="animate-fade-up-delay-3 grid gap-3 pt-2">
                 {copy.hero.trustPoints.map((item: string) => (
                   <div key={item} className="flex items-start gap-3 rounded-2xl border border-white/70 bg-white/85 px-4 py-3 shadow-[0_14px_30px_rgba(15,23,42,0.05)]">
                     <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#D4AF37]" />
@@ -155,10 +155,10 @@ export function HomeLanding() {
               </div>
             </div>
 
-            <div className="relative">
-              <div className="absolute -left-6 top-8 h-40 w-40 rounded-full bg-[#FFF3C4]/70 blur-3xl" />
+            <div className="relative animate-fade-up-delay-2">
+              <div className="animate-soft-float absolute -left-6 top-8 h-40 w-40 rounded-full bg-[#FFF3C4]/70 blur-3xl" />
               <div className="absolute -right-10 bottom-4 h-48 w-48 rounded-full bg-[#1B2A41]/10 blur-3xl" />
-              <div className="relative space-y-5 overflow-hidden rounded-[2rem] border border-[#E6C768]/28 bg-[#0F172A] p-6 text-white shadow-[0_34px_90px_rgba(15,23,42,0.22)] md:p-8">
+              <div className="animate-soft-glow relative space-y-5 overflow-hidden rounded-[2rem] border border-[#E6C768]/28 bg-[#0F172A] p-6 text-white shadow-[0_34px_90px_rgba(15,23,42,0.22)] md:p-8">
                 <div className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5">
                   <div className="relative aspect-[16/10]">
                     <Image
@@ -276,6 +276,42 @@ export function HomeLanding() {
 
         <section className="py-12 md:py-20">
           <div className="container px-4 md:px-6">
+            <div className="rounded-[2rem] border border-white/80 bg-white/88 p-6 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-8">
+              <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+                <div>
+                  <Badge variant="outline" className="border-[#E6C768]/40 bg-[#FFF7DA] px-4 py-2 text-sm text-[#1B2A41]">
+                    {copy.proof.badge}
+                  </Badge>
+                  <h2 className="mt-5 text-3xl font-semibold tracking-tight text-[#0F172A] sm:text-4xl">
+                    {copy.proof.title}
+                  </h2>
+                </div>
+                <div className="grid gap-4 md:grid-cols-3">
+                  {copy.proof.stats.map((stat: any) => (
+                    <div key={stat[1]} className="animate-fade-up rounded-[1.5rem] border border-[#E6C768]/18 bg-[linear-gradient(180deg,#FFFFFF,#F7F9FC)] p-5">
+                      <p className="text-4xl font-semibold tracking-tight text-[#1B2A41]">{stat[0]}</p>
+                      <p className="mt-2 text-sm font-medium text-[#B8962E]">{stat[1]}</p>
+                      <p className="mt-3 text-sm leading-7 text-[#5B6474]">{stat[2]}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="mt-6 flex flex-wrap gap-3 border-t border-[#E6C768]/16 pt-6">
+                {copy.proof.trustStrip.map((item: string) => (
+                  <div
+                    key={item}
+                    className="rounded-full border border-[#1B2A41]/10 bg-[#F7F9FC] px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#3A4A63]"
+                  >
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-12 md:py-20">
+          <div className="container px-4 md:px-6">
             <div className="mx-auto max-w-3xl text-center">
               <Badge variant="outline" className="border-[#E6C768]/40 bg-white/80 px-4 py-2 text-sm text-[#1B2A41]">{copy.why.badge}</Badge>
               <h2 className="mt-5 text-3xl font-semibold tracking-tight text-[#0F172A] sm:text-5xl">{copy.why.title}</h2>
@@ -285,7 +321,7 @@ export function HomeLanding() {
               {copy.why.cards.map((card: any, index: number) => {
                 const Icon = whyIcons[index];
                 return (
-                  <Card key={card[0]} className={`group rounded-[1.75rem] border border-white/80 bg-white/90 shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] ${index === 0 ? 'lg:row-span-2 lg:min-h-[420px] justify-between' : ''}`}>
+                  <Card key={card[0]} className={`group animate-fade-up rounded-[1.75rem] border border-white/80 bg-white/90 shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)] ${index === 0 ? 'lg:row-span-2 lg:min-h-[420px] justify-between' : ''}`}>
                     <CardHeader>
                       <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FFF3C4] text-[#1B2A41] shadow-sm transition group-hover:scale-105">
                         <Icon className="h-5 w-5 text-[#D4AF37]" />
@@ -322,7 +358,7 @@ export function HomeLanding() {
             </div>
             <div className="grid gap-5">
               {copy.journey.steps.map((step: any) => (
-                <div key={step[0]} className="rounded-[1.75rem] border border-[#E6C768]/22 bg-white/92 p-6 shadow-[0_16px_40px_rgba(15,23,42,0.06)] transition hover:border-[#E6C768]/40 hover:shadow-[0_22px_54px_rgba(15,23,42,0.1)]">
+                <div key={step[0]} className="animate-fade-up rounded-[1.75rem] border border-[#E6C768]/22 bg-white/92 p-6 shadow-[0_16px_40px_rgba(15,23,42,0.06)] transition hover:border-[#E6C768]/40 hover:shadow-[0_22px_54px_rgba(15,23,42,0.1)]">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
                     <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#1B2A41] text-lg font-semibold text-[#F2D16B]">{step[0]}</div>
                     <div>
@@ -347,7 +383,7 @@ export function HomeLanding() {
               {copy.modules.cards.map((module: any) => {
                 const Icon = getModuleIcon(module[0]);
                 return (
-                  <Card key={module[1]} className="group rounded-[1.5rem] border border-white/80 bg-white/92 shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
+                  <Card key={module[1]} className="group animate-fade-up rounded-[1.5rem] border border-white/80 bg-white/92 shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
                     <CardHeader className="space-y-4">
                       <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FFF3C4] shadow-sm">
                         <Icon className="h-5 w-5 text-[#D4AF37]" />
@@ -358,6 +394,93 @@ export function HomeLanding() {
                   </Card>
                 );
               })}
+            </div>
+          </div>
+        </section>
+
+        <section className="py-12 md:py-20">
+          <div className="container px-4 md:px-6">
+            <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+              <div>
+                <Badge variant="outline" className="border-[#E6C768]/40 bg-white/80 px-4 py-2 text-sm text-[#1B2A41]">
+                  {copy.therapistDemo.badge}
+                </Badge>
+                <h2 className="mt-5 text-3xl font-semibold tracking-tight text-[#0F172A] sm:text-5xl">
+                  {copy.therapistDemo.title}
+                </h2>
+                <p className="mt-5 max-w-[720px] text-lg leading-8 text-[#4B5563]">
+                  {copy.therapistDemo.description}
+                </p>
+                <div className="mt-8 grid gap-4">
+                  {copy.therapistDemo.timeline.map((item: any, index: number) => (
+                    <div key={item[0]} className="animate-fade-up rounded-[1.5rem] border border-white/80 bg-white/92 p-5 shadow-[0_16px_40px_rgba(15,23,42,0.06)]">
+                      <div className="flex gap-4">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#1B2A41] text-sm font-semibold text-[#F2D16B]">
+                          0{index + 1}
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-[#1B2A41]">{item[0]}</h3>
+                          <p className="mt-2 text-sm leading-7 text-[#5B6474]">{item[1]}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="animate-soft-glow rounded-[2rem] border border-[#E6C768]/26 bg-[linear-gradient(180deg,#1B2A41,#0F172A)] p-6 text-white shadow-[0_30px_80px_rgba(15,23,42,0.18)] md:p-8">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.24em] text-[#F2D16B]">{copy.therapistDemo.panelTitle}</p>
+                    <h3 className="mt-3 text-2xl font-semibold text-white">Patient overview</h3>
+                  </div>
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/10">
+                    <Image src={BRAND_SYMBOL} alt="NeuroQuest symbol" width={28} height={28} className="h-7 w-7 object-contain" />
+                  </div>
+                </div>
+                <p className="mt-4 text-sm leading-7 text-white/72">{copy.therapistDemo.panelSummary}</p>
+                <div className="mt-6 grid gap-4">
+                  <div className="rounded-[1.5rem] border border-white/10 bg-white/6 p-5">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.22em] text-[#F2D16B]">
+                          {locale === 'es' ? 'Último check-in' : 'Latest check-in'}
+                        </p>
+                        <p className="mt-2 text-xl font-semibold text-white">
+                          {locale === 'es' ? 'Moderate · 24/40' : 'Moderate · 24/40'}
+                        </p>
+                      </div>
+                      <div className="rounded-full border border-[#E6C768]/20 bg-[#FFF3C4]/10 px-3 py-1 text-xs text-[#F2D16B]">
+                        {locale === 'es' ? 'hace 2 días' : '2 days ago'}
+                      </div>
+                    </div>
+                    <div className="mt-4 h-2 rounded-full bg-white/10">
+                      <div className="h-2 w-[60%] rounded-full bg-gradient-to-r from-[#D4AF37] to-[#F2D16B]" />
+                    </div>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="rounded-[1.5rem] border border-white/10 bg-white/6 p-5">
+                      <p className="text-xs uppercase tracking-[0.22em] text-[#F2D16B]">
+                        {locale === 'es' ? 'Observer reciente' : 'Recent observer'}
+                      </p>
+                      <p className="mt-3 text-sm leading-7 text-white/72">
+                        {locale === 'es'
+                          ? 'Trigger: contaminación. Urgencia compulsiva: alta. Situación reciente documentada.'
+                          : 'Trigger: contamination. Compulsion urge: high. Recent situation documented.'}
+                      </p>
+                    </div>
+                    <div className="rounded-[1.5rem] border border-white/10 bg-white/6 p-5">
+                      <p className="text-xs uppercase tracking-[0.22em] text-[#F2D16B]">
+                        {locale === 'es' ? 'Actividad reciente' : 'Recent activity'}
+                      </p>
+                      <p className="mt-3 text-sm leading-7 text-white/72">
+                        {locale === 'es'
+                          ? 'Misión ERP activa, progreso longitudinal disponible y riesgo básico visible.'
+                          : 'Active ERP mission, longitudinal progress available, and basic risk visible.'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
