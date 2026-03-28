@@ -49,12 +49,12 @@ export function AppSidebar() {
   const navItems = [
     { href: '/dashboard', icon: <LayoutDashboard />, label: t('nav.dashboard') },
     { href: '/check-in', icon: <ClipboardCheck />, label: t('nav.checkIn') },
-    { href: '/progress', icon: <BarChart3 />, label: t('nav.progress') },
     { href: '/observer', icon: <Eye />, label: t('nav.observer') },
     { href: '/exposure', icon: <Route />, label: t('nav.exposure') },
     { href: '/reprogram', icon: <Brain />, label: t('nav.reprogram') },
     { href: '/regulation', icon: <HeartPulse />, label: t('nav.regulation') },
     { href: '/grounding', icon: <Zap />, label: t('nav.grounding') },
+    { href: '/progress', icon: <BarChart3 />, label: t('nav.progress') },
   ];
 
   return (

@@ -11,6 +11,8 @@ import { useUserProfile } from '@/hooks/use-user-profile';
 import { calculateMentalCheckInScore, CHECK_IN_MAX_SCORE, getMentalCheckInLevel, type MentalCheckInLevel } from '@/lib/mental-check-in';
 import type { CheckupAnswer, Recommendations, RiskFlags } from '@/models/mental-checkup';
 import { persistMentalCheckIn } from '@/lib/check-in-records';
+import { PatientReportActions } from '@/components/patient-report-actions';
+import { buildPatientReportText } from '@/lib/patient-report';
 
 type MissionResult = {
   category: string;
@@ -30,23 +32,27 @@ type OptionItem = {
 };
 
 export default function CheckInPage() {
-  const { t } = useTranslation();
+  const { t, tm, locale } = useTranslation();
   const { user, firestore } = useFirebase();
   const { userProfile } = useUserProfile();
 
   const questions = useMemo<QuestionItem[]>(() => (
-    Array.from({ length: 10 }, (_, index) => ({
-      id: index + 1,
-      text: t(`checkIn.questions.${index}.text`),
-    }))
-  ), [t]);
+    tm<QuestionItem[]>('checkIn.questions')
+      .map((question, index) => ({
+        id: Number(question?.id ?? index + 1),
+        text: String(question?.text ?? ''),
+      }))
+      .filter((question) => question.text.length > 0)
+  ), [tm]);
 
   const options = useMemo<OptionItem[]>(() => (
-    Array.from({ length: 5 }, (_, index) => ({
-      value: index,
-      label: t(`checkIn.options.${index}.label`),
-    }))
-  ), [t]);
+    tm<OptionItem[]>('checkIn.options')
+      .map((option, index) => ({
+        value: Number(option?.value ?? index),
+        label: String(option?.label ?? ''),
+      }))
+      .filter((option) => option.label.length > 0)
+  ), [tm]);
 
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [notes, setNotes] = useState('');
@@ -57,6 +63,8 @@ export default function CheckInPage() {
     score: number;
     severity: MentalCheckInLevel;
     mission: MissionResult;
+    note: string;
+    generatedAt: Date;
   } | null>(null);
 
   const answeredAllQuestions = questions.every((question) => typeof answers[question.id] === 'number');
@@ -167,6 +175,8 @@ export default function CheckInPage() {
         score: computedScore,
         severity: computedSeverity,
         mission: currentMission,
+        note: professionalNote,
+        generatedAt: new Date(),
       });
     } catch (submitError) {
       console.error('Error saving check-in:', submitError);
@@ -175,6 +185,38 @@ export default function CheckInPage() {
       setSaving(false);
     }
   };
+
+  const reportPatient = userProfile?.displayName || user?.displayName || user?.email || t('sidebar.guestUser');
+  const resultReportText = useMemo(() => {
+    if (!result) return '';
+
+    return buildPatientReportText({
+      title: t('checkIn.reportTitle'),
+      patientLabel: t('checkIn.reportPatientLabel'),
+      patient: reportPatient,
+      generatedAtLabel: t('checkIn.reportGeneratedAtLabel'),
+      generatedAt: result.generatedAt.toLocaleString(locale),
+      summaryTitle: t('checkIn.reportClinicalSummaryTitle'),
+      summary: t('checkIn.reportClinicalSummary', {
+        category: result.mission.category,
+        score: result.score,
+        maxScore: CHECK_IN_MAX_SCORE,
+        mission: result.mission.mission,
+      }),
+      sections: [
+        {
+          title: t('checkIn.reportTasksTitle'),
+          lines: result.mission.tasks,
+        },
+        {
+          title: t('checkIn.reportNotesTitle'),
+          lines: [result.note],
+        },
+      ],
+      patientSignatureLabel: t('checkIn.reportPatientSignature'),
+      therapistSignatureLabel: t('checkIn.reportTherapistSignature'),
+    });
+  }, [locale, reportPatient, result, t]);
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -248,7 +290,7 @@ export default function CheckInPage() {
               </p>
             </div>
 
-            <Button type="submit" disabled={saving}>
+            <Button type="submit" disabled={saving || !answeredAllQuestions}>
               {saving ? t('checkIn.saving') : t('checkIn.saveButton')}
             </Button>
 
@@ -269,7 +311,10 @@ export default function CheckInPage() {
 
       {result ? (
         <section className="rounded-xl border bg-card p-6 shadow-sm space-y-4">
-          <h2 className="text-2xl font-bold">{t('checkIn.resultTitle')}</h2>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-2xl font-bold">{t('checkIn.resultTitle')}</h2>
+            <PatientReportActions reportTitle={t('checkIn.reportTitle')} reportText={resultReportText} />
+          </div>
           <div className="grid gap-3">
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">{t('checkIn.totalScore')}</p>
@@ -296,6 +341,31 @@ export default function CheckInPage() {
               </ul>
             </div>
 
+            <div className="rounded-lg border p-4 text-sm">
+              <p className="font-medium">{t('checkIn.reportHeaderTitle')}</p>
+              <div className="mt-3 grid gap-2 md:grid-cols-2">
+                <p><span className="font-medium">{t('checkIn.reportPatientLabel')}:</span> {reportPatient}</p>
+                <p><span className="font-medium">{t('checkIn.reportGeneratedAtLabel')}:</span> {result.generatedAt.toLocaleString(locale)}</p>
+              </div>
+            </div>
+
+            <div className="rounded-lg border p-4 text-sm">
+              <p className="font-medium">{t('checkIn.reportClinicalSummaryTitle')}</p>
+              <p className="mt-2">
+                {t('checkIn.reportClinicalSummary', {
+                  category: result.mission.category,
+                  score: result.score,
+                  maxScore: CHECK_IN_MAX_SCORE,
+                  mission: result.mission.mission,
+                })}
+              </p>
+            </div>
+
+            <div className="rounded-lg border p-4 text-sm">
+              <p className="font-medium">{t('checkIn.reportNotesTitle')}</p>
+              <p className="mt-2 text-muted-foreground">{result.note}</p>
+            </div>
+
             {result.severity === 'severe' ? (
               <div className="rounded-lg border border-red-400 bg-red-50 p-4">
                 <p className="font-semibold text-red-700">{t('checkIn.alertTitle')}</p>
@@ -307,6 +377,15 @@ export default function CheckInPage() {
                 </div>
               </div>
             ) : null}
+
+            <div className="grid gap-6 pt-4 md:grid-cols-2">
+              <div className="border-t pt-3">
+                <p className="text-xs text-muted-foreground">{t('checkIn.reportPatientSignature')}</p>
+              </div>
+              <div className="border-t pt-3">
+                <p className="text-xs text-muted-foreground">{t('checkIn.reportTherapistSignature')}</p>
+              </div>
+            </div>
           </div>
         </section>
       ) : null}

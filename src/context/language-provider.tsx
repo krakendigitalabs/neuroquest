@@ -19,9 +19,14 @@ type LanguageContextType = {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-function getNestedTranslation(source: TranslationTree, key: string): TranslationValue | undefined {
+export function getNestedTranslation(source: TranslationTree, key: string): TranslationValue | undefined {
   return key.split('.').reduce<TranslationValue | undefined>((result, segment) => {
-    if (result && typeof result === 'object' && !Array.isArray(result)) {
+    if (Array.isArray(result)) {
+      const index = Number(segment);
+      return Number.isInteger(index) ? result[index] : undefined;
+    }
+
+    if (result && typeof result === 'object') {
       return (result as TranslationTree)[segment];
     }
 

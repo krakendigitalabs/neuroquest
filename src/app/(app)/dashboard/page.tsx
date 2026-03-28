@@ -67,7 +67,17 @@ export default function DashboardPage() {
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight font-headline">{t('dashboard.welcome')}</h1>
+        <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight font-headline">{t('dashboard.welcome')}</h1>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
+              <Link href="/home">{t('dashboard.returnHome')}</Link>
+            </Button>
+            <Button asChild size="sm" className="w-full sm:w-auto">
+              <Link href="/check-in">{t('nav.checkIn')}</Link>
+            </Button>
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

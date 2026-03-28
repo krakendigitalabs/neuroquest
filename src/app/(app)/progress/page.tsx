@@ -11,11 +11,15 @@ import { useTranslation } from '@/context/language-provider';
 import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import type { MentalCheckup } from '@/models/mental-checkup';
+import type { ThoughtRecord } from '@/models/thought-record';
+import type { ExposureMission } from '@/models/exposure-mission';
 import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import type { TooltipProps } from 'recharts';
 import { getProgressMetrics, normalizeProgressCheckups } from '@/lib/progress-checkups';
 import { PatientReportActions } from '@/components/patient-report-actions';
 import { buildPatientReportText } from '@/lib/patient-report';
+import { normalizeThoughtRecords } from '@/lib/thought-records';
+import { toDate } from '@/lib/thought-insights';
 
 const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
   if (active && payload && payload.length) {
@@ -45,9 +49,55 @@ export default function ProgressPage() {
   }, [firestore, user]);
 
   const { data: checkups } = useCollection<MentalCheckup>(checkupsQuery);
+  const thoughtsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return collection(firestore, 'users', user.uid, 'thoughtRecords');
+  }, [firestore, user]);
+  const { data: thoughtHistory } = useCollection<ThoughtRecord>(thoughtsQuery);
+  const missionsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return collection(firestore, 'users', user.uid, 'exposureMissions');
+  }, [firestore, user]);
+  const { data: missions } = useCollection<ExposureMission>(missionsQuery);
 
   const sortedCheckups = useMemo(() => normalizeProgressCheckups(checkups), [checkups]);
   const metrics = useMemo(() => getProgressMetrics(sortedCheckups), [sortedCheckups]);
+  const sortedThoughts = useMemo(
+    () =>
+      [...normalizeThoughtRecords(thoughtHistory)].sort(
+        (a, b) => (toDate(b.recordedAt)?.getTime() ?? 0) - (toDate(a.recordedAt)?.getTime() ?? 0)
+      ),
+    [thoughtHistory]
+  );
+  const sortedMissions = useMemo(
+    () =>
+      [...(missions ?? [])].sort(
+        (a, b) => (toDate(b.completionDate ?? b.createdAt)?.getTime() ?? 0) - (toDate(a.completionDate ?? a.createdAt)?.getTime() ?? 0)
+      ),
+    [missions]
+  );
+  const completedMissionCount = useMemo(
+    () => sortedMissions.filter((mission) => mission.status === 'completed').length,
+    [sortedMissions]
+  );
+  const averageThoughtIntensity = useMemo(() => {
+    if (!sortedThoughts.length) return null;
+    const total = sortedThoughts.reduce((sum, thought) => sum + thought.intensity, 0);
+    return Math.round((total / sortedThoughts.length) * 10) / 10;
+  }, [sortedThoughts]);
+  const thoughtTrendData = useMemo(
+    () =>
+      sortedThoughts
+        .slice(0, 7)
+        .reverse()
+        .map((thought, index) => ({
+          day: toDate(thought.recordedAt)
+            ? toDate(thought.recordedAt)?.toLocaleDateString(locale, { month: 'short', day: 'numeric' })
+            : `${t('progress.entryLabel')} ${index + 1}`,
+          intensity: thought.intensity,
+        })),
+    [locale, sortedThoughts, t]
+  );
 
   const trendData = useMemo(() => (
     [...metrics.trendData]
@@ -64,6 +114,7 @@ export default function ProgressPage() {
 
   const chartConfig = {
     score: { label: t('progress.checkInScore'), color: 'hsl(var(--destructive))' },
+    intensity: { label: t('observer.intensity'), color: 'hsl(var(--primary))' },
   };
   const generatedAt = useMemo(() => new Date(), []);
   const reportPatient = userProfile?.displayName || user?.displayName || user?.email || t('sidebar.guestUser');
@@ -111,6 +162,21 @@ export default function ProgressPage() {
             ? `${t(`progress.trendStates.${metrics.trendDirection}`)} (${metrics.trendDelta.toLocaleString(locale)})`
             : t('progress.trendUnavailableDescription'),
         ],
+      },
+      {
+        title: t('progress.reportObserverTitle'),
+        lines: sortedThoughts.length
+          ? sortedThoughts.slice(0, 5).map((thought) => {
+              const thoughtDate = toDate(thought.recordedAt)?.toLocaleString(locale) ?? t('progress.unknownDate');
+              return `${thoughtDate} · ${thought.thoughtText} · ${t('observer.intensity')}: ${thought.intensity}/10`;
+            })
+          : [t('observer.noThoughts')],
+      },
+      {
+        title: t('progress.reportMissionsTitle'),
+        lines: sortedMissions.length
+          ? sortedMissions.slice(0, 5).map((mission) => `${mission.title} · ${t(`progress.${mission.status}`)} · XP ${mission.xpReward}`)
+          : [t('progress.noMissionsYet')],
       },
     ],
     patientSignatureLabel: t('progress.reportPatientSignature'),
@@ -174,6 +240,28 @@ export default function ProgressPage() {
             <p className="text-xs text-muted-foreground">{t('progress.latestLevelDescription')}</p>
           </CardContent>
         </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('progress.observerSummaryTitle')}</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {averageThoughtIntensity !== null ? averageThoughtIntensity.toLocaleString(locale) : t('observer.noThoughts')}
+            </div>
+            <p className="text-xs text-muted-foreground">{t('progress.observerSummaryDescription')}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('progress.missionsSummaryTitle')}</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{completedMissionCount.toLocaleString(locale)}</div>
+            <p className="text-xs text-muted-foreground">{t('progress.missionsSummaryDescription')}</p>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -232,6 +320,57 @@ export default function ProgressPage() {
         </Card>
       </div>
 
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('progress.observerChartTitle')}</CardTitle>
+            <CardDescription>{t('progress.observerChartDescription')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {thoughtTrendData.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t('observer.noThoughts')}</p>
+            ) : (
+              <ChartContainer config={chartConfig} className="h-64">
+                <ComposedChart data={thoughtTrendData}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                  <YAxis width={20} tickLine={false} axisLine={false} domain={[0, 10]} />
+                  <ChartTooltip content={<CustomTooltip />} />
+                  <Line type="monotone" dataKey="intensity" stroke={chartConfig.intensity.color} strokeWidth={2} dot name={t('observer.intensity')} />
+                </ComposedChart>
+              </ChartContainer>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('progress.latestMissionsTitle')}</CardTitle>
+            <CardDescription>{t('progress.latestMissionsDescription')}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {sortedMissions.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t('progress.noMissionsYet')}</p>
+            ) : (
+              sortedMissions.slice(0, 5).map((mission) => (
+                <div key={mission.id} className="rounded-lg border p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-medium">{mission.title}</p>
+                    <Badge variant={mission.status === 'completed' ? 'secondary' : 'outline'}>
+                      {t(`progress.${mission.status}`)}
+                    </Badge>
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">{mission.description}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {toDate(mission.completionDate ?? mission.createdAt)?.toLocaleString(locale) ?? t('progress.unknownDate')}
+                  </p>
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>{t('progress.reportTitle')}</CardTitle>
@@ -279,6 +418,34 @@ export default function ProgressPage() {
                     <p>{checkup.score}/{checkup.maxScore || '—'}</p>
                     <p>{t(`checkIn.results.${checkup.level}.category`)}</p>
                   </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="rounded-lg border p-4">
+            <p className="font-medium">{t('progress.reportObserverTitle')}</p>
+            {sortedThoughts.length === 0 ? (
+              <p className="mt-2 text-muted-foreground">{t('observer.noThoughts')}</p>
+            ) : (
+              <div className="mt-3 space-y-2">
+                {sortedThoughts.slice(0, 5).map((thought) => (
+                  <p key={`report-thought-${thought.id}`}>
+                    {toDate(thought.recordedAt)?.toLocaleString(locale) ?? t('progress.unknownDate')} · {thought.thoughtText} · {t('observer.intensity')}: {thought.intensity}/10
+                  </p>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="rounded-lg border p-4">
+            <p className="font-medium">{t('progress.reportMissionsTitle')}</p>
+            {sortedMissions.length === 0 ? (
+              <p className="mt-2 text-muted-foreground">{t('progress.noMissionsYet')}</p>
+            ) : (
+              <div className="mt-3 space-y-2">
+                {sortedMissions.slice(0, 5).map((mission) => (
+                  <p key={`report-mission-${mission.id}`}>
+                    {mission.title} · {t(`progress.${mission.status}`)} · XP {mission.xpReward}
+                  </p>
                 ))}
               </div>
             )}

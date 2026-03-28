@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Target, CheckCircle, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -15,6 +15,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { PatientReportActions } from '@/components/patient-report-actions';
+import { buildPatientReportText } from '@/lib/patient-report';
+import { toDate } from '@/lib/thought-insights';
 
 const MissionCard = ({ mission, onComplete }: { mission: WithId<ExposureMission>, onComplete: (missionId: string, xp: number) => void }) => {
   const { t } = useTranslation();
@@ -74,7 +77,7 @@ const MissionCard = ({ mission, onComplete }: { mission: WithId<ExposureMission>
 
 
 export default function ExposurePage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { firestore, user } = useFirebase();
   const { toast } = useToast();
   const [showCustomMissionForm, setShowCustomMissionForm] = useState(false);
@@ -206,14 +209,57 @@ export default function ExposurePage() {
   const completedCount = completedMissions.length;
   const totalMissions = (missions || []).length;
   const progressValue = totalMissions > 0 ? (completedCount / totalMissions) * 100 : 0;
+  const generatedAt = useMemo(() => new Date(), []);
+  const reportPatient = user?.displayName || user?.email || t('sidebar.guestUser');
+  const reportText = useMemo(() => buildPatientReportText({
+    title: t('exposure.reportTitle'),
+    patientLabel: t('exposure.reportPatientLabel'),
+    patient: reportPatient,
+    generatedAtLabel: t('exposure.reportGeneratedAtLabel'),
+    generatedAt: generatedAt.toLocaleString(locale),
+    summaryTitle: t('exposure.reportSummaryTitle'),
+    summary: totalMissions
+      ? t('exposure.reportSummaryWithProgress', {
+          completed: completedCount,
+          total: totalMissions,
+          xp: completedMissions.reduce((sum, mission) => sum + mission.xpReward, 0),
+        })
+      : t('exposure.reportSummaryEmpty'),
+    sections: [
+      {
+        title: t('exposure.completedMissions'),
+        lines: completedMissions.length
+          ? completedMissions.map((mission) => {
+              const completionDate = toDate(mission.completionDate)?.toLocaleString(locale) ?? t('progress.unknownDate');
+              const missionTypeKey = (mission.missionType || '').toLowerCase().replace(/ /g, '_');
+              const translatedType = t(`missionTypes.${missionTypeKey}`);
+              return `${completionDate} · ${mission.title} · ${translatedType === `missionTypes.${missionTypeKey}` ? mission.missionType || t('nav.exposure') : translatedType} · XP ${mission.xpReward}`;
+            })
+          : [t('exposure.noCompletedMissions')],
+      },
+      {
+        title: t('exposure.availableMissions'),
+        lines: availableMissions.length
+          ? availableMissions.slice(0, 5).map((mission) => `${mission.title} · ${t(`progress.${mission.status}`)}`)
+          : [t('exposure.noAvailableMissions')],
+      },
+    ],
+    patientSignatureLabel: t('exposure.reportPatientSignature'),
+    therapistSignatureLabel: t('exposure.reportTherapistSignature'),
+  }), [availableMissions, completedCount, completedMissions, generatedAt, locale, reportPatient, t, totalMissions]);
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight font-headline">{t('exposure.title')}</h1>
-        <Button onClick={() => setShowCustomMissionForm((value) => !value)}>
-          <Plus className="mr-2 h-4 w-4" /> {t('exposure.customMission')}
-        </Button>
+        <div className="flex flex-1 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <h1 className="text-3xl font-bold tracking-tight font-headline">{t('exposure.title')}</h1>
+          <div className="flex flex-wrap gap-2">
+            <PatientReportActions reportTitle={t('exposure.reportTitle')} reportText={reportText} />
+            <Button onClick={() => setShowCustomMissionForm((value) => !value)}>
+              <Plus className="mr-2 h-4 w-4" /> {t('exposure.customMission')}
+            </Button>
+          </div>
+        </div>
       </div>
       <p className="text-muted-foreground">
         {t('exposure.description')}
@@ -277,6 +323,7 @@ export default function ExposurePage() {
         <Card>
           <CardHeader>
             <CardTitle>{t('exposure.progressTitle')}</CardTitle>
+            <CardDescription>{t('exposure.reportDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Progress value={progressValue} className="h-3" />

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/firebase';
 import { GoogleAuthProvider, signInWithPopup, signInAnonymously } from 'firebase/auth';
@@ -87,6 +88,9 @@ export default function LoginPage() {
             <>
               <SignInButton />
               <GuestSignInButton />
+              <Button asChild variant="outline" className="w-full">
+                <Link href="/home">{t('login.homeButton')}</Link>
+              </Button>
             </>
           )}
         </CardContent>
