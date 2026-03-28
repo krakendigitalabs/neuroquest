@@ -400,6 +400,20 @@
       "primaryCta": "Start",
       "secondaryCta": "Explore modules"
     },
+    "donation": {
+      "badge": "Donate to help",
+      "title": "Your support can open follow-up and care for more people affected by mental distress.",
+      "description": "Every donation helps sustain a platform built to support real processes with more clarity, continuity, and access. If you want to support this mission, leave your details and continue to the secure donation link.",
+      "formTitle": "Before donating",
+      "fields": {
+        "name": "Full name",
+        "email": "Email address",
+        "phone": "Phone number"
+      },
+      "helper": "Your contribution helps expand access, follow-up, and support for people who need mental-health care today.",
+      "cta": "Go to donate",
+      "linkLabel": "Open donation link"
+    },
     "footer": {
       "productDescription": "Mental-health follow-up with clinical structure, therapeutic gamification, and contextual support for patients and therapists.",
       "linksTitle": "Sections",

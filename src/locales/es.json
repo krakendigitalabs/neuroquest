@@ -400,6 +400,20 @@
       "primaryCta": "Comenzar",
       "secondaryCta": "Explorar módulos"
     },
+    "donation": {
+      "badge": "Donar para ayudar",
+      "title": "Tu aporte puede abrir seguimiento y apoyo para más personas afectadas mentalmente.",
+      "description": "Cada donación ayuda a sostener una plataforma que busca acompañar procesos reales con más claridad, continuidad y acceso. Si quieres apoyar esta misión, déjanos tus datos y continúa al enlace seguro de donación.",
+      "formTitle": "Antes de donar",
+      "fields": {
+        "name": "Nombre completo",
+        "email": "Correo electrónico",
+        "phone": "Teléfono"
+      },
+      "helper": "Tu aporte impulsa acceso, seguimiento y acompañamiento para más personas que hoy necesitan apoyo mental.",
+      "cta": "Ir a donar",
+      "linkLabel": "Abrir enlace de donación"
+    },
     "footer": {
       "productDescription": "Seguimiento mental con estructura clínica, gamificación terapéutica y soporte contextual para pacientes y terapeutas.",
       "linksTitle": "Secciones",

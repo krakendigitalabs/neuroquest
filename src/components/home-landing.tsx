@@ -1,11 +1,14 @@
 'use client';
 
+import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, BrainCircuit, ShieldPlus, Sparkles, TriangleAlert } from 'lucide-react';
+import { ArrowRight, BrainCircuit, HeartHandshake, ShieldPlus, Sparkles, TriangleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTranslation } from '@/context/language-provider';
 import { useTherapistAccess } from '@/hooks/use-therapist-access';
@@ -131,6 +134,20 @@ type LandingCopy = {
     primaryCta: string;
     secondaryCta: string;
   };
+  donation: {
+    badge: string;
+    title: string;
+    description: string;
+    formTitle: string;
+    fields: {
+      name: string;
+      email: string;
+      phone: string;
+    };
+    helper: string;
+    cta: string;
+    linkLabel: string;
+  };
   footer: {
     productDescription: string;
     linksTitle: string;
@@ -148,6 +165,15 @@ export function HomeLanding() {
   const { user } = useUser();
   const { hasTherapistAccess } = useTherapistAccess();
   const copy = tm<LandingCopy>('landing');
+  const [donorName, setDonorName] = useState('');
+  const [donorEmail, setDonorEmail] = useState('');
+  const [donorPhone, setDonorPhone] = useState('');
+  const donationLink = 'https://checkout.wompi.co/method';
+  const canDonate = donorName.trim() && donorEmail.trim() && donorPhone.trim();
+  const donationSummary = useMemo(
+    () => `${donorName.trim()} | ${donorEmail.trim()} | ${donorPhone.trim()}`,
+    [donorEmail, donorName, donorPhone]
+  );
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_top_left,rgba(242,209,107,0.16),transparent_22%),radial-gradient(circle_at_top_right,rgba(27,42,65,0.1),transparent_28%),linear-gradient(180deg,#FFFFFF_0%,#F7F9FC_42%,#EEF2F7_100%)] text-[#0F172A]">
@@ -381,6 +407,67 @@ export function HomeLanding() {
           <div className="container px-4 md:px-6">
             <div className="overflow-hidden rounded-[2.25rem] border border-[#E6C768]/26 bg-[radial-gradient(circle_at_top,rgba(242,209,107,0.18),transparent_34%),linear-gradient(135deg,#1B2A41,#0F172A)] px-6 py-10 text-white shadow-[0_34px_90px_rgba(15,23,42,0.22)] md:px-10 md:py-12">
               <div className="grid gap-8 lg:grid-cols-[1fr_0.75fr] lg:items-center"><div><Badge className="border-white/12 bg-white/10 px-4 py-2 text-sm text-[#F2D16B] hover:bg-white/10">{copy.finalCta.badge}</Badge><h2 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">{copy.finalCta.title}</h2><p className="mt-5 max-w-[720px] text-lg leading-8 text-white/74">{copy.finalCta.description}</p></div><div className="flex flex-col gap-3"><Button size="lg" asChild className="border-0 bg-[#D4AF37] text-white shadow-[0_14px_30px_rgba(212,175,55,0.25)] hover:bg-[#C49B2C]"><Link href={user ? '/dashboard' : '/login'} className="flex items-center gap-2">{copy.finalCta.primaryCta} <ArrowRight className="h-5 w-5" /></Link></Button><Button size="lg" variant="outline" asChild className="border-white/15 bg-white/8 text-white hover:bg-white/12"><a href="#modulos">{copy.finalCta.secondaryCta}</a></Button></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section className="pb-14 md:pb-24">
+          <div className="container px-4 md:px-6">
+            <div className="grid gap-8 rounded-[2.25rem] border border-[#E6C768]/18 bg-white/78 p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-2xl md:p-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+              <div>
+                <Badge variant="outline" className="border-[#E6C768]/40 bg-[#FFF7DA] px-4 py-2 text-sm text-[#1B2A41]">{copy.donation.badge}</Badge>
+                <h2 className="mt-5 text-3xl font-semibold tracking-tight text-[#0F172A] sm:text-4xl">{copy.donation.title}</h2>
+                <p className="mt-5 max-w-[640px] text-lg leading-8 text-[#4B5563]">{copy.donation.description}</p>
+                <div className="mt-6 inline-flex items-center gap-3 rounded-[1.25rem] border border-[#E6C768]/22 bg-[#FFF9E8] px-4 py-3 text-sm text-[#3A4A63]">
+                  <HeartHandshake className="h-5 w-5 text-[#D4AF37]" />
+                  <span>{copy.donation.helper}</span>
+                </div>
+              </div>
+
+              <div className="rounded-[2rem] border border-white/80 bg-[linear-gradient(180deg,#FFFFFF,#F7F9FC)] p-6 shadow-[0_18px_45px_rgba(15,23,42,0.06)]">
+                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#B8962E]">{copy.donation.formTitle}</p>
+                <div className="mt-6 grid gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="donor-name" className="text-[#1B2A41]">{copy.donation.fields.name}</Label>
+                    <Input id="donor-name" value={donorName} onChange={(event) => setDonorName(event.target.value)} className="h-12 rounded-xl border-[#1B2A41]/10 bg-white" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="donor-email" className="text-[#1B2A41]">{copy.donation.fields.email}</Label>
+                    <Input id="donor-email" type="email" value={donorEmail} onChange={(event) => setDonorEmail(event.target.value)} className="h-12 rounded-xl border-[#1B2A41]/10 bg-white" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="donor-phone" className="text-[#1B2A41]">{copy.donation.fields.phone}</Label>
+                    <Input id="donor-phone" type="tel" value={donorPhone} onChange={(event) => setDonorPhone(event.target.value)} className="h-12 rounded-xl border-[#1B2A41]/10 bg-white" />
+                  </div>
+                </div>
+                <div className="mt-6 flex flex-col gap-3">
+                  <Button
+                    size="lg"
+                    asChild={Boolean(canDonate)}
+                    disabled={!canDonate}
+                    className="border-0 bg-[#D4AF37] text-white shadow-[0_14px_30px_rgba(212,175,55,0.24)] hover:bg-[#C49B2C] disabled:cursor-not-allowed disabled:bg-[#D4AF37]/50"
+                  >
+                    {canDonate ? (
+                      <a
+                        href={donationLink}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center justify-center gap-2"
+                        aria-label={`${copy.donation.cta} ${donationSummary}`}
+                      >
+                        {copy.donation.cta} <ArrowRight className="h-5 w-5" />
+                      </a>
+                    ) : (
+                      <span className="flex items-center justify-center gap-2">
+                        {copy.donation.cta} <ArrowRight className="h-5 w-5" />
+                      </span>
+                    )}
+                  </Button>
+                  <a href={donationLink} target="_blank" rel="noreferrer" className="text-sm font-medium text-[#1B2A41] underline decoration-[#D4AF37] underline-offset-4 transition hover:text-[#B8962E]">
+                    {copy.donation.linkLabel}
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </section>
