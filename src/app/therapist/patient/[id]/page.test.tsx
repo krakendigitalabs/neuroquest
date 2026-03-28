@@ -46,6 +46,18 @@ vi.mock('@/context/language-provider', () => ({
       if (key === 'therapist.riskLevel') return 'Risk level';
       if (key === 'therapist.checkInHistory') return 'Check-in history';
       if (key === 'therapist.checkInHistoryDesc') return 'Check-in history desc';
+      if (key === 'therapist.reportTitle') return 'Patient clinical report';
+      if (key === 'therapist.reportDescription') return 'Clinical summary ready for printing';
+      if (key === 'therapist.reportHeaderTitle') return 'Report header';
+      if (key === 'therapist.reportPatientLabel') return 'Patient';
+      if (key === 'therapist.reportGeneratedAtLabel') return 'Issued at';
+      if (key === 'therapist.reportClinicalSummaryTitle') return 'Clinical summary';
+      if (key === 'therapist.reportClinicalSummary') return `Latest check-in: ${values?.level} with score ${values?.score}. Current risk: ${values?.risk}. Latest recorded activity: ${values?.activity}.`;
+      if (key === 'therapist.reportCheckInHistoryTitle') return 'Recent check-ins';
+      if (key === 'therapist.reportThoughtsTitle') return 'Recent thoughts report';
+      if (key === 'therapist.reportMissionsTitle') return 'Recent missions report';
+      if (key === 'therapist.reportPatientSignature') return 'Patient signature';
+      if (key === 'therapist.reportTherapistSignature') return 'Therapist signature';
       if (key === 'therapist.observerTracking') return 'Observer tracking';
       if (key === 'therapist.observerTrackingDesc') return 'Observer tracking desc';
       if (key === 'therapist.recentMissions') return 'Recent missions';
@@ -79,6 +91,10 @@ vi.mock('@/context/language-provider', () => ({
       if (key === 'observer.riskLevels.high') return 'High';
       if (key === 'observer.riskLevels.medium') return 'Medium';
       if (key === 'observer.riskLevels.low') return 'Low';
+      if (key === 'reports.printPdf') return 'Print / PDF';
+      if (key === 'reports.sendWhatsApp') return 'Send by WhatsApp';
+      if (key === 'reports.sendEmail') return 'Send by email';
+      if (key === 'reports.emailSubjectPrefix') return 'NeuroQuest report';
       if (key.startsWith('observer.emotions.')) return key.split('.').at(-1) ?? key;
       if (key.startsWith('progress.')) return key;
       if (key.startsWith('checkIn.results.')) return key.split('.').slice(-2, -1)[0] ?? key;
@@ -188,13 +204,17 @@ describe('TherapistPatientDetailPage', () => {
   it('renders patient detail with real clinical data', () => {
     render(<TherapistPatientDetailPage />);
 
-    expect(screen.getByText('Pat Doe')).toBeInTheDocument();
+    expect(screen.getAllByText('Pat Doe').length).toBeGreaterThan(0);
     expect(screen.getByText('pat@example.com')).toBeInTheDocument();
     expect(screen.getByText('18/40')).toBeInTheDocument();
     expect(screen.getAllByText('I will contaminate everyone')).toHaveLength(2);
     expect(screen.getByText('Touch the doorknob once')).toBeInTheDocument();
     expect(screen.getByText('High')).toBeInTheDocument();
     expect(screen.getAllByText('Needs attention')).toHaveLength(2);
+    expect(screen.getAllByText('Patient clinical report').length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('button', { name: 'Print / PDF' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('button', { name: 'Send by WhatsApp' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('button', { name: 'Send by email' }).length).toBeGreaterThan(0);
   });
 
   it('allows therapist access without requiring admin role', () => {

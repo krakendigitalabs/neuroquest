@@ -26,6 +26,11 @@ function AppBody({ children }: { children: React.ReactNode }) {
       <head>
         <title>{title}</title>
         <meta name="description" content={description} />
+        <link
+          rel="icon"
+          href="https://res.cloudinary.com/dr50ioh9h/image/upload/v1774648742/simbolo_nq_okc053.png?v=20260327"
+          type="image/png"
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

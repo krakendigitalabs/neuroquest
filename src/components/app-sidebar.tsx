@@ -59,21 +59,21 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader>
-        <Logo />
+      <SidebarHeader className="gap-3 p-3 sm:p-2">
+        <Logo className="min-w-0" />
       </SidebarHeader>
 
       <SidebarContent>
-        <div className="p-2 flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            <UserAvatar />
-            <div>
-              <p className="font-semibold">
+        <div className="flex min-w-0 flex-col gap-3 p-3 sm:gap-4 sm:p-2">
+          <div className="flex min-w-0 items-center gap-3">
+            <UserAvatar className="h-10 w-10 shrink-0 sm:h-8 sm:w-8" />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold sm:text-base">
                 {isProfileLoading
                   ? '...'
                   : userProfile?.displayName || user?.displayName || t('sidebar.user')}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="truncate text-[11px] text-muted-foreground sm:text-xs">
                 {isProfileLoading
                   ? '...'
                   : t('userProgress.level', { level: userProfile?.level ?? 1 })}
@@ -95,6 +95,7 @@ export function AppSidebar() {
                 asChild
                 isActive={pathname === item.href}
                 tooltip={{ children: item.label }}
+                className="min-h-11 px-3 py-2 text-sm sm:min-h-8 sm:px-2 sm:py-2"
               >
                 <Link href={item.href}>
                   {item.icon}
@@ -106,10 +107,10 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
 
-      <SidebarFooter>
+      <SidebarFooter className="gap-3 p-3 pt-2 sm:gap-2 sm:p-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleLogout}>
+            <SidebarMenuButton onClick={handleLogout} className="min-h-11 px-3 py-2 text-sm sm:min-h-8 sm:px-2 sm:py-2">
               <LogOut />
               <span>{t('sidebar.logout')}</span>
             </SidebarMenuButton>
@@ -118,11 +119,11 @@ export function AppSidebar() {
 
         <SidebarSeparator />
 
-        <LanguageSwitcher className="p-2 group-data-[collapsible=icon]:flex-col" />
+        <LanguageSwitcher className="group-data-[collapsible=icon]:flex-col" />
 
         <SidebarSeparator />
 
-        <div className="p-2">
+        <div>
           <CrisisButton />
         </div>
       </SidebarFooter>
