@@ -13,11 +13,10 @@ export function getLandingCopy(locale: string) {
       },
       hero: {
         badge: 'Plataforma de seguimiento mental con enfoque clínico',
-        title:
-          'NeuroQuest convierte el seguimiento emocional en un proceso claro, estructurado y útil para pacientes y terapeutas.',
+        title: 'Seguimiento clínico de la mente, en tiempo real.',
         description:
-          'No es una app genérica de bienestar. Es una plataforma digital de seguimiento mental con check-in clínico, observer, progreso longitudinal, panel terapéutico, soporte de crisis y gamificación terapéutica basada en CBT y ERP.',
-        primaryCta: 'Entrar a NeuroQuest',
+          'NeuroQuest convierte tu estado mental en datos estructurados, medibles y accionables para acompañarte en tu proceso. Integra evaluación clínica, seguimiento longitudinal, observación de pensamientos y lectura terapéutica en una sola experiencia.',
+        primaryCta: 'Iniciar seguimiento',
         secondaryCta: 'Ver cómo funciona',
         trustPoints: [
           'Mental Check-In clínico con score 0-40 y severidad real.',
@@ -77,10 +76,10 @@ export function getLandingCopy(locale: string) {
         trustStrip: ['CBT', 'ERP', 'Firestore', 'Historial longitudinal', 'Resumen imprimible', 'Crisis Support Medellín'],
       },
       why: {
-        badge: 'Por qué NeuroQuest',
-        title: 'Una interfaz amable, pero diseñada para trabajo clínico real.',
+        badge: 'Qué es NeuroQuest',
+        title: 'Una plataforma clínica digital para dar estructura, continuidad y contexto al proceso terapéutico.',
         description:
-          'NeuroQuest une seguimiento estructurado, personalización terapéutica y visibilidad clínica. Se siente más humano que una historia clínica rígida y más sólido que una app de bienestar genérica.',
+          'NeuroQuest no reemplaza la atención profesional. La complementa con seguimiento estructurado, trazabilidad del progreso y una lectura más clara de lo que ocurre entre sesiones.',
         cards: [
           {
             title: 'Seguimiento longitudinal',
@@ -131,7 +130,7 @@ export function getLandingCopy(locale: string) {
       },
       modules: {
         badge: 'Módulos reales del MVP',
-        title: 'Lo que NeuroQuest ya hace hoy',
+        title: 'Los módulos que hoy sostienen el seguimiento clínico real',
         description:
           'Cada bloque de esta landing se apoya en capacidades existentes del producto, no en features inventadas.',
         cards: [
@@ -159,7 +158,7 @@ export function getLandingCopy(locale: string) {
       },
       audiences: {
         badge: 'Pacientes y terapeutas',
-        title: 'NeuroQuest responde a dos necesidades distintas dentro del mismo sistema.',
+        title: 'Una misma plataforma, con vistas útiles para pacientes y profesionales.',
         patientTitle: 'Para pacientes',
         therapistTitle: 'Para terapeutas',
         patientIntro:
@@ -181,7 +180,7 @@ export function getLandingCopy(locale: string) {
       },
       science: {
         badge: 'Base científica y seguridad',
-        title: 'Seguimiento estructurado, orientación proporcional y límites clínicos visibles.',
+        title: 'Seguimiento estructurado con límites clínicos explícitos.',
         description:
           'La narrativa del producto se apoya en CBT, ERP, observación de pensamientos, seguimiento longitudinal y orientación clínica proporcional a la severidad reportada.',
         pillars: [
@@ -198,11 +197,11 @@ export function getLandingCopy(locale: string) {
         ],
       },
       finalCta: {
-        badge: 'Listo para demo',
-        title: 'Presenta NeuroQuest como una plataforma real de seguimiento clínico digital.',
+        badge: 'Seguimiento con claridad',
+        title: 'Comienza con una interfaz diseñada para acompañar, medir y dar continuidad.',
         description:
-          'La experiencia visual es moderna y cálida, pero el mensaje se mantiene riguroso: NeuroQuest ya opera sobre funciones reales, datos reales y rutas de apoyo reales.',
-        primaryCta: 'Abrir la aplicación',
+          'NeuroQuest reúne check-in clínico, observer, progreso, soporte dinámico y lectura terapéutica en un sistema digital serio, sereno y accionable.',
+        primaryCta: 'Iniciar seguimiento',
         secondaryCta: 'Explorar módulos',
       },
       footer: {
@@ -230,11 +229,10 @@ export function getLandingCopy(locale: string) {
     },
     hero: {
       badge: 'A mental-health tracking platform with clinical structure',
-      title:
-        'NeuroQuest turns emotional follow-up into a clear, structured, and useful process for patients and therapists.',
+      title: 'Clinical mental follow-up, in real time.',
       description:
-        'This is not a generic wellness app. It is a real digital platform with clinical check-ins, observer workflows, longitudinal progress, therapist review, crisis support, and therapeutic gamification grounded in CBT and ERP.',
-      primaryCta: 'Open NeuroQuest',
+        'NeuroQuest turns mental state into structured, measurable, and actionable information to support the clinical process. It combines assessment, longitudinal tracking, thought observation, and therapist visibility in one system.',
+      primaryCta: 'Start tracking',
       secondaryCta: 'See how it works',
       trustPoints: [
         'Clinical Mental Check-In with real 0-40 scoring and severity.',
@@ -294,10 +292,10 @@ export function getLandingCopy(locale: string) {
       trustStrip: ['CBT', 'ERP', 'Firestore', 'Longitudinal history', 'Printable summary', 'Medellin Crisis Support'],
     },
     why: {
-      badge: 'Why NeuroQuest',
-      title: 'A warmer interface, built for real clinical work.',
+      badge: 'What NeuroQuest is',
+      title: 'A clinical digital platform built to give structure, continuity, and context to mental follow-up.',
       description:
-        'NeuroQuest combines structured follow-up, therapeutic personalization, and clinical visibility. It feels more human than rigid charting and more grounded than generic wellness software.',
+        'NeuroQuest does not replace professional care. It complements it with structured follow-up, progress traceability, and a clearer view of what happens between sessions.',
       cards: [
         ['Longitudinal follow-up', 'It does not stop at one measurement. It stores real history, trend, recent entries, and an evolving view of the case.'],
         ['Therapeutic gamification', 'XP, missions, and progression support adherence without trivializing distress or overstating outcomes.'],
@@ -316,7 +314,7 @@ export function getLandingCopy(locale: string) {
     },
     modules: {
       badge: 'Real MVP modules',
-      title: 'What NeuroQuest already does today',
+      title: 'The modules that support real clinical follow-up today',
       description: 'Every block on this landing is anchored to existing product capabilities, not invented features.',
       cards: [
         ['checkin', 'Mental Check-In', 'A 10-question clinical flow with total score and healthy, mild, moderate, and severe classification.'],
@@ -343,7 +341,7 @@ export function getLandingCopy(locale: string) {
     },
     audiences: {
       badge: 'Patients and therapists',
-      title: 'NeuroQuest serves two different needs inside one system.',
+      title: 'One platform, with useful views for patients and professionals.',
       patientTitle: 'For patients',
       therapistTitle: 'For therapists',
       patientIntro: 'A clearer experience to understand mental state, sustain adherence, and lower follow-up friction.',
@@ -363,7 +361,7 @@ export function getLandingCopy(locale: string) {
     },
     science: {
       badge: 'Clinical basis and safety',
-      title: 'Structured follow-up, proportional guidance, and visible clinical limits.',
+      title: 'Structured follow-up with explicit clinical limits.',
       description:
         'The product narrative is grounded in CBT, ERP, thought observation, longitudinal tracking, and guidance proportional to the user-reported severity.',
       pillars: [
@@ -380,11 +378,11 @@ export function getLandingCopy(locale: string) {
       ],
     },
     finalCta: {
-      badge: 'Ready for demo',
-      title: 'Present NeuroQuest as a real platform for digital clinical follow-up.',
+      badge: 'Tracking with clarity',
+      title: 'Start with an interface designed to support, measure, and sustain continuity.',
       description:
-        'The visual experience is modern and warm, but the message stays rigorous: NeuroQuest already runs on real functions, real data, and real support pathways.',
-      primaryCta: 'Open the application',
+        'NeuroQuest brings together clinical check-in, observer workflows, progress, dynamic support, and therapist visibility in a serious and calm digital system.',
+      primaryCta: 'Start tracking',
       secondaryCta: 'Explore modules',
     },
     footer: {
