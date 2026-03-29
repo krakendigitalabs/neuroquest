@@ -4,6 +4,7 @@ import { doc } from 'firebase/firestore';
 import { useFirebase, useDoc, useMemoFirebase } from '@/firebase';
 import { useAdmin } from '@/hooks/use-admin';
 import { useUserProfile } from '@/hooks/use-user-profile';
+import { hasMinimumAccountRole } from '@/lib/account-role';
 
 export function useTherapistAccess() {
   const { firestore, user } = useFirebase();
@@ -19,11 +20,13 @@ export function useTherapistAccess() {
 
   const isTherapist = !!therapistDoc;
   const isProfessionalRole = userProfile?.userRole === 'professional' || userProfile?.userRole === 'clinic';
-  const hasTherapistAccess = isAdmin || isTherapist || isProfessionalRole;
+  const canManageClinicalWorkspace = hasMinimumAccountRole(userProfile?.accountRole, 'administrator');
+  const hasTherapistAccess = isAdmin || isTherapist || isProfessionalRole || canManageClinicalWorkspace;
   const isLoading = isAdminLoading || isUserProfileLoading || (!isAdmin && isTherapistLoading);
   const isClinic = userProfile?.userRole === 'clinic';
 
   return {
+    canManageClinicalWorkspace,
     hasTherapistAccess,
     isAdmin,
     isClinic,

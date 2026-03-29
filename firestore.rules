@@ -68,6 +68,42 @@ service cloud.firestore {
       return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
+    function requesterAccountRole() {
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.accountRole
+        : null;
+    }
+
+    function hasWorkspaceAccessRole(allowedRoles) {
+      return requesterAccountRole() in allowedRoles;
+    }
+
+    function canManageWorkspaceUsers() {
+      return isAdmin() || hasWorkspaceAccessRole(['owner', 'manager', 'administrator']);
+    }
+
+    function canEditWorkspaceContent() {
+      return isAdmin() || hasWorkspaceAccessRole(['owner', 'manager', 'administrator', 'editor']);
+    }
+
+    function canAssignAccountRole(targetRole) {
+      return isAdmin() ||
+        (requesterAccountRole() == 'owner' && targetRole in ['owner', 'manager', 'administrator', 'editor', 'commentator', 'viewer']) ||
+        (requesterAccountRole() == 'manager' && targetRole in ['manager', 'administrator', 'editor', 'commentator', 'viewer']) ||
+        (requesterAccountRole() == 'administrator' && targetRole in ['editor', 'commentator', 'viewer']);
+    }
+
+    function privilegedProfileFieldsAllowedByRequester() {
+      return canAssignAccountRole(request.resource.data.accountRole) &&
+        (
+          isAdmin() ||
+          (
+            request.resource.data.userRole in ['clinic', 'professional', 'patient'] &&
+            request.resource.data.isAdmin == resource.data.isAdmin
+          )
+        );
+    }
+
     /**
      * Checks if the requesting user is a therapist assigned to the given patient (userId).
      * Performs an efficient `get` on the therapist's own document.
@@ -102,6 +138,7 @@ service cloud.firestore {
     function hasValidLatestCheckInSummary() {
       return (!('latestCheckInScore' in request.resource.data) || request.resource.data.latestCheckInScore is number) &&
         (!('userRole' in request.resource.data) || request.resource.data.userRole in ['clinic', 'professional', 'patient']) &&
+        (!('accountRole' in request.resource.data) || request.resource.data.accountRole in ['owner', 'manager', 'administrator', 'editor', 'commentator', 'viewer']) &&
         (!('latestCheckInLevel' in request.resource.data) || request.resource.data.latestCheckInLevel in ['healthy', 'mild', 'moderate', 'severe']) &&
         (!('latestCheckInAt' in request.resource.data) || request.resource.data.latestCheckInAt == null || request.resource.data.latestCheckInAt is timestamp) &&
         (!('latestCheckInNote' in request.resource.data) || request.resource.data.latestCheckInNote is string) &&
@@ -124,6 +161,12 @@ service cloud.firestore {
         (!('latestThoughtIsIntrusive' in request.resource.data) || request.resource.data.latestThoughtIsIntrusive is bool);
     }
 
+    function nonPrivilegedProfileFieldsRemainImmutable() {
+      return request.resource.data.userRole == resource.data.userRole &&
+        request.resource.data.accountRole == resource.data.accountRole &&
+        request.resource.data.isAdmin == resource.data.isAdmin;
+    }
+
     // -------------------------------------------------------------------------
     // Collection Rules
     // -------------------------------------------------------------------------
@@ -137,10 +180,23 @@ service cloud.firestore {
      * @principle Enforces self-management of user profiles and allows read access for authorized staff.
      */
     match /users/{userId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
-      allow create: if isOwner(userId) && request.resource.data.id == userId && hasValidLatestCheckInSummary() && hasValidLatestThoughtSummary();
-      allow update: if isOwner(userId) && request.resource.data.id == resource.data.id && hasValidLatestCheckInSummary() && hasValidLatestThoughtSummary();
+      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow create: if isOwner(userId) &&
+        request.resource.data.id == userId &&
+        hasValidLatestCheckInSummary() &&
+        hasValidLatestThoughtSummary() &&
+        (
+          (isAdmin() && request.resource.data.userRole in ['clinic', 'professional', 'patient'] && request.resource.data.accountRole in ['owner', 'manager', 'administrator', 'editor', 'commentator', 'viewer']) ||
+          (!isAdmin() && request.resource.data.userRole == 'patient' && request.resource.data.accountRole == 'viewer' && request.resource.data.isAdmin == false)
+        );
+      allow update: if request.resource.data.id == resource.data.id &&
+        hasValidLatestCheckInSummary() &&
+        hasValidLatestThoughtSummary() &&
+        (
+          (isOwner(userId) && nonPrivilegedProfileFieldsRemainImmutable()) ||
+          (canManageWorkspaceUsers() && privilegedProfileFieldsAllowedByRequester())
+        );
       allow delete: if isOwner(userId);
     }
 
@@ -153,11 +209,11 @@ service cloud.firestore {
      * @principle Enforces self-management of professional profiles.
      */
     match /therapists/{therapistId} {
-      allow get: if isOwner(therapistId) || isAdmin(); // A patient could also get via `isSignedIn()`
+      allow get: if isOwner(therapistId) || isAdmin() || canManageWorkspaceUsers(); // A patient could also get via `isSignedIn()`
       allow list: if false;
-      allow create: if isOwner(therapistId);
-      allow update: if isExistingOwner(therapistId);
-      allow delete: if isExistingOwner(therapistId);
+      allow create: if isOwner(therapistId) || canManageWorkspaceUsers();
+      allow update: if isExistingOwner(therapistId) || canManageWorkspaceUsers();
+      allow delete: if isExistingOwner(therapistId) || canManageWorkspaceUsers();
     }
 
     /**
@@ -184,11 +240,11 @@ service cloud.firestore {
      * @principle Restricts access to a user's own data tree, with read-only access for assigned therapists.
      */
     match /users/{userId}/thoughtRecords/{recordId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
+      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
       allow create: if isOwner(userId) && incomingDataMatchesOwner(userId);
       allow update: if isExistingOwner(userId) && ownerIsImmutable();
-      allow delete: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId) || canManageWorkspaceUsers();
     }
 
     /**
@@ -200,11 +256,11 @@ service cloud.firestore {
      * @principle Allows collaborative writes between a user and their assigned therapist on specific data.
      */
     match /users/{userId}/exposureMissions/{missionId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
-      allow create: if (isOwner(userId) || isTherapistOfUser(userId)) && incomingDataMatchesOwner(userId);
-      allow update: if (isExistingOwner(userId) || isTherapistOfUser(userId)) && ownerIsImmutable();
-      allow delete: if isExistingOwner(userId);
+      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow create: if (isOwner(userId) || isTherapistOfUser(userId) || canManageWorkspaceUsers()) && incomingDataMatchesOwner(userId);
+      allow update: if (isExistingOwner(userId) || isTherapistOfUser(userId) || canManageWorkspaceUsers()) && ownerIsImmutable();
+      allow delete: if isExistingOwner(userId) || canManageWorkspaceUsers();
     }
 
     /**
@@ -215,11 +271,11 @@ service cloud.firestore {
      * @principle Restricts access to a user's own data tree, with read-only access for assigned therapists.
      */
     match /users/{userId}/mental_checkups/{checkupId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
+      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
       allow create: if isOwner(userId) && incomingDataMatchesOwner(userId);
       allow update: if isExistingOwner(userId) && ownerIsImmutable();
-      allow delete: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId) || canManageWorkspaceUsers();
     }
 
     /**
@@ -230,11 +286,11 @@ service cloud.firestore {
      *            and admins to review longitudinal engagement.
      */
     match /users/{userId}/progressEvents/{eventId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
+      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
       allow create: if isOwner(userId) && incomingDataMatchesOwner(userId);
       allow update: if isExistingOwner(userId) && ownerIsImmutable();
-      allow delete: if isExistingOwner(userId) || isAdmin();
+      allow delete: if isExistingOwner(userId) || isAdmin() || canManageWorkspaceUsers();
     }
 
     /**
@@ -244,11 +300,11 @@ service cloud.firestore {
      * @principle Allows collaborative care documentation while keeping records scoped to the patient.
      */
     match /users/{userId}/medicalSupportPlans/{planId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
-      allow create: if (isOwner(userId) || isTherapistOfUser(userId) || isAdmin()) && incomingDataMatchesOwner(userId);
-      allow update: if (isExistingOwner(userId) || isTherapistOfUser(userId) || isAdmin()) && ownerIsImmutable();
-      allow delete: if isExistingOwner(userId) || isAdmin();
+      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow create: if (isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers()) && incomingDataMatchesOwner(userId);
+      allow update: if (isExistingOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers()) && ownerIsImmutable();
+      allow delete: if isExistingOwner(userId) || isAdmin() || canManageWorkspaceUsers();
     }
 
     /**
@@ -257,11 +313,11 @@ service cloud.firestore {
      * @path /users/{userId}/medicationPrescriptions/{prescriptionId}
      */
     match /users/{userId}/medicationPrescriptions/{prescriptionId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
-      allow create: if (isOwner(userId) || isTherapistOfUser(userId) || isAdmin()) && incomingDataMatchesOwner(userId);
-      allow update: if (isExistingOwner(userId) || isTherapistOfUser(userId) || isAdmin()) && ownerIsImmutable();
-      allow delete: if isExistingOwner(userId) || isAdmin();
+      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow create: if (isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers()) && incomingDataMatchesOwner(userId);
+      allow update: if (isExistingOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers()) && ownerIsImmutable();
+      allow delete: if isExistingOwner(userId) || isAdmin() || canManageWorkspaceUsers();
     }
 
     /**
@@ -275,9 +331,9 @@ service cloud.firestore {
     match /exerciseTemplates/{templateId} {
       allow get: if isSignedIn();
       allow list: if isSignedIn();
-      allow create: if isAdmin();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow create: if canEditWorkspaceContent();
+      allow update: if canEditWorkspaceContent();
+      allow delete: if canEditWorkspaceContent();
     }
 
     /**
@@ -288,11 +344,11 @@ service cloud.firestore {
      * @principle Restricts access to a user's own data tree, with read-only access for assigned therapists.
      */
     match /users/{userId}/exerciseLogs/{logId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
+      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
       allow create: if isOwner(userId) && incomingDataMatchesOwner(userId);
       allow update: if isExistingOwner(userId) && ownerIsImmutable();
-      allow delete: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId) || canManageWorkspaceUsers();
     }
 
     /**
@@ -303,11 +359,11 @@ service cloud.firestore {
      * @principle Restricts access to a user's own data tree, with read-only access for assigned therapists.
      */
     match /users/{userId}/mentalCombatEvents/{eventId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
+      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
       allow create: if isOwner(userId) && incomingDataMatchesOwner(userId);
       allow update: if isExistingOwner(userId) && ownerIsImmutable();
-      allow delete: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId) || canManageWorkspaceUsers();
     }
 
     /**
@@ -318,11 +374,11 @@ service cloud.firestore {
      * @principle Restricts access to a user's own data tree, with read-only access for assigned therapists.
      */
     match /users/{userId}/anxietyLogs/{logId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
+      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
       allow create: if isOwner(userId) && incomingDataMatchesOwner(userId);
       allow update: if isExistingOwner(userId) && ownerIsImmutable();
-      allow delete: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId) || canManageWorkspaceUsers();
     }
 
     /**
@@ -336,9 +392,9 @@ service cloud.firestore {
     match /achievements/{achievementId} {
       allow get: if isSignedIn();
       allow list: if isSignedIn();
-      allow create: if isAdmin();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow create: if canEditWorkspaceContent();
+      allow update: if canEditWorkspaceContent();
+      allow delete: if canEditWorkspaceContent();
     }
 
     /**
@@ -350,9 +406,9 @@ service cloud.firestore {
      * @principle Restricts write access for earned rewards to trusted roles to maintain system integrity.
      */
     match /users/{userId}/userAchievements/{userAchievementId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
-      allow create: if isAdmin() && incomingDataMatchesOwner(userId);
+      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow create: if (isAdmin() || canEditWorkspaceContent()) && incomingDataMatchesOwner(userId);
       allow update: if false; // Achievements are immutable once granted
       allow delete: if false;
     }

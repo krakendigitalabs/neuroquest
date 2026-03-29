@@ -45,6 +45,8 @@ vi.mock('@/context/language-provider', () => ({
       if (key === 'sidebar.user') return 'User';
       if (key === 'nav.wellness') return 'Wellness';
       if (key === 'nav.medication') return 'Prescribed Medication';
+      if (key === 'nav.workspaceUsers') return 'Workspace users';
+      if (key === 'accountRoles.viewer') return 'View only';
       if (key === 'userRoles.patient') return 'Patient user';
       if (key === 'userProgress.level') return `Level ${values?.level ?? 1}`;
       if (key === 'languageSwitcher.english') return 'English';
@@ -70,12 +72,19 @@ vi.mock('@/hooks/use-user-profile', () => ({
   useUserProfile: () => ({
     userProfile: {
       displayName: 'Pat Doe',
+      accountRole: 'viewer',
       userRole: 'patient',
       level: 3,
       currentXp: 40,
       xpToNextLevel: 100,
     },
     isLoading: false,
+  }),
+}));
+
+vi.mock('@/hooks/use-account-access', () => ({
+  useAccountAccess: () => ({
+    canManageWorkspaceUsers: true,
   }),
 }));
 
@@ -108,7 +117,8 @@ describe('AppSidebar', () => {
     expect(screen.getByText('Progress')).toBeInTheDocument();
     expect(screen.getByText('Observer')).toBeInTheDocument();
     expect(screen.getByText('Prescribed Medication')).toBeInTheDocument();
-    expect(screen.getByText('Patient user · Level 3')).toBeInTheDocument();
+    expect(screen.getByText('Workspace users')).toBeInTheDocument();
+    expect(screen.getByText('View only · Patient user · Level 3')).toBeInTheDocument();
     expect(screen.queryByText('Challenges')).not.toBeInTheDocument();
   });
 });

@@ -114,7 +114,7 @@ describe('ProgressPage', () => {
       user: { uid: 'user-1', displayName: 'Pat Doe', email: 'pat@example.com' },
     });
     useUserProfileMock.mockReturnValue({
-      userProfile: { displayName: 'Pat Doe' },
+      userProfile: { displayName: 'Pat Doe', accountRole: 'viewer', userRole: 'patient' },
     });
     useCollectionMock
       .mockReturnValueOnce({
@@ -160,7 +160,7 @@ describe('ProgressPage', () => {
       user: { uid: 'user-1', displayName: 'Pat Doe', email: 'pat@example.com' },
     });
     useUserProfileMock.mockReturnValue({
-      userProfile: { displayName: 'Pat Doe' },
+      userProfile: { displayName: 'Pat Doe', accountRole: 'viewer', userRole: 'patient' },
     });
     useCollectionMock
       .mockReturnValueOnce({ data: [] })
@@ -212,7 +212,7 @@ describe('ProgressPage', () => {
       user: { uid: 'user-1', displayName: 'Pat Doe', email: 'pat@example.com' },
     });
     useUserProfileMock.mockReturnValue({
-      userProfile: { displayName: 'Pat Doe' },
+      userProfile: { displayName: 'Pat Doe', accountRole: 'viewer', userRole: 'patient' },
     });
     useCollectionMock
       .mockReturnValueOnce({ data: [] })
@@ -243,7 +243,7 @@ describe('ProgressPage', () => {
       user: { uid: 'user-1', displayName: 'Pat Doe', email: 'pat@example.com' },
     });
     useUserProfileMock.mockReturnValue({
-      userProfile: { displayName: 'Pat Doe' },
+      userProfile: { displayName: 'Pat Doe', accountRole: 'viewer', userRole: 'patient' },
     });
     useCollectionMock
       .mockReturnValueOnce({

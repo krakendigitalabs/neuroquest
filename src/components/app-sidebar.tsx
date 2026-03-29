@@ -25,6 +25,7 @@ import {
   LogOut,
   Zap,
   ClipboardCheck,
+  Users,
 } from 'lucide-react';
 
 import { Logo } from '@/components/logo';
@@ -36,12 +37,14 @@ import { signOut } from 'firebase/auth';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { UserAvatar } from './user-avatar';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { useAccountAccess } from '@/hooks/use-account-access';
 
 export function AppSidebar() {
   const pathname = usePathname();
   const { t } = useTranslation();
   const { auth, user } = useFirebase();
   const { userProfile, isLoading: isProfileLoading } = useUserProfile();
+  const { canManageWorkspaceUsers } = useAccountAccess();
   const { isMobile, setOpenMobile } = useSidebar();
 
   const handleLogout = async () => {
@@ -73,6 +76,9 @@ export function AppSidebar() {
     { href: '/grounding', icon: <Zap />, label: t('nav.grounding') },
     { href: '/progress', icon: <BarChart3 />, label: t('nav.progress') },
   ];
+  const managementItems = canManageWorkspaceUsers
+    ? [{ href: '/workspace-users', icon: <Users />, label: t('nav.workspaceUsers') }]
+    : [];
 
   return (
     <Sidebar>
@@ -93,7 +99,7 @@ export function AppSidebar() {
               <p className="truncate text-[11px] text-muted-foreground sm:text-xs">
                 {isProfileLoading
                   ? '...'
-                  : `${t(`userRoles.${userProfile?.userRole ?? 'patient'}`)} · ${t('userProgress.level', { level: userProfile?.level ?? 1 })}`}
+                  : `${t(`accountRoles.${userProfile?.accountRole ?? 'viewer'}`)} · ${t(`userRoles.${userProfile?.userRole ?? 'patient'}`)} · ${t('userProgress.level', { level: userProfile?.level ?? 1 })}`}
               </p>
             </div>
           </div>
@@ -107,6 +113,21 @@ export function AppSidebar() {
 
         <SidebarMenu>
           {navItems.map((item) => (
+            <SidebarMenuItem key={item.href}>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === item.href}
+                tooltip={{ children: item.label }}
+                className="min-h-11 px-3 py-2 text-sm sm:min-h-8 sm:px-2 sm:py-2"
+              >
+                <Link href={item.href} onClick={handleNavigate}>
+                  {item.icon}
+                  <span>{item.label}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+          {managementItems.map((item) => (
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 asChild

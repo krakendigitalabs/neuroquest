@@ -1,4 +1,5 @@
 import {FieldValue} from 'firebase/firestore';
+import { AccountRole } from '@/lib/account-role';
 
 export type UserRole = 'clinic' | 'professional' | 'patient';
 
@@ -8,6 +9,7 @@ export interface UserProfile {
   displayName: string;
   photoURL: string;
   userRole: UserRole;
+  accountRole: AccountRole;
   requestedRole?: UserRole;
   level: number;
   currentXp: number;

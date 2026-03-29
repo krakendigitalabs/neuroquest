@@ -14,7 +14,8 @@
     "grounding": "Grounding",
     "challenges": "Challenges",
     "medication": "Prescribed Medication",
-    "checkIn": "Mental Check-In"
+    "checkIn": "Mental Check-In",
+    "workspaceUsers": "Users and access"
   },
   "dashboard": {
     "welcome": "Welcome back, Explorer!",
@@ -172,6 +173,14 @@
     "clinic": "Clinic user",
     "professional": "Professional user",
     "patient": "Patient user"
+  },
+  "accountRoles": {
+    "owner": "Owner",
+    "manager": "Manager",
+    "administrator": "Administrator",
+    "editor": "Editor",
+    "commentator": "Commentator",
+    "viewer": "View only"
   },
   "ui": {
     "close": "Close",
@@ -1089,6 +1098,18 @@
   "layout": {
     "loading": "Loading...",
     "redirecting": "Redirecting to login..."
+  },
+  "workspaceUsers": {
+    "title": "Users and access control",
+    "description": "Manage operational and clinical roles from a single view.",
+    "guardrailsTitle": "Hierarchical permission control",
+    "guardrailsDescription": "Owner, manager, and administrator can manage access according to their level. The server blocks self-escalation outside the allowed hierarchy.",
+    "listTitle": "Workspace users",
+    "listDescription": "Adjust each user's account role and clinical role with operational traceability.",
+    "currentSummary": "Current account role: {accountRole} · Current clinical role: {userRole}",
+    "accountRoleLabel": "Account role",
+    "userRoleLabel": "Clinical role",
+    "save": "Save access"
   },
   "loading": "Loading...",
   "missionTypes": {

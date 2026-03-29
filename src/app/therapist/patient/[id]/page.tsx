@@ -33,7 +33,7 @@ function translateEmotion(t: (key: string) => string, emotion?: string) {
 
 export default function TherapistPatientDetailPage() {
   const { t, locale } = useTranslation();
-  const { hasTherapistAccess, isAdmin, isLoading } = useTherapistAccess();
+  const { canManageClinicalWorkspace, hasTherapistAccess, isAdmin, isLoading } = useTherapistAccess();
   const { firestore, user } = useFirebase();
   const router = useRouter();
   const params = useParams<{ id: string }>();
@@ -45,7 +45,7 @@ export default function TherapistPatientDetailPage() {
   }, [firestore, hasTherapistAccess, patientId]);
   const { data: patient, isLoading: isPatientLoading } = useDoc<UserProfile>(patientDocRef);
 
-  const canViewPatient = isAdmin || isAssignedTherapist(patient, user?.uid);
+  const canViewPatient = isAdmin || canManageClinicalWorkspace || isAssignedTherapist(patient, user?.uid);
 
   const checkupsQuery = useMemoFirebase(() => {
     if (!firestore || !patientId || !canViewPatient) return null;

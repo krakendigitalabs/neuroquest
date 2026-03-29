@@ -112,6 +112,7 @@ describe('TherapistPatientDetailPage', () => {
   beforeEach(() => {
     pushMock.mockReset();
     useTherapistAccessMock.mockReturnValue({
+      canManageClinicalWorkspace: false,
       hasTherapistAccess: true,
       isAdmin: false,
       isLoading: false,
@@ -219,6 +220,7 @@ describe('TherapistPatientDetailPage', () => {
 
   it('allows therapist access without requiring admin role', () => {
     useTherapistAccessMock.mockReturnValue({
+      canManageClinicalWorkspace: false,
       hasTherapistAccess: true,
       isAdmin: false,
       isLoading: false,
@@ -228,6 +230,22 @@ describe('TherapistPatientDetailPage', () => {
     render(<TherapistPatientDetailPage />);
 
     expect(pushMock).not.toHaveBeenCalledWith('/dashboard');
+    expect(screen.getAllByText('Pat Doe').length).toBeGreaterThan(0);
+  });
+
+  it('allows workspace administrators to open the patient detail without assignment', () => {
+    useTherapistAccessMock.mockReturnValue({
+      canManageClinicalWorkspace: true,
+      hasTherapistAccess: true,
+      isAdmin: false,
+      isLoading: false,
+      isTherapist: false,
+    });
+    useFirebaseMock.mockReturnValue({ firestore: {}, user: { uid: 'workspace-admin-1' } });
+
+    render(<TherapistPatientDetailPage />);
+
+    expect(pushMock).not.toHaveBeenCalledWith('/therapist');
     expect(screen.getAllByText('Pat Doe').length).toBeGreaterThan(0);
   });
 });

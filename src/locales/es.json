@@ -13,7 +13,8 @@
     "grounding": "Anclaje",
     "challenges": "Desafíos",
     "medication": "Medicación Prescrita",
-    "checkIn": "Chequeo Mental"
+    "checkIn": "Chequeo Mental",
+    "workspaceUsers": "Usuarios y accesos"
   },
   "dashboard": {
     "welcome": "¡Bienvenido de nuevo, Explorador!",
@@ -171,6 +172,14 @@
     "clinic": "Usuario clínica",
     "professional": "Usuario profesional",
     "patient": "Usuario paciente"
+  },
+  "accountRoles": {
+    "owner": "Propietario",
+    "manager": "Gerente",
+    "administrator": "Administrador",
+    "editor": "Editor",
+    "commentator": "Comentarista",
+    "viewer": "Solo ver"
   },
   "ui": {
     "close": "Cerrar",
@@ -1088,6 +1097,18 @@
   "layout": {
     "loading": "Cargando...",
     "redirecting": "Redirigiendo al inicio de sesión..."
+  },
+  "workspaceUsers": {
+    "title": "Usuarios y control de acceso",
+    "description": "Gestiona roles operativos y clínicos desde una sola vista.",
+    "guardrailsTitle": "Control jerárquico de permisos",
+    "guardrailsDescription": "Owner, manager y administrator pueden gestionar accesos según su nivel. El servidor bloquea la autoescalación fuera de lo permitido.",
+    "listTitle": "Usuarios del workspace",
+    "listDescription": "Ajusta el rol de cuenta y el rol clínico de cada usuario con trazabilidad operativa.",
+    "currentSummary": "Rol de cuenta actual: {accountRole} · Rol clínico actual: {userRole}",
+    "accountRoleLabel": "Rol de cuenta",
+    "userRoleLabel": "Rol clínico",
+    "save": "Guardar acceso"
   },
   "loading": "Cargando...",
   "missionTypes": {

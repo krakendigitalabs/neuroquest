@@ -47,7 +47,7 @@ function translateEmotion(t: (key: string) => string, emotion?: string) {
 
 export default function TherapistDashboard() {
   const { t, locale } = useTranslation();
-  const { hasTherapistAccess, isLoading } = useTherapistAccess();
+  const { canManageClinicalWorkspace, hasTherapistAccess, isLoading } = useTherapistAccess();
   const { firestore, user } = useFirebase();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
@@ -56,8 +56,12 @@ export default function TherapistDashboard() {
 
   const patientsQuery = useMemoFirebase(() => {
     if (!firestore || !user || !hasTherapistAccess) return null;
+    if (canManageClinicalWorkspace) {
+      return collection(firestore, 'users');
+    }
+
     return query(collection(firestore, 'users'), where('therapistIds', 'array-contains', user.uid));
-  }, [firestore, hasTherapistAccess, user]);
+  }, [canManageClinicalWorkspace, firestore, hasTherapistAccess, user]);
   const { data: patients, isLoading: arePatientsLoading } = useCollection<UserProfile>(patientsQuery);
 
   const thoughtsQuery = useMemoFirebase(() => {

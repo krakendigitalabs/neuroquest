@@ -33,6 +33,7 @@ function UserProfileInitializer({ user }: { user: User }) {
           displayName: user.isAnonymous ? t('sidebar.guestUser') : (user.displayName || t('sidebar.anonymousUser')),
           photoURL: user.photoURL || '',
           userRole: isClinicAdmin ? 'clinic' : 'patient',
+          accountRole: isClinicAdmin ? 'owner' : 'viewer',
           requestedRole: requestedRole ?? (isClinicAdmin ? 'clinic' : 'patient'),
           level: 1,
           currentXp: 0,

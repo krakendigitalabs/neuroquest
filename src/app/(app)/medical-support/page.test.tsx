@@ -68,6 +68,8 @@ describe('MedicalSupportPage', () => {
       isLoading: false,
       userProfile: {
         displayName: 'Pat Doe',
+        accountRole: 'viewer',
+        userRole: 'patient',
         latestCheckInLevel: 'healthy',
         latestCheckInScore: 0,
         latestCheckInAt: null,
@@ -89,6 +91,8 @@ describe('MedicalSupportPage', () => {
       isLoading: false,
       userProfile: {
         displayName: 'Pat Doe',
+        accountRole: 'viewer',
+        userRole: 'patient',
         latestCheckInLevel: 'severe',
         latestCheckInScore: 31,
         latestCheckInAt: '2026-03-27T10:00:00.000Z',

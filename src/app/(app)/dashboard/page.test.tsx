@@ -99,6 +99,8 @@ describe('DashboardPage severe flow', () => {
     useUserProfileMock.mockReturnValue({
       isLoading: false,
       userProfile: {
+        accountRole: 'viewer',
+        userRole: 'patient',
         currentXp: 30,
         level: 2,
         latestCheckInAt: '2026-03-27T10:00:00.000Z',
@@ -146,6 +148,8 @@ describe('DashboardPage severe flow', () => {
     useUserProfileMock.mockReturnValue({
       isLoading: false,
       userProfile: {
+        accountRole: 'viewer',
+        userRole: 'patient',
         currentXp: 30,
         level: 2,
         latestCheckInAt: '2026-03-27T10:00:00.000Z',

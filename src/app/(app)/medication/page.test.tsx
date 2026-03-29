@@ -87,7 +87,7 @@ describe('MedicationPage', () => {
       user: { uid: 'user-1', displayName: 'Pat Doe', email: 'pat@example.com' },
     });
     useUserProfileMock.mockReturnValue({
-      userProfile: { displayName: 'Pat Doe' },
+      userProfile: { displayName: 'Pat Doe', accountRole: 'viewer', userRole: 'patient' },
     });
     useCollectionMock.mockReturnValue({ data: [] });
 
