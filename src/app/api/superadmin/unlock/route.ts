@@ -3,7 +3,7 @@ import { SUPERADMIN_COOKIE_NAME } from '@/lib/superadmin-config';
 
 export async function POST(request: NextRequest) {
   const { pin } = await request.json();
-  const expectedPin = process.env.SUPERADMIN_PIN;
+  const expectedPin = process.env.SUPERADMIN_PIN?.trim();
 
   if (!expectedPin || expectedPin.length !== 3) {
     return NextResponse.json({ error: 'superadmin-pin-not-configured' }, { status: 500 });
