@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { doc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { User } from 'firebase/auth';
@@ -65,67 +65,84 @@ function resolveBootstrapRole(user: User, requestedRole: ReturnType<typeof readP
   };
 }
 
-function UserProfileInitializer({ user }: { user: User }) {
+function UserProfileInitializer({ user, onReady }: { user: User; onReady: () => void }) {
   const { firestore } = useFirebase();
   const { t } = useTranslation();
 
   useEffect(() => {
+    let cancelled = false;
+
     const createUserProfile = async () => {
-      if (!user || !firestore) return;
-
-      const userRef = doc(firestore, 'users', user.uid);
-      const userDoc = await getDoc(userRef);
-      const requestedRole = readPendingRequestedRole();
-      const bootstrap = resolveBootstrapRole(user, requestedRole);
-      const existingData = userDoc.exists() ? userDoc.data() : null;
-
-      const newUserProfile = {
-        id: user.uid,
-        email: user.email || '',
-        displayName: user.isAnonymous ? t('sidebar.guestUser') : (user.displayName || t('sidebar.anonymousUser')),
-        photoURL: user.photoURL || '',
-        role: bootstrap.role,
-        userRole: bootstrap.userRole,
-        accountRole: existingData?.accountRole ?? bootstrap.accountRole,
-        requestedRole: bootstrap.requestedRole,
-        pinnedPatientModules: bootstrap.role === 'patient'
-          ? (existingData?.pinnedPatientModules ?? ['check-in', 'observer', 'progress'])
-          : [],
-        level: existingData?.level ?? 1,
-        currentXp: existingData?.currentXp ?? 0,
-        xpToNextLevel: existingData?.xpToNextLevel ?? 100,
-        isAdmin: existingData?.isAdmin ?? bootstrap.isAdmin,
-        isAnonymous: user.isAnonymous,
-        createdAt: existingData?.createdAt ?? serverTimestamp(),
-        therapistIds: existingData?.therapistIds ?? [],
-        latestThoughtAt: existingData?.latestThoughtAt ?? null,
-        latestThoughtEmotion: existingData?.latestThoughtEmotion ?? '',
-        latestThoughtIntensity: existingData?.latestThoughtIntensity ?? 0,
-        latestThoughtLabel: existingData?.latestThoughtLabel ?? '',
-        latestThoughtPreview: existingData?.latestThoughtPreview ?? '',
-        latestThoughtIsIntrusive: existingData?.latestThoughtIsIntrusive ?? false,
-      };
-
-      if (!userDoc.exists()) {
-        setDocumentNonBlocking(userRef, newUserProfile, { merge: false });
-      } else {
-        const needsBootstrapUpdate =
-          !existingData?.role ||
-          !existingData?.userRole ||
-          !existingData?.accountRole ||
-          (bootstrap.role === 'patient' && !Array.isArray(existingData?.pinnedPatientModules)) ||
-          (bootstrap.role === 'clinic' && existingData?.role !== 'clinic');
-
-        if (needsBootstrapUpdate) {
-          setDocumentNonBlocking(userRef, newUserProfile, { merge: true });
+      if (!user || !firestore) {
+        if (!cancelled) {
+          onReady();
         }
+        return;
       }
 
-      clearPendingRequestedRole();
+      try {
+        const userRef = doc(firestore, 'users', user.uid);
+        const userDoc = await getDoc(userRef);
+        const requestedRole = readPendingRequestedRole();
+        const bootstrap = resolveBootstrapRole(user, requestedRole);
+        const existingData = userDoc.exists() ? userDoc.data() : null;
+
+        const newUserProfile = {
+          id: user.uid,
+          email: user.email || '',
+          displayName: user.isAnonymous ? t('sidebar.guestUser') : (user.displayName || t('sidebar.anonymousUser')),
+          photoURL: user.photoURL || '',
+          role: bootstrap.role,
+          userRole: bootstrap.userRole,
+          accountRole: existingData?.accountRole ?? bootstrap.accountRole,
+          requestedRole: bootstrap.requestedRole,
+          pinnedPatientModules: bootstrap.role === 'patient'
+            ? (existingData?.pinnedPatientModules ?? ['check-in', 'observer', 'progress'])
+            : [],
+          level: existingData?.level ?? 1,
+          currentXp: existingData?.currentXp ?? 0,
+          xpToNextLevel: existingData?.xpToNextLevel ?? 100,
+          isAdmin: existingData?.isAdmin ?? bootstrap.isAdmin,
+          isAnonymous: user.isAnonymous,
+          createdAt: existingData?.createdAt ?? serverTimestamp(),
+          therapistIds: existingData?.therapistIds ?? [],
+          latestThoughtAt: existingData?.latestThoughtAt ?? null,
+          latestThoughtEmotion: existingData?.latestThoughtEmotion ?? '',
+          latestThoughtIntensity: existingData?.latestThoughtIntensity ?? 0,
+          latestThoughtLabel: existingData?.latestThoughtLabel ?? '',
+          latestThoughtPreview: existingData?.latestThoughtPreview ?? '',
+          latestThoughtIsIntrusive: existingData?.latestThoughtIsIntrusive ?? false,
+        };
+
+        if (!userDoc.exists()) {
+          setDocumentNonBlocking(userRef, newUserProfile, { merge: false });
+        } else {
+          const needsBootstrapUpdate =
+            !existingData?.role ||
+            !existingData?.userRole ||
+            !existingData?.accountRole ||
+            (bootstrap.role === 'patient' && !Array.isArray(existingData?.pinnedPatientModules)) ||
+            (bootstrap.role === 'clinic' && existingData?.role !== 'clinic');
+
+          if (needsBootstrapUpdate) {
+            setDocumentNonBlocking(userRef, newUserProfile, { merge: true });
+          }
+        }
+
+        clearPendingRequestedRole();
+      } finally {
+        if (!cancelled) {
+          onReady();
+        }
+      }
     };
 
-    createUserProfile();
-  }, [user, firestore, t]);
+    void createUserProfile();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, firestore, onReady, t]);
 
   return null;
 }
@@ -135,12 +152,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, isUserLoading } = useFirebase();
   const router = useRouter();
   const { t } = useTranslation();
+  const [isProfileReady, setIsProfileReady] = useState(false);
 
   useEffect(() => {
     if (!isUserLoading && !user) {
-      router.push('/login');
+      router.replace('/login');
     }
   }, [user, isUserLoading, router]);
+
+  useEffect(() => {
+    if (user) {
+      setIsProfileReady(false);
+    }
+  }, [user?.uid]);
 
   if (isUserLoading) {
     return <div>{t('layout.loading')}</div>;
@@ -150,10 +174,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return <div>{t('layout.redirecting')}</div>;
   }
 
+  if (!isProfileReady) {
+    return (
+      <>
+        <UserProfileInitializer user={user} onReady={() => setIsProfileReady(true)} />
+        <div>{t('layout.loading')}</div>
+      </>
+    );
+  }
 
   return (
     <SidebarProvider>
-      <UserProfileInitializer user={user} />
+      <UserProfileInitializer user={user} onReady={() => setIsProfileReady(true)} />
       <AppSidebar />
       <SidebarInset>
         <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-border/60 bg-background/95 px-4 py-3 backdrop-blur md:hidden">
