@@ -118,6 +118,16 @@ export default function ProgressPage() {
     () => sortedActivityEvents.filter((event) => event.type !== 'opened'),
     [sortedActivityEvents]
   );
+  const weeklyMeaningfulActivityEvents = useMemo(() => {
+    const now = new Date();
+    const sevenDaysAgo = new Date(now);
+    sevenDaysAgo.setDate(now.getDate() - 7);
+
+    return meaningfulActivityEvents.filter((event) => {
+      const eventDate = toDate(event.createdAt);
+      return !!eventDate && eventDate >= sevenDaysAgo;
+    });
+  }, [meaningfulActivityEvents]);
   const engagementEvents = useMemo(
     () => sortedActivityEvents.filter((event) => event.type === 'opened'),
     [sortedActivityEvents]
@@ -134,6 +144,10 @@ export default function ProgressPage() {
       return accumulator;
     }, {});
   }, [meaningfulActivityEvents]);
+  const weeklyActiveModuleCount = useMemo(
+    () => new Set(weeklyMeaningfulActivityEvents.map((event) => event.module)).size,
+    [weeklyMeaningfulActivityEvents]
+  );
   const thoughtTrendData = useMemo(
     () =>
       sortedThoughts
@@ -427,6 +441,12 @@ export default function ProgressPage() {
             <CardContent>
               <div className="text-2xl font-bold">{recentActivityCount.toLocaleString(locale)}</div>
               <p className="text-xs text-muted-foreground">{t('progress.recordedActivityDescription')}</p>
+              <div className="mt-3 rounded-lg bg-muted/50 p-3 text-sm">
+                {t('progress.weeklySummary', {
+                  events: weeklyMeaningfulActivityEvents.length,
+                  modules: weeklyActiveModuleCount,
+                })}
+              </div>
             </CardContent>
           </Card>
           <Card>

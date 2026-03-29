@@ -49,6 +49,8 @@ vi.mock('@/context/language-provider', () => ({
       if (key === 'dashboard.noRecentActivity') return 'No recent activity yet';
       if (key === 'dashboard.recentActivityHint') return 'Complete actions in modules to see the latest useful movement here.';
       if (key === 'dashboard.activeModulesCount') return `${values?.count ?? 0} modules with meaningful activity`;
+      if (key === 'dashboard.weeklySummaryTitle') return 'Weekly summary';
+      if (key === 'dashboard.weeklySummaryBody') return `${values?.events ?? 0} useful events across ${values?.modules ?? 0} modules this week.`;
       if (key === 'dashboard.nextStepCardTitle') return 'Suggested next step';
       if (key === 'dashboard.nextStepTitles.severe') return 'Stabilize and ask for support now';
       if (key === 'dashboard.nextStepDescriptions.severe') return 'Use crisis support first and then review medical guidance.';
@@ -124,5 +126,6 @@ describe('DashboardPage severe flow', () => {
     expect(screen.getByText('31/40')).toBeInTheDocument();
     expect(screen.getByText('Suggested next step')).toBeInTheDocument();
     expect(screen.getByText('Stabilize and ask for support now')).toBeInTheDocument();
+    expect(screen.getByText('Weekly summary')).toBeInTheDocument();
   });
 });

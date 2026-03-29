@@ -36,6 +36,8 @@
     "noRecentActivity": "Aún no hay actividad reciente",
     "recentActivityHint": "Completa acciones en módulos para ver aquí el último movimiento útil.",
     "activeModulesCount": "{count} módulos con actividad real",
+    "weeklySummaryTitle": "Resumen semanal",
+    "weeklySummaryBody": "{events} eventos útiles en {modules} módulos esta semana.",
     "nextStepCardTitle": "Siguiente paso sugerido",
     "nextStepTitles": {
       "severe": "Estabiliza y busca apoyo ahora",
@@ -692,6 +694,7 @@
       "activityTitle": "Actividad reciente",
       "activityDescription": "Eventos útiles recientes y cobertura acumulada por módulo."
     },
+    "weeklySummary": "{events} eventos útiles en {modules} módulos durante los últimos 7 días.",
     "currentSnapshot": "Actual",
     "entryLabel": "Registro",
     "fortitude": "Fortaleza Mental",

@@ -63,9 +63,23 @@ export default function DashboardPage() {
     () => (activityEvents ?? []).filter((event) => event.type !== 'opened'),
     [activityEvents]
   );
+  const weeklyActivityEvents = useMemo(() => {
+    const now = new Date();
+    const sevenDaysAgo = new Date(now);
+    sevenDaysAgo.setDate(now.getDate() - 7);
+
+    return meaningfulActivityEvents.filter((event) => {
+      const eventDate = toDate(event.createdAt);
+      return !!eventDate && eventDate >= sevenDaysAgo;
+    });
+  }, [meaningfulActivityEvents]);
   const activeModuleCount = useMemo(
     () => new Set(meaningfulActivityEvents.map((event) => event.module)).size,
     [meaningfulActivityEvents]
+  );
+  const weeklyActiveModuleCount = useMemo(
+    () => new Set(weeklyActivityEvents.map((event) => event.module)).size,
+    [weeklyActivityEvents]
   );
   const latestActivity = meaningfulActivityEvents[0] ?? null;
   const summaryText = useMemo(() => {
@@ -302,6 +316,17 @@ export default function DashboardPage() {
                 <Button asChild variant="ghost" size="sm" className="px-2">
                   <Link href="/progress">{t('nav.progress')}</Link>
                 </Button>
+              </div>
+              <div className="mt-3 rounded-lg bg-muted/50 p-3">
+                <p className="text-xs font-medium text-muted-foreground">{t('dashboard.weeklySummaryTitle')}</p>
+                <p className="mt-1 text-sm">
+                  {isLoading
+                    ? '...'
+                    : t('dashboard.weeklySummaryBody', {
+                        events: weeklyActivityEvents.length,
+                        modules: weeklyActiveModuleCount,
+                      })}
+                </p>
               </div>
             </div>
             <div className="rounded-lg border p-4">

@@ -37,6 +37,8 @@
     "noRecentActivity": "No recent activity yet",
     "recentActivityHint": "Complete actions in modules to see the latest useful movement here.",
     "activeModulesCount": "{count} modules with meaningful activity",
+    "weeklySummaryTitle": "Weekly summary",
+    "weeklySummaryBody": "{events} useful events across {modules} modules this week.",
     "nextStepCardTitle": "Suggested next step",
     "nextStepTitles": {
       "severe": "Stabilize and ask for support now",
@@ -693,6 +695,7 @@
       "activityTitle": "Recent activity",
       "activityDescription": "Recent useful events and cumulative coverage by module."
     },
+    "weeklySummary": "{events} useful events across {modules} modules in the last 7 days.",
     "currentSnapshot": "Current",
     "entryLabel": "Entry",
     "fortitude": "Mental Fortitude",

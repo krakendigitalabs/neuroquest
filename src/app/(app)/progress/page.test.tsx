@@ -78,6 +78,7 @@ vi.mock('@/context/language-provider', () => ({
       if (key === 'progress.sections.engagementDescription') return 'Usage and continuity signals, kept separate from clinical progress.';
       if (key === 'progress.sections.activityTitle') return 'Recent activity';
       if (key === 'progress.sections.activityDescription') return 'Recent useful events and cumulative coverage by module.';
+      if (key === 'progress.weeklySummary') return `${values?.events ?? 0} useful events across ${values?.modules ?? 0} modules in the last 7 days.`;
       if (key === 'progress.noCheckInsYet') return 'No saved check-ins yet.';
       if (key === 'progress.unknownDate') return 'Date unavailable';
       if (key === 'progress.checkInScore') return 'Check-In Score';
@@ -196,6 +197,7 @@ describe('ProgressPage', () => {
     expect(screen.getAllByText('Recent module activity').length).toBeGreaterThan(0);
     expect(screen.getByText('Thought reframed')).toBeInTheDocument();
     expect(screen.getByText('Box Breathing')).toBeInTheDocument();
+    expect(screen.getByText('2 useful events across 2 modules in the last 7 days.')).toBeInTheDocument();
     expect(screen.queryByText('Module opened')).not.toBeInTheDocument();
   });
 });
