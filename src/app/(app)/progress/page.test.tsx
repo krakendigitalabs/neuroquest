@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ProgressPage from './page';
 
 vi.mock('firebase/firestore', () => ({
@@ -91,6 +91,12 @@ vi.mock('@/components/ui/chart', () => ({
 }));
 
 describe('ProgressPage', () => {
+  beforeEach(() => {
+    useFirebaseMock.mockReset();
+    useCollectionMock.mockReset();
+    useUserProfileMock.mockReset();
+  });
+
   it('does not invent a trend when there is not enough history to compare blocks', () => {
     useFirebaseMock.mockReturnValue({
       firestore: {},
@@ -99,26 +105,30 @@ describe('ProgressPage', () => {
     useUserProfileMock.mockReturnValue({
       userProfile: { displayName: 'Pat Doe' },
     });
-    useCollectionMock.mockReturnValue({
-      data: [
-        {
-          id: 'check-1',
-          createdAt: '2026-03-26T10:00:00.000Z',
-          score: 18,
-          maxScore: 40,
-          level: 'moderate',
-          resultTitle: 'Moderate',
-        },
-        {
-          id: 'check-2',
-          createdAt: '2026-03-20T10:00:00.000Z',
-          score: 8,
-          maxScore: 40,
-          level: 'mild',
-          resultTitle: 'Mild',
-        },
-      ],
-    });
+    useCollectionMock
+      .mockReturnValueOnce({
+        data: [
+          {
+            id: 'check-1',
+            createdAt: '2026-03-26T10:00:00.000Z',
+            score: 18,
+            maxScore: 40,
+            level: 'moderate',
+            resultTitle: 'Moderate',
+          },
+          {
+            id: 'check-2',
+            createdAt: '2026-03-20T10:00:00.000Z',
+            score: 8,
+            maxScore: 40,
+            level: 'mild',
+            resultTitle: 'Mild',
+          },
+        ],
+      })
+      .mockReturnValueOnce({ data: [] })
+      .mockReturnValueOnce({ data: [] })
+      .mockReturnValueOnce({ data: [] });
 
     render(<ProgressPage />);
 
@@ -130,5 +140,56 @@ describe('ProgressPage', () => {
     expect(screen.getByRole('button', { name: 'Print / PDF' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Send by WhatsApp' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Send by email' })).toBeInTheDocument();
+  });
+
+  it('keeps opened events out of progress totals while still showing them as engagement', () => {
+    useFirebaseMock.mockReturnValue({
+      firestore: {},
+      user: { uid: 'user-1', displayName: 'Pat Doe', email: 'pat@example.com' },
+    });
+    useUserProfileMock.mockReturnValue({
+      userProfile: { displayName: 'Pat Doe' },
+    });
+    useCollectionMock
+      .mockReturnValueOnce({ data: [] })
+      .mockReturnValueOnce({ data: [] })
+      .mockReturnValueOnce({ data: [] })
+      .mockReturnValueOnce({
+        data: [
+          {
+            id: 'event-1',
+            userId: 'user-1',
+            module: 'grounding',
+            type: 'opened',
+            detail: '',
+            createdAt: '2026-03-28T09:00:00.000Z',
+          },
+          {
+            id: 'event-2',
+            userId: 'user-1',
+            module: 'regulation',
+            type: 'saved',
+            detail: 'Box Breathing',
+            createdAt: '2026-03-28T10:00:00.000Z',
+          },
+          {
+            id: 'event-3',
+            userId: 'user-1',
+            module: 'reprogram',
+            type: 'saved',
+            detail: 'Thought reframed',
+            createdAt: '2026-03-28T11:00:00.000Z',
+          },
+        ],
+      });
+
+    render(<ProgressPage />);
+
+    expect(screen.getAllByText('2').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('1').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Recent module activity').length).toBeGreaterThan(0);
+    expect(screen.getByText('Thought reframed')).toBeInTheDocument();
+    expect(screen.getByText('Box Breathing')).toBeInTheDocument();
+    expect(screen.queryByText('Module opened')).not.toBeInTheDocument();
   });
 });
