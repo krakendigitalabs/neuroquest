@@ -1,0 +1,225 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+4 0 obj
+<< /Type /Pages /Count 5 /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R] >>
+endobj
+5 0 obj
+<< /Length 594 >>
+stream
+0.93 0.97 0.98 rg 0 0 595 842 re f
+0.43 0.67 0.84 rg 48 710 499 70 re f
+BT /F2 28 Tf 1 0 0 1 60 745 Tm (NeuroQuest) Tj ET
+BT /F2 20 Tf 1 0 0 1 60 660 Tm (Documento) Tj ET
+BT /F1 12 Tf 1 0 0 1 60 620 Tm (Arquitectura, procesos, logica y decisiones de diseno) Tj ET
+BT /F1 11 Tf 1 0 0 1 60 570 Tm (Producto: NeuroQuest) Tj ET
+BT /F1 11 Tf 1 0 0 1 60 552 Tm (Stack: Next.js, React, TypeScript, Firebase, Vercel) Tj ET
+BT /F1 11 Tf 1 0 0 1 60 534 Tm (Fecha de generacion automatica desde el repositorio) Tj ET
+BT /F1 10 Tf 1 0 0 1 60 70 Tm (Documento generado localmente desde C:\\neuroquest) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 2948 >>
+stream
+BT /F2 18 Tf 1 0 0 1 48 802 Tm (NeuroQuest) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 764 Tm (Documento Ejecutivo) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 732 Tm (Resumen funcional y tecnico de alto nivel para presentacion a cliente, aliados o direccion.) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 708 Tm (1. Que es NeuroQuest) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 676 Tm (NeuroQuest es una plataforma web de apoyo y seguimiento en bienestar mental que organiza) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 662 Tm (check-ins, modulos de trabajo personal, visualizacion de progreso, apoyo preventivo y) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 648 Tm (monitoreo profesional.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 624 Tm (La solucion no se limita a mostrar paginas. Convierte acciones reales del usuario en una) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 610 Tm (lectura clara de avance, actividad semanal y siguiente paso recomendado.) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 586 Tm (2. Problema que resuelve) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 554 Tm (Antes de esta arquitectura, los modulos podian existir como piezas aisladas:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 530 Tm (- un check-in por un lado) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 516 Tm (- ejercicios por otro) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 502 Tm (- progreso separado) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 488 Tm (- dashboard sin suficiente contexto operativo) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 464 Tm (El problema era de coherencia:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 440 Tm (- no toda la actividad quedaba reflejada) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 426 Tm (- abrir un modulo podia confundirse con progreso real) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 412 Tm (- el dashboard no siempre orientaba el siguiente paso) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 398 Tm (- las metricas podian inflarse o quedar incompletas) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 374 Tm (NeuroQuest resuelve eso unificando la actividad transversal del usuario.) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 350 Tm (3. Resultado principal de la solucion) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 318 Tm (La plataforma ahora logra cuatro cosas a la vez:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 294 Tm (1. Registrar acciones terapeuticas o de apoyo en tiempo real.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 280 Tm (2. Separar progreso real de simple navegacion.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 266 Tm (3. Mostrar un resumen semanal entendible.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 252 Tm (4. Volver el dashboard accionable.) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 228 Tm (4. Componentes principales) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 196 Tm (4.1 Check-In Mental) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 168 Tm (Recoge respuestas, calcula score, clasifica severidad y actualiza el estado actual del) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 154 Tm (usuario.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 130 Tm (4.2 Observer) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 102 Tm (Permite registrar pensamientos y convertirlos en informacion util para seguimiento.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 78 Tm (4.3 Exposure) Tj ET
+BT /F1 9 Tf 1 0 0 1 48 24 Tm (NeuroQuest - Documento - Pagina 2/5) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 2564 >>
+stream
+BT /F1 11 Tf 1 0 0 1 48 802 Tm (Gestiona misiones y su estado de avance.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 778 Tm (4.4 Grounding, Regulation y Reprogram) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 750 Tm (Registran acciones concretas de apoyo emocional, respiracion, reestructuracion y regulacion.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 726 Tm (4.5 Medical Support y Wellness) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 698 Tm (Concentran orientacion preventiva y apoyo estructurado, sin contar solo la apertura del) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 684 Tm (modulo como progreso.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 660 Tm (4.6 Progress) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 632 Tm (Consolida actividad real, engagement, tendencias, historia reciente y resumen semanal.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 608 Tm (4.7 Dashboard) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 580 Tm (Muestra estado actual, actividad reciente, resumen semanal y recomienda el siguiente paso) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 566 Tm (mas util.) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 542 Tm (5. La idea central del sistema) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 510 Tm (La solucion gira sobre un principio:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 486 Tm (No toda interaccion es progreso real.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 452 Tm (Por eso NeuroQuest separa dos cosas:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 428 Tm (- engagement: el usuario entro o abrio un modulo) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 414 Tm (- progreso real: el usuario hizo una accion significativa) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 390 Tm (Ese cambio mejora calidad de metrica, lectura clinica y utilidad del dashboard.) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 366 Tm (6. Como funciona en terminos simples) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 334 Tm (Paso 1) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 306 Tm (El usuario entra a un modulo y realiza una accion:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 282 Tm (- guardar un check-in) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 268 Tm (- registrar un pensamiento) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 254 Tm (- completar una mision) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 240 Tm (- iniciar una practica) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 226 Tm (- revisar una rutina) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 202 Tm (Paso 2) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 174 Tm (El sistema guarda la informacion principal en Firestore.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 150 Tm (Paso 3) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 122 Tm (El sistema registra un evento comun de actividad.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 98 Tm (Paso 4) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 70 Tm (Dashboard y Progress leen esos eventos y reflejan:) Tj ET
+BT /F1 9 Tf 1 0 0 1 48 24 Tm (NeuroQuest - Documento - Pagina 3/5) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 9 0 R >>
+endobj
+11 0 obj
+<< /Length 2473 >>
+stream
+BT /F1 11 Tf 1 0 0 1 48 792 Tm (- actividad reciente) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 778 Tm (- modulos activos) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 764 Tm (- resumen semanal) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 750 Tm (- recomendacion de siguiente paso) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 726 Tm (7. Beneficios de negocio y producto) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 694 Tm (7.1 Lectura mas confiable) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 666 Tm (La metrica ya no se infla solo por abrir paginas.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 642 Tm (7.2 Mejor experiencia del usuario) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 614 Tm (El dashboard ya no solo muestra datos; orienta.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 590 Tm (7.3 Mejor seguimiento profesional) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 562 Tm (La actividad transversal y el historial dan mas contexto para revisar evolucion.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 538 Tm (7.4 Escalabilidad funcional) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 510 Tm (Nuevos modulos pueden conectarse al feed comun de eventos sin rehacer toda la logica del) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 496 Tm (dashboard.) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 472 Tm (8. Logica funcional resumida) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 440 Tm (Check-In) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 412 Tm (- suma respuestas) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 398 Tm (- calcula score) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 384 Tm (- asigna severidad) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 370 Tm (- actualiza el estado actual del usuario) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 346 Tm (Progress) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 318 Tm (- separa actividad significativa de aperturas) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 304 Tm (- calcula tendencia por bloques recientes) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 290 Tm (- cuenta actividad util por modulo) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 276 Tm (- resume ultimos 7 dias) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 252 Tm (Dashboard) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 224 Tm (- revisa severidad actual) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 210 Tm (- revisa ultima actividad util) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 196 Tm (- define el siguiente paso recomendado) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 172 Tm (9. Flujograma ejecutivo) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 140 Tm ([Usuario]) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 126 Tm (   |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 112 Tm (   v) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 98 Tm ([Realiza accion en un modulo]) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 84 Tm (   |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 70 Tm (   v) Tj ET
+BT /F1 9 Tf 1 0 0 1 48 24 Tm (NeuroQuest - Documento - Pagina 4/5) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 11 0 R >>
+endobj
+13 0 obj
+<< /Length 2361 >>
+stream
+BT /F3 9 Tf 1 0 0 1 56 802 Tm ([Sistema guarda dato principal]) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 788 Tm (   |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 774 Tm (   v) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 760 Tm ([Sistema registra evento comun]) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 746 Tm (   |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 732 Tm (   +--> [Progress actualiza metricas]) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 718 Tm (   |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 704 Tm (   +--> [Dashboard actualiza actividad y siguiente paso]) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 670 Tm (10. Que ya quedo resuelto en esta solucion) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 638 Tm (- conexion de progreso con los modulos relevantes) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 624 Tm (- separacion entre engagement y progreso real) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 610 Tm (- correccion de errores por permisos en writes no bloqueantes) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 596 Tm (- optimizacion de queries) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 582 Tm (- resumen semanal real en dashboard y progress) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 568 Tm (- dashboard con recomendacion accionable) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 544 Tm (11. Valor tecnico) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 512 Tm (La arquitectura es simple de explicar, facil de mantener y suficientemente robusta para) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 498 Tm (crecer.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 474 Tm (Puntos fuertes:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 450 Tm (- logica auditable) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 436 Tm (- menos acoplamiento entre modulos) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 422 Tm (- mejor tolerancia a fallos secundarios) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 408 Tm (- rendimiento mas controlado) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 394 Tm (- base lista para futuras capacidades) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 370 Tm (12. Conclusion ejecutiva) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 338 Tm (NeuroQuest ya no funciona como un conjunto de pantallas separadas. Ahora opera como una) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 324 Tm (plataforma coherente donde la actividad del usuario se transforma en estado, seguimiento,) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 310 Tm (resumen semanal y orientacion accionable.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 286 Tm (Ese cambio mejora tanto la experiencia de usuario como la capacidad de seguimiento del) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 272 Tm (producto.) Tj ET
+BT /F1 9 Tf 1 0 0 1 48 24 Tm (NeuroQuest - Documento - Pagina 5/5) Tj ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 13 0 R >>
+endobj
+15 0 obj
+<< /Type /Catalog /Pages 4 0 R >>
+endobj
+xref
+0 16
+0000000000 65535 f 
+0000000015 00000 n 
+0000000085 00000 n 
+0000000160 00000 n 
+0000000228 00000 n 
+0000000312 00000 n 
+0000000957 00000 n 
+0000001103 00000 n 
+0000004103 00000 n 
+0000004249 00000 n 
+0000006865 00000 n 
+0000007012 00000 n 
+0000009538 00000 n 
+0000009686 00000 n 
+0000012100 00000 n 
+0000012248 00000 n 
+trailer
+<< /Size 16 /Root 15 0 R >>
+startxref
+12298
+%%EOF

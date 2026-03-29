@@ -101,9 +101,13 @@ service cloud.firestore {
      */
     function hasValidLatestCheckInSummary() {
       return (!('latestCheckInScore' in request.resource.data) || request.resource.data.latestCheckInScore is number) &&
+        (!('userRole' in request.resource.data) || request.resource.data.userRole in ['clinic', 'professional', 'patient']) &&
         (!('latestCheckInLevel' in request.resource.data) || request.resource.data.latestCheckInLevel in ['healthy', 'mild', 'moderate', 'severe']) &&
         (!('latestCheckInAt' in request.resource.data) || request.resource.data.latestCheckInAt == null || request.resource.data.latestCheckInAt is timestamp) &&
-        (!('latestCheckInNote' in request.resource.data) || request.resource.data.latestCheckInNote is string);
+        (!('latestCheckInNote' in request.resource.data) || request.resource.data.latestCheckInNote is string) &&
+        (!('latestCheckInSelfHarmRisk' in request.resource.data) || request.resource.data.latestCheckInSelfHarmRisk is bool) &&
+        (!('latestCheckInNeedsProfessionalSupport' in request.resource.data) || request.resource.data.latestCheckInNeedsProfessionalSupport is bool) &&
+        (!('latestCheckInUrgentSupport' in request.resource.data) || request.resource.data.latestCheckInUrgentSupport is bool);
     }
 
     /**
@@ -240,6 +244,19 @@ service cloud.firestore {
      * @principle Allows collaborative care documentation while keeping records scoped to the patient.
      */
     match /users/{userId}/medicalSupportPlans/{planId} {
+      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
+      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
+      allow create: if (isOwner(userId) || isTherapistOfUser(userId) || isAdmin()) && incomingDataMatchesOwner(userId);
+      allow update: if (isExistingOwner(userId) || isTherapistOfUser(userId) || isAdmin()) && ownerIsImmutable();
+      allow delete: if isExistingOwner(userId) || isAdmin();
+    }
+
+    /**
+     * @description Stores prescribed medication records documented by the user or their
+     *              treating professional. This is documentation only, not automatic prescribing.
+     * @path /users/{userId}/medicationPrescriptions/{prescriptionId}
+     */
+    match /users/{userId}/medicationPrescriptions/{prescriptionId} {
       allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
       allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin();
       allow create: if (isOwner(userId) || isTherapistOfUser(userId) || isAdmin()) && incomingDataMatchesOwner(userId);

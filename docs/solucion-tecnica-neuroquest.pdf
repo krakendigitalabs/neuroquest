@@ -1,0 +1,577 @@
+%PDF-1.4
+%âãÏÓ
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+4 0 obj
+<< /Type /Pages /Count 12 /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R 24 0 R 26 0 R 28 0 R] >>
+endobj
+5 0 obj
+<< /Length 594 >>
+stream
+0.93 0.97 0.98 rg 0 0 595 842 re f
+0.43 0.67 0.84 rg 48 710 499 70 re f
+BT /F2 28 Tf 1 0 0 1 60 745 Tm (NeuroQuest) Tj ET
+BT /F2 20 Tf 1 0 0 1 60 660 Tm (Documento) Tj ET
+BT /F1 12 Tf 1 0 0 1 60 620 Tm (Arquitectura, procesos, logica y decisiones de diseno) Tj ET
+BT /F1 11 Tf 1 0 0 1 60 570 Tm (Producto: NeuroQuest) Tj ET
+BT /F1 11 Tf 1 0 0 1 60 552 Tm (Stack: Next.js, React, TypeScript, Firebase, Vercel) Tj ET
+BT /F1 11 Tf 1 0 0 1 60 534 Tm (Fecha de generacion automatica desde el repositorio) Tj ET
+BT /F1 10 Tf 1 0 0 1 60 70 Tm (Documento generado localmente desde C:\\neuroquest) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 3749 >>
+stream
+BT /F2 18 Tf 1 0 0 1 48 802 Tm (NeuroQuest) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 764 Tm (Documento Tecnico) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 732 Tm (Arquitectura, logica, algoritmos, procesos y flujos operativos de la solucion.) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 708 Tm (1. Proposito del documento) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 676 Tm (Este documento explica el significado funcional, la logica interna, los algoritmos) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 662 Tm (principales, los procesos operativos y los flujos de la solucion NeuroQuest. El enfoque es) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 648 Tm (tecnico y de producto: que hace el sistema, como lo hace, por que se estructuro asi y como) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 634 Tm (se conectan los modulos entre si.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 610 Tm (No es un manual de usuario final. Es una explicacion de arquitectura, reglas de negocio y) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 596 Tm (comportamiento del sistema.) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 572 Tm (2. Vision general de la solucion) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 540 Tm (NeuroQuest es una aplicacion web construida con Next.js, React, TypeScript y Firebase. Su) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 526 Tm (objetivo es centralizar seguimiento de bienestar mental, registro de actividad terapeutica,) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 512 Tm (apoyo preventivo, visualizacion de progreso y herramientas para seguimiento profesional.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 488 Tm (La solucion combina cinco capas:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 464 Tm (1. Capa de interfaz: pantallas, dashboard, progreso, modulos terapeuticos y soporte.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 450 Tm (2. Capa de reglas de negocio: calculo de score, clasificacion de severidad, tendencias,) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 436 Tm (resumen semanal y recomendacion del siguiente paso.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 422 Tm (3. Capa de persistencia: Firestore por usuario y subcolecciones especializadas.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 408 Tm (4. Capa de actividad transversal: eventos compartidos de progreso en tiempo real.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 394 Tm (5. Capa de seguridad operativa: autenticacion, reglas de Firestore, writes no bloqueantes y) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 380 Tm (degradacion segura.) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 356 Tm (3. Objetivos funcionales principales) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 324 Tm (- Registrar check-ins mentales y clasificar severidad.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 310 Tm (- Guardar pensamientos, exposiciones y actividades de apoyo.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 296 Tm (- Mostrar progreso real sin mezclarlo con simple navegacion.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 282 Tm (- Reunir actividad transversal de varios modulos en una vista comun.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 268 Tm (- Dar al dashboard una logica accionable y no solo informativa.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 254 Tm (- Mantener seguridad operativa cuando alguna escritura secundaria falle.) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 230 Tm (4. Arquitectura de alto nivel) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 198 Tm (4.1 Stack principal) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 170 Tm (- Frontend: Next.js App Router + React 19.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 156 Tm (- Lenguaje: TypeScript.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 142 Tm (- UI: Tailwind + componentes UI internos.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 128 Tm (- Persistencia: Firebase Firestore.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 114 Tm (- Autenticacion: Firebase Authentication.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 100 Tm (- IA: Genkit / flujos de apoyo cognitivo y misiones.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 86 Tm (- Despliegue web: Vercel.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 72 Tm (- Reglas de datos: Firebase CLI.) Tj ET
+BT /F1 9 Tf 1 0 0 1 48 24 Tm (NeuroQuest - Documento - Pagina 2/12) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 2743 >>
+stream
+BT /F2 11 Tf 1 0 0 1 48 802 Tm (4.2 Estructura por capas) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 774 Tm (Usuario) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 760 Tm (  |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 746 Tm (  v) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 732 Tm (Next.js / React UI) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 718 Tm (  |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 704 Tm (  +--> Hooks y librerias de dominio) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 690 Tm (  |       - mental-check-in) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 676 Tm (  |       - progress-checkups) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 662 Tm (  |       - progress-events) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 648 Tm (  |       - dashboard) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 634 Tm (  |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 620 Tm (  +--> Firebase client) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 606 Tm (          |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 592 Tm (          +--> Auth) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 578 Tm (          +--> Firestore) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 564 Tm (                    |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 550 Tm (                    +--> users/{uid}) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 536 Tm (                    +--> mental_checkups) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 522 Tm (                    +--> thoughtRecords) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 508 Tm (                    +--> exposureMissions) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 494 Tm (                    +--> progressEvents) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 460 Tm (5. Modelo de datos principal) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 428 Tm (5.1 Documento base de usuario) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 400 Tm (Ruta:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 376 Tm (users/{uid}) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 342 Tm (Campos denormalizados relevantes:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 318 Tm (- latestCheckInScore) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 304 Tm (- latestCheckInLevel) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 290 Tm (- latestCheckInAt) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 276 Tm (- latestCheckInNote) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 262 Tm (- currentXp) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 248 Tm (- level) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 234 Tm (- campos de ultimo pensamiento y ultimo estado) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 210 Tm (La logica usa denormalizacion para que el dashboard pueda responder rapido sin recalcular) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 196 Tm (desde cero en cada vista.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 172 Tm (5.2 Subcolecciones clave) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 144 Tm (users/{uid}/mental_checkups) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 130 Tm (users/{uid}/thoughtRecords) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 116 Tm (users/{uid}/exposureMissions) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 102 Tm (users/{uid}/progressEvents) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 68 Tm (5.3 Evento transversal de progreso) Tj ET
+BT /F1 9 Tf 1 0 0 1 48 24 Tm (NeuroQuest - Documento - Pagina 3/12) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 9 0 R >>
+endobj
+11 0 obj
+<< /Length 2363 >>
+stream
+BT /F1 11 Tf 1 0 0 1 48 792 Tm (Modelo:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 768 Tm (- userId) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 754 Tm (- module) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 740 Tm (- type) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 726 Tm (- detail) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 712 Tm (- createdAt) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 688 Tm (Modulos:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 664 Tm (- check-in) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 650 Tm (- observer) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 636 Tm (- exposure) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 622 Tm (- medical-support) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 608 Tm (- grounding) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 594 Tm (- regulation) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 580 Tm (- reprogram) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 566 Tm (- wellness) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 542 Tm (Tipos:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 518 Tm (- saved) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 504 Tm (- created) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 490 Tm (- completed) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 476 Tm (- opened) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 452 Tm (El punto importante de diseño es que opened ya no se trata como progreso real. Solo cuenta) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 438 Tm (como engagement.) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 414 Tm (6. Logica principal del sistema) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 382 Tm (6.1 Algoritmo de score del Mental Check-In) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 354 Tm (Archivo base:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 330 Tm (src/lib/mental-check-in.ts) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 296 Tm (Logica:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 272 Tm (1. El usuario responde una lista de preguntas.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 258 Tm (2. Cada respuesta tiene un valor numerico.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 244 Tm (3. El score final es la suma de todos los valores.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 230 Tm (4. El score se compara contra umbrales clinicos configurados.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 216 Tm (5. El resultado se clasifica en:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 202 Tm (- healthy) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 188 Tm (- mild) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 174 Tm (- moderate) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 160 Tm (- severe) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 136 Tm (Formula:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 112 Tm (score_total = suma\(answer.value\)) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 78 Tm (Clasificacion:) Tj ET
+BT /F1 9 Tf 1 0 0 1 48 24 Tm (NeuroQuest - Documento - Pagina 4/12) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 11 0 R >>
+endobj
+13 0 obj
+<< /Length 2737 >>
+stream
+BT /F3 9 Tf 1 0 0 1 56 802 Tm (si score <= maxScoreDelUmbral => usar ese nivel) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 788 Tm (si no coincide con ninguno => severe) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 754 Tm (Razon de diseño:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 730 Tm (- Es deterministicamente auditable.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 716 Tm (- Evita ambiguedad.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 702 Tm (- Permite persistir score y severidad con consistencia.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 678 Tm (6.2 Persistencia atomica del Check-In) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 650 Tm (Archivo base:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 626 Tm (src/lib/check-in-records.ts) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 592 Tm (Proceso:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 568 Tm (1. Se crea un documento en mental_checkups.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 554 Tm (2. En el mismo batch se agrega un progressEvent.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 540 Tm (3. En el mismo batch se actualiza users/{uid} con campos denormalizados.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 526 Tm (4. Se hace batch.commit\(\).) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 502 Tm (Ventaja:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 478 Tm (- El estado del check-in, el feed de progreso y el resumen del usuario quedan sincronizados) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 464 Tm (  dentro de una sola operacion atomica.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 440 Tm (Flujo:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 416 Tm (Usuario completa check-in) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 402 Tm (  -> calcular score) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 388 Tm (  -> calcular nivel) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 374 Tm (  -> crear payload del check-in) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 360 Tm (  -> batch.set\(mental_checkups\)) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 346 Tm (  -> batch.set\(progressEvents, type=saved\)) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 332 Tm (  -> batch.set\(users/{uid}, merge=true\)) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 318 Tm (  -> commit) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 284 Tm (6.3 Algoritmo de tendencia de progreso) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 256 Tm (Archivo base:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 232 Tm (src/lib/progress-checkups.ts) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 198 Tm (El sistema no usa una regresion compleja. Usa una heuristica simple, explicable y estable:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 174 Tm (1. Toma los 5 check-ins mas recientes.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 160 Tm (2. Calcula su promedio.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 146 Tm (3. Toma los 5 anteriores.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 132 Tm (4. Calcula su promedio.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 118 Tm (5. Compara ambos bloques.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 94 Tm (Formula:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 70 Tm (latestAverage = promedio\(ultimos 5\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 48 24 Tm (NeuroQuest - Documento - Pagina 5/12) Tj ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 13 0 R >>
+endobj
+15 0 obj
+<< /Length 2573 >>
+stream
+BT /F3 9 Tf 1 0 0 1 56 802 Tm (previousAverage = promedio\(5 anteriores\)) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 788 Tm (delta = latestAverage - previousAverage) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 754 Tm (Regla de tendencia:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 730 Tm (si delta >= 1     => up) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 716 Tm (si delta <= -1    => down) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 702 Tm (si -1 < delta < 1 => stable) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 668 Tm (Interpretacion:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 644 Tm (- up significa mayor carga reciente.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 630 Tm (- down significa mejora relativa.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 616 Tm (- stable significa variacion menor a un punto.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 592 Tm (Ventajas:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 568 Tm (- Facil de explicar a usuarios y terapeutas.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 554 Tm (- Evita sobreinterpretar pequeñas oscilaciones.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 540 Tm (- No depende de grandes volumenes de datos.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 516 Tm (6.4 Algoritmo de actividad significativa) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 488 Tm (Archivo base:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 464 Tm (src/app/\(app\)/progress/page.tsx) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 430 Tm (Problema que resolvio la solucion:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 406 Tm (Antes, abrir un modulo podia inflar el progreso. Eso era conceptualmente incorrecto.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 382 Tm (Solucion:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 358 Tm (1. Se cargan eventos desde progressEvents.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 344 Tm (2. Se separan eventos:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 330 Tm (- significativos: saved, created, completed) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 316 Tm (- engagement: opened) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 302 Tm (3. Las metricas clinicas usan solo eventos significativos.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 288 Tm (4. Las aperturas quedan en una seccion aparte.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 264 Tm (Regla:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 240 Tm (meaningful = events where type != opened) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 226 Tm (engagement = events where type == opened) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 192 Tm (Esto corrige la inflacion artificial del progreso.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 168 Tm (6.5 Algoritmo de resumen semanal real) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 140 Tm (Implementado en:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 116 Tm (- Dashboard) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 102 Tm (- Progress) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 78 Tm (Logica:) Tj ET
+BT /F1 9 Tf 1 0 0 1 48 24 Tm (NeuroQuest - Documento - Pagina 6/12) Tj ET
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 15 0 R >>
+endobj
+17 0 obj
+<< /Length 3115 >>
+stream
+BT /F1 11 Tf 1 0 0 1 48 802 Tm (1. Se toma la fecha actual.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 788 Tm (2. Se calcula now - 7 dias.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 774 Tm (3. Se filtran solo eventos significativos cuya fecha sea mayor o igual a ese umbral.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 760 Tm (4. Se cuentan:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 746 Tm (- numero de eventos utiles) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 732 Tm (- numero de modulos con actividad util) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 708 Tm (Formula:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 684 Tm (weeklyEvents = meaningfulEvents where createdAt >= now - 7 dias) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 670 Tm (weeklyModules = cantidad de modulos unicos en weeklyEvents) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 636 Tm (Esto crea una lectura semanal real, no una simple foto del ultimo evento.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 612 Tm (6.6 Algoritmo del dashboard accionable) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 584 Tm (Archivo base:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 560 Tm (src/app/\(app\)/dashboard/page.tsx) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 526 Tm (El dashboard decide el siguiente paso en orden de prioridad:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 502 Tm (1. Si la severidad actual es severe, prioriza crisis y soporte medico.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 488 Tm (2. Si no existe check-in reciente, empuja a /check-in.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 474 Tm (3. Si la ultima actividad fue observer, empuja a reprogram.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 460 Tm (4. Si la ultima actividad fue exposure, empuja a progress o vuelve a exposure.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 446 Tm (5. Si la ultima actividad fue grounding o regulation, empuja a observar y consolidar) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 432 Tm (progreso.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 418 Tm (6. Si no aplica nada especial, usa una ruta por defecto hacia progress.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 394 Tm (Pseudocodigo:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 370 Tm (if latestCheckInLevel == severe:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 356 Tm (    return crisis flow) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 342 Tm (elif no latest check-in:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 328 Tm (    return check-in flow) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 314 Tm (elif latestActivity.module == observer:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 300 Tm (    return reprogram) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 286 Tm (elif latestActivity.module == exposure:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 272 Tm (    return progress/exposure) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 258 Tm (elif latestActivity.module in [grounding, regulation]:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 244 Tm (    return progress/observer) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 230 Tm (else:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 216 Tm (    return default progress flow) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 182 Tm (La logica es deliberadamente simple, auditable y mantenible.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 158 Tm (6.7 Writes no bloqueantes) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 130 Tm (Archivo base:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 106 Tm (src/firebase/non-blocking-updates.tsx) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 72 Tm (Problema previo:) Tj ET
+BT /F1 9 Tf 1 0 0 1 48 24 Tm (NeuroQuest - Documento - Pagina 7/12) Tj ET
+endstream
+endobj
+18 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 17 0 R >>
+endobj
+19 0 obj
+<< /Length 3091 >>
+stream
+BT /F1 11 Tf 1 0 0 1 48 802 Tm (Si una escritura secundaria fallaba por permisos o conectividad, el listener global podia) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 788 Tm (terminar rompiendo la app del lado cliente.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 764 Tm (Solucion:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 740 Tm (- Las operaciones secundarias se ejecutan sin bloquear la interfaz.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 726 Tm (- Si fallan, se registran con console.warn.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 712 Tm (- No se relanza una excepcion fatal.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 688 Tm (Patron:) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 664 Tm (operacion async) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 650 Tm (  .catch\(error => console.warn\(...\)\)) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 616 Tm (Resultado:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 592 Tm (- La app sigue operativa.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 578 Tm (- El fallo queda visible para debugging.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 564 Tm (- El usuario no pierde la pantalla por un write accesorio.) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 540 Tm (7. Procesos principales del producto) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 508 Tm (7.1 Proceso A: Check-In y reflejo inmediato en progreso) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 480 Tm (Usuario entra a Check-In) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 466 Tm (  -> responde preguntas) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 452 Tm (  -> sistema calcula score y severidad) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 438 Tm (  -> sistema guarda mental_checkup) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 424 Tm (  -> sistema actualiza user profile) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 410 Tm (  -> sistema registra progressEvent) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 396 Tm (  -> Dashboard y Progress pueden reflejarlo en tiempo real) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 362 Tm (7.2 Proceso B: Observer y reprogramacion) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 334 Tm (Usuario registra pensamiento) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 320 Tm (  -> sistema guarda thoughtRecord) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 306 Tm (  -> sistema registra progressEvent tipo saved) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 292 Tm (  -> Observer muestra seguimiento) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 278 Tm (  -> Dashboard identifica actividad reciente) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 264 Tm (  -> Progress actualiza actividad util y cobertura por modulo) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 230 Tm (7.3 Proceso C: Modulos de apoyo y engagement) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 202 Tm (Usuario abre modulo) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 188 Tm (  -> useTrackModuleActivity registra opened una vez por sesion y por dia) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 174 Tm (  -> ese evento aparece como engagement) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 160 Tm (  -> no altera metricas de progreso real) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 126 Tm (7.4 Proceso D: Modulos con acciones reales) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 98 Tm (Usuario ejecuta una accion significativa) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 84 Tm (  -> ejemplo: iniciar respiracion, marcar grounding, completar reprogramacion) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 70 Tm (  -> sistema registra saved/created/completed) Tj ET
+BT /F1 9 Tf 1 0 0 1 48 24 Tm (NeuroQuest - Documento - Pagina 8/12) Tj ET
+endstream
+endobj
+20 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 19 0 R >>
+endobj
+21 0 obj
+<< /Length 2985 >>
+stream
+BT /F3 9 Tf 1 0 0 1 56 802 Tm (  -> Progress lo cuenta como actividad util) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 788 Tm (  -> Dashboard lo usa para actividad reciente y siguiente paso) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 754 Tm (7.5 Proceso E: Resumen semanal) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 726 Tm (Sistema consulta progressEvents ordenados por fecha) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 712 Tm (  -> filtra solo eventos significativos) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 698 Tm (  -> filtra ultimos 7 dias) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 684 Tm (  -> cuenta eventos) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 670 Tm (  -> cuenta modulos unicos) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 656 Tm (  -> renderiza resumen semanal en Dashboard y Progress) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 622 Tm (8. Flujogramas) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 590 Tm (8.1 Flujograma general del sistema) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 562 Tm ([Usuario]) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 548 Tm (   |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 534 Tm (   v) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 520 Tm ([Modulo UI]) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 506 Tm (   |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 492 Tm (   +--> [Reglas de negocio]) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 478 Tm (   |         |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 464 Tm (   |         +--> score / severidad / tendencia / siguiente paso) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 450 Tm (   |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 436 Tm (   +--> [Persistencia Firestore]) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 422 Tm (             |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 408 Tm (             +--> users/{uid}) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 394 Tm (             +--> mental_checkups) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 380 Tm (             +--> thoughtRecords) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 366 Tm (             +--> exposureMissions) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 352 Tm (             +--> progressEvents) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 338 Tm (                         |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 324 Tm (                         v) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 310 Tm (                  [Dashboard + Progress]) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 276 Tm (8.2 Flujograma de progreso real vs engagement) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 248 Tm ([Evento nuevo]) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 234 Tm (   |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 220 Tm (   v) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 206 Tm ({type == opened?}) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 192 Tm (   | yes                       | no) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 178 Tm (   v                           v) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 164 Tm ([Engagement]            [Actividad significativa]) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 150 Tm (   |                           |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 136 Tm (   v                           v) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 122 Tm ([No cambia score]       [Se muestra en progreso real]) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 108 Tm (   |                           |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 94 Tm (   +---------> [Feed de actividad] <---------+) Tj ET
+BT /F1 9 Tf 1 0 0 1 48 24 Tm (NeuroQuest - Documento - Pagina 9/12) Tj ET
+endstream
+endobj
+22 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 21 0 R >>
+endobj
+23 0 obj
+<< /Length 3500 >>
+stream
+BT /F2 11 Tf 1 0 0 1 48 802 Tm (8.3 Flujograma del dashboard accionable) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 774 Tm ([Carga Dashboard]) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 760 Tm (   |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 746 Tm (   v) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 732 Tm ([Lee user profile + missions + progressEvents]) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 718 Tm (   |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 704 Tm (   v) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 690 Tm ({latestCheckInLevel == severe?}) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 676 Tm (   | yes                              | no) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 662 Tm (   v                                  v) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 648 Tm ([Mostrar crisis/support]      {hay check-in?}) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 634 Tm (                                      | no) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 620 Tm (                                      v) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 606 Tm (                               [Enviar a Check-In]) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 592 Tm (                                      |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 578 Tm (                                      | yes) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 564 Tm (                                      v) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 550 Tm (                             [Revisar ultima actividad]) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 536 Tm (                                      |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 522 Tm (             +------------------------+-----------------------+) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 508 Tm (             |                        |                       |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 494 Tm (             v                        v                       v) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 480 Tm (        observer                 exposure              grounding/regulation) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 466 Tm (             |                        |                       |) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 452 Tm (             v                        v                       v) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 438 Tm (      [Ir a reprogram]        [Ir a progress]        [Ir a observer/progress]) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 404 Tm (9. Decisiones de diseño relevantes) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 372 Tm (9.1 Por que usar denormalizacion) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 344 Tm (Porque el dashboard necesita velocidad y simplicidad. Leer solo users/{uid} evita recalcular) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 330 Tm (todo para cada carga.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 306 Tm (9.2 Por que separar progreso real de engagement) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 278 Tm (Porque abrir una pantalla no equivale a una accion terapeutica. La separacion protege la) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 264 Tm (calidad de la metrica.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 240 Tm (9.3 Por que usar un feed transversal de eventos) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 212 Tm (Porque varios modulos generan actividad distinta, y el sistema necesitaba una vista comun) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 198 Tm (sin acoplar el dashboard a cada coleccion individual.) Tj ET
+BT /F2 11 Tf 1 0 0 1 48 174 Tm (9.4 Por que usar heuristicas simples) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 146 Tm (Porque en este contexto:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 122 Tm (- son mas auditables) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 108 Tm (- son mas faciles de explicar) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 94 Tm (- reducen ambiguedad) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 80 Tm (- no dependen de modelos opacos) Tj ET
+BT /F1 9 Tf 1 0 0 1 48 24 Tm (NeuroQuest - Documento - Pagina 10/12) Tj ET
+endstream
+endobj
+24 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 23 0 R >>
+endobj
+25 0 obj
+<< /Length 3078 >>
+stream
+BT /F2 13 Tf 1 0 0 1 48 802 Tm (10. Rendimiento y robustez) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 770 Tm (Mejoras aplicadas:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 746 Tm (- Queries con orderBy + limit.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 732 Tm (- Feed de actividad con corte acotado.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 718 Tm (- Filtrado semanal en cliente sobre un conjunto ya limitado.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 704 Tm (- Writes no bloqueantes con degradacion segura.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 690 Tm (- Reglas de Firestore ajustadas para progressEvents.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 666 Tm (Resultado:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 642 Tm (- menos lecturas innecesarias) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 628 Tm (- menor riesgo de caida por errores secundarios) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 614 Tm (- mejor experiencia en tiempo real) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 590 Tm (11. Cobertura funcional ya integrada) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 558 Tm (La solucion ya conecta con progreso real a:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 534 Tm (- Check-In) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 520 Tm (- Observer) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 506 Tm (- Exposure) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 492 Tm (- Grounding) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 478 Tm (- Regulation) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 464 Tm (- Reprogram) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 450 Tm (- Medical Support) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 436 Tm (- Wellness) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 412 Tm (Ademas:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 388 Tm (- Dashboard consume actividad real reciente.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 374 Tm (- Progress separa metricas reales de engagement.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 360 Tm (- Ambos muestran resumen semanal util.) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 336 Tm (12. Limitaciones actuales) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 304 Tm (- El sistema usa reglas heuristicas, no inferencia clinica avanzada.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 290 Tm (- El resumen semanal depende de eventos ya persistidos; si un modulo no registra eventos) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 276 Tm (  utiles, no aparecera correctamente.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 262 Tm (- El modelo actual privilegia explicabilidad sobre sofisticacion estadistica.) Tj ET
+BT /F2 13 Tf 1 0 0 1 48 238 Tm (13. Archivos tecnicos clave) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 206 Tm (src/lib/mental-check-in.ts) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 192 Tm (src/lib/check-in-records.ts) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 178 Tm (src/lib/progress-checkups.ts) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 164 Tm (src/lib/progress-events.ts) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 150 Tm (src/lib/thought-records.ts) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 136 Tm (src/hooks/use-track-module-activity.ts) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 122 Tm (src/firebase/non-blocking-updates.tsx) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 108 Tm (src/app/\(app\)/dashboard/page.tsx) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 94 Tm (src/app/\(app\)/progress/page.tsx) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 80 Tm (src/models/progress-event.ts) Tj ET
+BT /F3 9 Tf 1 0 0 1 56 66 Tm (firestore.rules) Tj ET
+BT /F1 9 Tf 1 0 0 1 48 24 Tm (NeuroQuest - Documento - Pagina 11/12) Tj ET
+endstream
+endobj
+26 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 25 0 R >>
+endobj
+27 0 obj
+<< /Length 1032 >>
+stream
+BT /F2 13 Tf 1 0 0 1 48 782 Tm (14. Conclusion) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 750 Tm (NeuroQuest evoluciono desde un conjunto de modulos independientes hacia una arquitectura) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 736 Tm (unificada de progreso transversal. La clave de la solucion es la combinacion de:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 712 Tm (- persistencia atomica en operaciones importantes) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 698 Tm (- feed comun de actividad) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 684 Tm (- separacion entre engagement y progreso real) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 670 Tm (- dashboard accionable) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 656 Tm (- resumen semanal consistente) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 642 Tm (- degradacion segura ante errores secundarios) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 618 Tm (Eso hace que la plataforma sea mas coherente, mas medible, mas estable y mas util para) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 604 Tm (usuarios y seguimiento profesional.) Tj ET
+BT /F1 9 Tf 1 0 0 1 48 24 Tm (NeuroQuest - Documento - Pagina 12/12) Tj ET
+endstream
+endobj
+28 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 27 0 R >>
+endobj
+29 0 obj
+<< /Type /Catalog /Pages 4 0 R >>
+endobj
+xref
+0 30
+0000000000 65535 f 
+0000000015 00000 n 
+0000000085 00000 n 
+0000000160 00000 n 
+0000000228 00000 n 
+0000000362 00000 n 
+0000001007 00000 n 
+0000001153 00000 n 
+0000004954 00000 n 
+0000005100 00000 n 
+0000007895 00000 n 
+0000008042 00000 n 
+0000010458 00000 n 
+0000010606 00000 n 
+0000013396 00000 n 
+0000013544 00000 n 
+0000016170 00000 n 
+0000016318 00000 n 
+0000019486 00000 n 
+0000019634 00000 n 
+0000022778 00000 n 
+0000022926 00000 n 
+0000025964 00000 n 
+0000026112 00000 n 
+0000029665 00000 n 
+0000029813 00000 n 
+0000032944 00000 n 
+0000033092 00000 n 
+0000034177 00000 n 
+0000034325 00000 n 
+trailer
+<< /Size 30 /Root 29 0 R >>
+startxref
+34375
+%%EOF

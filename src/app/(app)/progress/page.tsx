@@ -152,28 +152,33 @@ export default function ProgressPage() {
     () =>
       sortedThoughts
         .slice(0, 7)
-        .reverse()
-        .map((thought, index) => ({
-          day: toDate(thought.recordedAt)
-            ? toDate(thought.recordedAt)?.toLocaleDateString(locale, { month: 'short', day: 'numeric' })
-            : `${t('progress.entryLabel')} ${index + 1}`,
-          intensity: thought.intensity,
-        })),
-    [locale, sortedThoughts, t]
+        .map((thought) => {
+          const recordedAt = toDate(thought.recordedAt);
+          if (!recordedAt) return null;
+          return {
+            day: recordedAt.toLocaleDateString(locale, { month: 'short', day: 'numeric' }),
+            intensity: thought.intensity,
+          };
+        })
+        .filter((thought): thought is { day: string; intensity: number } => thought !== null)
+        .reverse(),
+    [locale, sortedThoughts]
   );
 
   const trendData = useMemo(() => (
     [...metrics.trendData]
-      .reverse()
-      .map((checkup, index) => {
+      .map((checkup) => {
+        if (!checkup.createdAt) return null;
         return {
-          day: checkup.createdAt
-            ? checkup.createdAt.toLocaleDateString(locale, { month: 'short', day: 'numeric' })
-            : `${t('progress.entryLabel')} ${index + 1}`,
+          day: checkup.createdAt.toLocaleDateString(locale, { month: 'short', day: 'numeric' }),
           score: checkup.score,
         };
       })
-  ), [locale, metrics.trendData, t]);
+      .filter((checkup): checkup is { day: string; score: number } => checkup !== null)
+      .reverse()
+  ), [locale, metrics.trendData]);
+  const hasEnoughCheckInTrendData = trendData.length >= 2;
+  const hasEnoughThoughtTrendData = thoughtTrendData.length >= 2;
 
   const chartConfig = {
     score: { label: t('progress.checkInScore'), color: 'hsl(var(--destructive))' },
@@ -189,6 +194,8 @@ export default function ProgressPage() {
         return t('nav.exposure');
       case 'medical-support':
         return t('medical.title');
+      case 'medication':
+        return t('nav.medication');
       case 'grounding':
         return t('nav.grounding');
       case 'regulation':
@@ -508,16 +515,24 @@ export default function ProgressPage() {
           <CardContent>
             {trendData.length === 0 ? (
               <p className="text-sm text-muted-foreground">{t('progress.noCheckInsYet')}</p>
+            ) : !hasEnoughCheckInTrendData ? (
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>{t('progress.realDataChartNeedsMorePoints')}</p>
+                <p>{t('progress.chartSourceCheckIns')}</p>
+              </div>
             ) : (
-              <ChartContainer config={chartConfig} className="h-64">
-                <ComposedChart data={trendData}>
-                  <CartesianGrid vertical={false} />
-                  <XAxis dataKey="day" tickLine={false} axisLine={false} />
-                  <YAxis width={20} tickLine={false} axisLine={false} />
-                  <ChartTooltip content={<CustomTooltip />} />
-                  <Line type="monotone" dataKey="score" stroke={chartConfig.score.color} strokeWidth={2} dot name={t('progress.checkInScore')} />
-                </ComposedChart>
-              </ChartContainer>
+              <div className="space-y-2">
+                <ChartContainer config={chartConfig} className="h-64">
+                  <ComposedChart data={trendData}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                    <YAxis width={20} tickLine={false} axisLine={false} />
+                    <ChartTooltip content={<CustomTooltip />} />
+                    <Line type="monotone" dataKey="score" stroke={chartConfig.score.color} strokeWidth={2} dot name={t('progress.checkInScore')} />
+                  </ComposedChart>
+                </ChartContainer>
+                <p className="text-xs text-muted-foreground">{t('progress.chartSourceCheckIns')}</p>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -561,16 +576,24 @@ export default function ProgressPage() {
           <CardContent>
             {thoughtTrendData.length === 0 ? (
               <p className="text-sm text-muted-foreground">{t('observer.noThoughts')}</p>
+            ) : !hasEnoughThoughtTrendData ? (
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>{t('progress.realDataChartNeedsMorePoints')}</p>
+                <p>{t('progress.chartSourceThoughts')}</p>
+              </div>
             ) : (
-              <ChartContainer config={chartConfig} className="h-64">
-                <ComposedChart data={thoughtTrendData}>
-                  <CartesianGrid vertical={false} />
-                  <XAxis dataKey="day" tickLine={false} axisLine={false} />
-                  <YAxis width={20} tickLine={false} axisLine={false} domain={[0, 10]} />
-                  <ChartTooltip content={<CustomTooltip />} />
-                  <Line type="monotone" dataKey="intensity" stroke={chartConfig.intensity.color} strokeWidth={2} dot name={t('observer.intensity')} />
-                </ComposedChart>
-              </ChartContainer>
+              <div className="space-y-2">
+                <ChartContainer config={chartConfig} className="h-64">
+                  <ComposedChart data={thoughtTrendData}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                    <YAxis width={20} tickLine={false} axisLine={false} domain={[0, 10]} />
+                    <ChartTooltip content={<CustomTooltip />} />
+                    <Line type="monotone" dataKey="intensity" stroke={chartConfig.intensity.color} strokeWidth={2} dot name={t('observer.intensity')} />
+                  </ComposedChart>
+                </ChartContainer>
+                <p className="text-xs text-muted-foreground">{t('progress.chartSourceThoughts')}</p>
+              </div>
             )}
           </CardContent>
         </Card>

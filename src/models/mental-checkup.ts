@@ -19,6 +19,7 @@ export interface Recommendations {
 export interface RiskFlags {
     selfHarmRisk: boolean;
     needsProfessionalSupport: boolean;
+    urgentSupportRecommended?: boolean;
 }
 
 export interface MentalCheckup {

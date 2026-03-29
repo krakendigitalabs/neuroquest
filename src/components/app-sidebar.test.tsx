@@ -43,6 +43,9 @@ vi.mock('@/context/language-provider', () => ({
       if (key === 'nav.grounding') return 'Grounding';
       if (key === 'sidebar.logout') return 'Logout';
       if (key === 'sidebar.user') return 'User';
+      if (key === 'nav.wellness') return 'Wellness';
+      if (key === 'nav.medication') return 'Prescribed Medication';
+      if (key === 'userRoles.patient') return 'Patient user';
       if (key === 'userProgress.level') return `Level ${values?.level ?? 1}`;
       if (key === 'languageSwitcher.english') return 'English';
       if (key === 'languageSwitcher.spanish') return 'Spanish';
@@ -67,6 +70,7 @@ vi.mock('@/hooks/use-user-profile', () => ({
   useUserProfile: () => ({
     userProfile: {
       displayName: 'Pat Doe',
+      userRole: 'patient',
       level: 3,
       currentXp: 40,
       xpToNextLevel: 100,
@@ -103,7 +107,8 @@ describe('AppSidebar', () => {
     expect(screen.getByText('Check-In')).toBeInTheDocument();
     expect(screen.getByText('Progress')).toBeInTheDocument();
     expect(screen.getByText('Observer')).toBeInTheDocument();
+    expect(screen.getByText('Prescribed Medication')).toBeInTheDocument();
+    expect(screen.getByText('Patient user · Level 3')).toBeInTheDocument();
     expect(screen.queryByText('Challenges')).not.toBeInTheDocument();
-    expect(screen.queryByText('Medical Support')).not.toBeInTheDocument();
   });
 });

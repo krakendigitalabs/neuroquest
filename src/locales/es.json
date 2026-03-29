@@ -12,7 +12,7 @@
     "progress": "Progreso",
     "grounding": "Anclaje",
     "challenges": "Desafíos",
-    "medication": "Apoyo Médico",
+    "medication": "Medicación Prescrita",
     "checkIn": "Chequeo Mental"
   },
   "dashboard": {
@@ -38,20 +38,27 @@
     "activeModulesCount": "{count} módulos con actividad real",
     "weeklySummaryTitle": "Resumen semanal",
     "weeklySummaryBody": "{events} eventos útiles en {modules} módulos esta semana.",
+    "weeklySummarySource": "Fuente: progressEvents registrados en los últimos 7 días.",
     "nextStepCardTitle": "Siguiente paso sugerido",
     "nextStepTitles": {
+      "urgentSupport": "Busca apoyo urgente ahora",
       "severe": "Estabiliza y busca apoyo ahora",
       "noCheckIn": "Empieza con un check-in real",
       "observer": "Convierte lo que observaste en una nueva perspectiva",
       "exposure": "Revisa qué cambió después de la exposición",
+      "medicalSupport": "Documenta el tratamiento formulado",
+      "medication": "Da seguimiento al tratamiento con progreso real",
       "regulation": "Convierte la regulación en seguimiento",
       "default": "Mantén el proceso en movimiento"
     },
     "nextStepDescriptions": {
+      "urgentSupport": "Tus señales recientes requieren priorizar apoyo en crisis y revisión clínica inmediata.",
       "severe": "Usa primero apoyo en crisis y luego revisa la orientación médica.",
       "noCheckIn": "Completa tu primer check-in para desbloquear guía más precisa.",
       "observer": "Usa reprogramación para trabajar el último pensamiento que registraste.",
       "exposure": "Abre progreso para ver cómo se está acumulando tu trabajo reciente de exposición.",
+      "medicalSupport": "Abre el módulo de medicación prescrita si ya existe una fórmula documentada por un profesional.",
+      "medication": "Revisa progreso y vuelve a apoyo médico si la fórmula documentada cambia.",
       "regulation": "Revisa progreso o registra qué cambió después de la práctica.",
       "default": "Abre progreso u observer para registrar el siguiente paso útil."
     },
@@ -66,6 +73,78 @@
     },
     "nextMissionTitle": "Tu Próxima Misión Personalizada",
     "nextMissionDescription": "Nuestra IA ha analizado tu actividad reciente para crear un nuevo desafío para ti."
+  },
+  "medicationModule": {
+    "title": "Medicación Prescrita",
+    "description": "Registro estructurado de fórmulas ya prescritas por un profesional, más un catálogo educativo de familias farmacológicas. No formula ni ajusta tratamientos automáticamente.",
+    "disclaimerTitle": "Solo documentación clínica y educación",
+    "disclaimerDescription": "Este módulo no prescribe, no calcula dosis y no reemplaza criterio médico. Registra medicación ya formulada por un profesional y resume efectos esperados, efectos adversos y alertas.",
+    "formTitle": "Registrar fórmula prescrita",
+    "formDescription": "Completa este formato solo con datos indicados por un profesional autorizado.",
+    "educationTitle": "Catálogo educativo por grupo clínico",
+    "educationDescription": "Información general sobre familias de medicamentos usadas con frecuencia. Es educativa, no una indicación de tratamiento.",
+    "historyTitle": "Fórmulas registradas",
+    "historyDescription": "Historial reciente de medicación prescrita documentada para este usuario.",
+    "reportTitle": "Reporte de medicación prescrita",
+    "reportPatientLabel": "Paciente",
+    "reportGeneratedAtLabel": "Fecha de emisión",
+    "reportSummaryTitle": "Resumen",
+    "reportSummaryWithCount": "{count} fórmulas registradas.",
+    "reportSummaryEmpty": "Aún no hay fórmulas registradas.",
+    "reportPatientSignature": "Firma del paciente",
+    "reportProfessionalSignature": "Firma del profesional",
+    "emptyTitle": "Sin fórmulas registradas",
+    "emptyDescription": "Todavía no hay medicación prescrita documentada.",
+    "save": "Guardar fórmula",
+    "saving": "Guardando fórmula...",
+    "saved": "La fórmula quedó guardada correctamente.",
+    "days": "días",
+    "errors": {
+      "session": "No hay una sesión activa o Firestore no está disponible.",
+      "required": "Completa todos los campos obligatorios de la fórmula antes de guardar.",
+      "duration": "La duración debe ser un número de días válido mayor a cero.",
+      "save": "No se pudo guardar la fórmula. Inténtalo de nuevo."
+    },
+    "disorderGroups": {
+      "depression": "Depresión",
+      "anxiety": "Ansiedad / pánico",
+      "bipolar": "Trastorno bipolar",
+      "adhd": "TDAH",
+      "psychosis": "Esquizofrenia / psicosis",
+      "insomnia": "Insomnio / burnout",
+      "eating-disorders": "Trastornos de la conducta alimentaria"
+    },
+    "form": {
+      "disorderGroup": "Grupo clínico",
+      "medicationName": "Medicamento formulado",
+      "medicationClass": "Familia o clase farmacológica",
+      "prescribedDose": "Dosis prescrita",
+      "frequency": "Frecuencia",
+      "durationDays": "Duración",
+      "route": "Vía de administración",
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha de finalización",
+      "prescribedFor": "Indicación o motivo clínico",
+      "expectedEffects": "Efectos esperados",
+      "commonSideEffects": "Efectos adversos frecuentes",
+      "keyAlerts": "Alertas importantes",
+      "notes": "Observaciones",
+      "professionalName": "Nombre del profesional",
+      "professionalLicense": "Registro o matrícula profesional",
+      "doctorSignature": "Firma del profesional",
+      "patientSignature": "Firma del paciente"
+    },
+    "placeholders": {
+      "dose": "Ej: 50 mg",
+      "frequency": "Ej: cada 24 horas"
+    },
+    "education": {
+      "examples": "Ejemplos",
+      "intendedUse": "Uso habitual",
+      "expectedEffects": "Efectos esperados",
+      "commonSideEffects": "Efectos adversos frecuentes",
+      "majorAlerts": "Alertas importantes"
+    }
   },
   "upcoming": {
     "badge": "Próximamente",
@@ -87,6 +166,11 @@
   "languageSwitcher": {
     "english": "Inglés",
     "spanish": "Español"
+  },
+  "userRoles": {
+    "clinic": "Usuario clínica",
+    "professional": "Usuario profesional",
+    "patient": "Usuario paciente"
   },
   "ui": {
     "close": "Cerrar",
@@ -695,6 +779,9 @@
       "activityDescription": "Eventos útiles recientes y cobertura acumulada por módulo."
     },
     "weeklySummary": "{events} eventos útiles en {modules} módulos durante los últimos 7 días.",
+    "realDataChartNeedsMorePoints": "No hay suficientes puntos reales registrados para mostrar este gráfico de forma honesta.",
+    "chartSourceCheckIns": "Fuente: mental_checkups registrados con fechas válidas.",
+    "chartSourceThoughts": "Fuente: thoughtRecords registrados con fechas válidas.",
     "currentSnapshot": "Actual",
     "entryLabel": "Registro",
     "fortitude": "Fortaleza Mental",
@@ -1217,6 +1304,8 @@
   "dailyMission": "Misión Diaria Personalizada",
   "alertTitle": "Alerta Importante",
   "alertText": "Tu respuesta sugiere malestar significativo o posible riesgo emocional. Busca apoyo profesional lo antes posible y contacta a una persona de confianza ahora mismo.",
+  "prioritySupportTitle": "Conviene priorizar apoyo profesional",
+  "prioritySupportText": "Tu registro actual justifica seguimiento profesional oportuno y una revisión clínica prudente.",
   "openCrisisSupport": "Abrir apoyo en crisis",
   "disclaimerTitle": "Orientación",
   "disclaimerText": "Esta herramienta ofrece orientación general basada en síntomas autoinformados. No sustituye un diagnóstico médico, psiquiátrico o psicológico profesional.",
@@ -1323,8 +1412,23 @@
   "guidanceTitle": "Orientación sugerida",
   "guidanceDescription": "El contenido cambia según tu último nivel registrado.",
   "completeCheckInFirst": "Completa primero tu Mental Check-In para desbloquear esta vista clínica.",
+  "openMedicationModule": "Abrir medicación prescrita",
+  "urgentSupportTitle": "Ruta de apoyo urgente",
+  "urgentSupportDescription": "Tus últimos registros sugieren que debes priorizar apoyo en crisis y ayuda profesional inmediata.",
+  "priorityReviewTitle": "Revisión profesional prioritaria",
+  "priorityReviewDescription": "Tus últimos registros justifican seguimiento profesional oportuno, aunque no necesariamente una ruta de crisis inmediata.",
+  "warningSignsTitle": "Señales de alarma para escalar ayuda",
+  "warningSignsDescription": "Busca ayuda profesional urgente o apoyo en crisis si además aparece cualquiera de estas señales clínicas mayores.",
   "severeAlertTitle": "Se requiere apoyo inmediato",
   "severeAlertDescription": "Tu último nivel es severo. Prioriza ayuda profesional y usa apoyo en crisis si hay riesgo o pérdida de control.",
+  "warningSigns": {
+    "items": [
+      "Pensamientos de suicidio, plan de hacerse daño o sensación de no poder mantenerse a salvo.",
+      "Escuchar voces, ideas claramente extrañas o pérdida de contacto con la realidad.",
+      "Varios días con casi nada de sueño junto con energía inusualmente alta, agitación o impulsividad marcada.",
+      "Desmayo, purgas o restricción alimentaria intensa que comprometa la seguridad física."
+    ]
+  },
   "dynamic": {
     "mild": {
       "title": "Recomendaciones básicas",

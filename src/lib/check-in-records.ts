@@ -70,6 +70,9 @@ export async function persistMentalCheckIn({
       latestCheckInLevel: level,
       latestCheckInAt: serverTimestamp(),
       latestCheckInNote: professionalNote,
+      latestCheckInSelfHarmRisk: riskFlags.selfHarmRisk,
+      latestCheckInNeedsProfessionalSupport: riskFlags.needsProfessionalSupport,
+      latestCheckInUrgentSupport: riskFlags.urgentSupportRecommended ?? false,
     },
     { merge: true },
   );

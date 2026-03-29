@@ -13,7 +13,7 @@
     "progress": "Progress",
     "grounding": "Grounding",
     "challenges": "Challenges",
-    "medication": "Medical Support",
+    "medication": "Prescribed Medication",
     "checkIn": "Mental Check-In"
   },
   "dashboard": {
@@ -39,20 +39,27 @@
     "activeModulesCount": "{count} modules with meaningful activity",
     "weeklySummaryTitle": "Weekly summary",
     "weeklySummaryBody": "{events} useful events across {modules} modules this week.",
+    "weeklySummarySource": "Source: registered progressEvents from the last 7 days.",
     "nextStepCardTitle": "Suggested next step",
     "nextStepTitles": {
+      "urgentSupport": "Seek urgent support now",
       "severe": "Stabilize and ask for support now",
       "noCheckIn": "Start with a real check-in",
       "observer": "Convert what you noticed into a new perspective",
       "exposure": "Review what changed after exposure",
+      "medicalSupport": "Document prescribed treatment",
+      "medication": "Follow medication with recorded progress",
       "regulation": "Turn regulation into follow-up",
       "default": "Keep the process moving"
     },
     "nextStepDescriptions": {
+      "urgentSupport": "Your recent signals require prioritizing crisis support and immediate clinical review.",
       "severe": "Use crisis support first and then review medical guidance.",
       "noCheckIn": "Complete your first check-in to unlock more precise guidance.",
       "observer": "Use reprogramming to work on the last thought you registered.",
       "exposure": "Open progress to see how your recent exposure work is accumulating.",
+      "medicalSupport": "Open the prescribed medication module if a clinician already documented a treatment plan.",
+      "medication": "Review progress and return to medical support if the documented prescription changes.",
       "regulation": "Check progress or capture what changed after the practice.",
       "default": "Open progress or observer to record the next useful step."
     },
@@ -67,6 +74,78 @@
     },
     "nextMissionTitle": "Your Next Personalized Mission",
     "nextMissionDescription": "Our AI has analyzed your recent activity to create a new challenge for you."
+  },
+  "medicationModule": {
+    "title": "Prescribed Medication",
+    "description": "Structured documentation of medications already prescribed by a professional, plus an educational catalog of medication families. It does not prescribe or auto-adjust treatment.",
+    "disclaimerTitle": "Documentation and education only",
+    "disclaimerDescription": "This module does not prescribe, calculate doses, or replace medical judgment. It records medication already prescribed by a professional and summarizes expected effects, side effects, and alerts.",
+    "formTitle": "Record prescribed medication",
+    "formDescription": "Complete this form only with information already indicated by an authorized professional.",
+    "educationTitle": "Educational catalog by clinical group",
+    "educationDescription": "General information about medication families commonly used in practice. Educational only, not a treatment recommendation.",
+    "historyTitle": "Recorded prescriptions",
+    "historyDescription": "Recent history of documented prescribed medication for this user.",
+    "reportTitle": "Prescribed medication report",
+    "reportPatientLabel": "Patient",
+    "reportGeneratedAtLabel": "Issued at",
+    "reportSummaryTitle": "Summary",
+    "reportSummaryWithCount": "{count} prescriptions recorded.",
+    "reportSummaryEmpty": "No prescriptions have been recorded yet.",
+    "reportPatientSignature": "Patient signature",
+    "reportProfessionalSignature": "Professional signature",
+    "emptyTitle": "No prescriptions recorded",
+    "emptyDescription": "There is no documented prescribed medication yet.",
+    "save": "Save prescription",
+    "saving": "Saving prescription...",
+    "saved": "The prescription was saved successfully.",
+    "days": "days",
+    "errors": {
+      "session": "There is no active session or Firestore is unavailable.",
+      "required": "Complete every required prescription field before saving.",
+      "duration": "Duration must be a valid number of days greater than zero.",
+      "save": "The prescription could not be saved. Please try again."
+    },
+    "disorderGroups": {
+      "depression": "Depression",
+      "anxiety": "Anxiety / panic",
+      "bipolar": "Bipolar disorder",
+      "adhd": "ADHD",
+      "psychosis": "Schizophrenia / psychosis",
+      "insomnia": "Insomnia / burnout",
+      "eating-disorders": "Eating disorders"
+    },
+    "form": {
+      "disorderGroup": "Clinical group",
+      "medicationName": "Prescribed medication",
+      "medicationClass": "Medication family or class",
+      "prescribedDose": "Prescribed dose",
+      "frequency": "Frequency",
+      "durationDays": "Duration",
+      "route": "Route",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "prescribedFor": "Clinical indication",
+      "expectedEffects": "Expected effects",
+      "commonSideEffects": "Common side effects",
+      "keyAlerts": "Key alerts",
+      "notes": "Notes",
+      "professionalName": "Professional name",
+      "professionalLicense": "Professional license",
+      "doctorSignature": "Professional signature",
+      "patientSignature": "Patient signature"
+    },
+    "placeholders": {
+      "dose": "e.g. 50 mg",
+      "frequency": "e.g. every 24 hours"
+    },
+    "education": {
+      "examples": "Examples",
+      "intendedUse": "Typical use",
+      "expectedEffects": "Expected effects",
+      "commonSideEffects": "Common side effects",
+      "majorAlerts": "Key alerts"
+    }
   },
   "upcoming": {
     "badge": "Coming soon",
@@ -88,6 +167,11 @@
   "languageSwitcher": {
     "english": "English",
     "spanish": "Spanish"
+  },
+  "userRoles": {
+    "clinic": "Clinic user",
+    "professional": "Professional user",
+    "patient": "Patient user"
   },
   "ui": {
     "close": "Close",
@@ -696,6 +780,9 @@
       "activityDescription": "Recent useful events and cumulative coverage by module."
     },
     "weeklySummary": "{events} useful events across {modules} modules in the last 7 days.",
+    "realDataChartNeedsMorePoints": "There are not enough real recorded points to show this chart honestly.",
+    "chartSourceCheckIns": "Source: registered mental_checkups with valid dates.",
+    "chartSourceThoughts": "Source: registered thoughtRecords with valid dates.",
     "currentSnapshot": "Current",
     "entryLabel": "Entry",
     "fortitude": "Mental Fortitude",
@@ -1185,6 +1272,8 @@
     "dailyMission": "Personalized Daily Mission",
     "alertTitle": "Important Alert",
     "alertText": "Your response suggests significant discomfort or possible emotional risk. Seek professional support as soon as possible and contact a trusted person right now.",
+    "prioritySupportTitle": "Professional support should be prioritized",
+    "prioritySupportText": "Your current record justifies timely professional follow-up and prudent clinical review.",
     "openCrisisSupport": "Open crisis support",
     "disclaimerTitle": "Guideline",
     "disclaimerText": "This tool provides general guidance based on self-reported symptoms. It does not substitute for a professional medical, psychiatric, or psychological diagnosis.",
@@ -1323,8 +1412,23 @@
     "guidanceTitle": "Suggested guidance",
     "guidanceDescription": "Content changes based on your latest recorded level.",
     "completeCheckInFirst": "Complete your Mental Check-In first to unlock this clinical view.",
+    "openMedicationModule": "Open prescribed medication",
+    "urgentSupportTitle": "Urgent support path",
+    "urgentSupportDescription": "Your latest records suggest you should prioritize crisis support and immediate professional help.",
+    "priorityReviewTitle": "Priority professional review",
+    "priorityReviewDescription": "Your latest records justify timely professional follow-up, even if they do not necessarily indicate an immediate crisis route.",
+    "warningSignsTitle": "Warning signs that should escalate help",
+    "warningSignsDescription": "Seek urgent professional help or crisis support if any of these major clinical warning signs are also present.",
     "severeAlertTitle": "Immediate support is required",
     "severeAlertDescription": "Your latest level is severe. Prioritize professional help and use crisis support if there is risk or loss of control.",
+    "warningSigns": {
+      "items": [
+        "Suicidal thoughts, a self-harm plan, or feeling unable to stay safe.",
+        "Hearing voices, clearly unusual beliefs, or losing contact with reality.",
+        "Several days of almost no sleep together with unusually high energy, agitation, or marked impulsivity.",
+        "Fainting, purging, or severe food restriction that puts physical safety at risk."
+      ]
+    },
     "dynamic": {
       "mild": {
         "title": "Basic recommendations",

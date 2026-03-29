@@ -5,6 +5,7 @@ export type ProgressModuleKey =
   | 'observer'
   | 'exposure'
   | 'medical-support'
+  | 'medication'
   | 'grounding'
   | 'regulation'
   | 'reprogram'

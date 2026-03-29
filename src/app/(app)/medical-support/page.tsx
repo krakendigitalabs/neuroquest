@@ -36,10 +36,17 @@ export default function MedicalSupportPage() {
   const hasLatestCheckIn = !!latestDate;
   const latestLevel = hasLatestCheckIn ? (userProfile?.latestCheckInLevel ?? null) : null;
   const latestScore = hasLatestCheckIn ? (userProfile?.latestCheckInScore ?? null) : null;
+  const urgentSupportRecommended = hasLatestCheckIn
+    ? (userProfile?.latestCheckInUrgentSupport ?? latestLevel === 'severe')
+    : false;
+  const needsProfessionalSupport = hasLatestCheckIn
+    ? (userProfile?.latestCheckInNeedsProfessionalSupport ?? (latestLevel === 'moderate' || latestLevel === 'severe'))
+    : false;
 
   const currentItems = latestLevel
     ? Array.from({ length: 3 }, (_, index) => t(`medical.dynamic.${latestLevel}.items.${index}`))
     : [];
+  const urgentWarningSigns = Array.from({ length: 4 }, (_, index) => t(`medical.warningSigns.items.${index}`));
   const generatedAt = toDate(new Date());
   const reportPatient = userProfile?.displayName || user?.displayName || user?.email || t('sidebar.guestUser');
   const reportClinicalSummary = latestLevel
@@ -158,23 +165,28 @@ export default function MedicalSupportPage() {
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
-                <Button type="button" variant="outline" onClick={handleReviewGuidance}>
-                  {t('medical.reviewGuidanceAction')}
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" variant="outline" onClick={handleReviewGuidance}>
+                    {t('medical.reviewGuidanceAction')}
+                  </Button>
+                  <Button asChild variant="secondary">
+                    <Link href="/medication">{t('medical.openMedicationModule')}</Link>
+                  </Button>
+                </div>
               </>
             )}
           </CardContent>
         </Card>
       </div>
 
-      {latestLevel === 'severe' ? (
+      {urgentSupportRecommended ? (
         <Card className="border-destructive/40 bg-destructive/5">
           <CardHeader>
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-destructive" />
-              <CardTitle>{t('medical.severeAlertTitle')}</CardTitle>
+              <CardTitle>{t('medical.urgentSupportTitle')}</CardTitle>
             </div>
-            <CardDescription>{t('medical.severeAlertDescription')}</CardDescription>
+            <CardDescription>{t('medical.urgentSupportDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild variant="destructive">
@@ -182,7 +194,34 @@ export default function MedicalSupportPage() {
             </Button>
           </CardContent>
         </Card>
+      ) : needsProfessionalSupport ? (
+        <Card className="border-amber-400 bg-amber-50">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-700" />
+              <CardTitle>{t('medical.priorityReviewTitle')}</CardTitle>
+            </div>
+            <CardDescription>{t('medical.priorityReviewDescription')}</CardDescription>
+          </CardHeader>
+        </Card>
       ) : null}
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-primary" />
+            <CardTitle>{t('medical.warningSignsTitle')}</CardTitle>
+          </div>
+          <CardDescription>{t('medical.warningSignsDescription')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            {urgentWarningSigns.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

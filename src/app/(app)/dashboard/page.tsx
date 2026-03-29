@@ -63,6 +63,10 @@ export default function DashboardPage() {
     () => (activityEvents ?? []).filter((event) => event.type !== 'opened'),
     [activityEvents]
   );
+  const latestDatedActivity = useMemo(
+    () => meaningfulActivityEvents.find((event) => !!toDate(event.createdAt)) ?? null,
+    [meaningfulActivityEvents]
+  );
   const weeklyActivityEvents = useMemo(() => {
     const now = new Date();
     const sevenDaysAgo = new Date(now);
@@ -81,7 +85,7 @@ export default function DashboardPage() {
     () => new Set(weeklyActivityEvents.map((event) => event.module)).size,
     [weeklyActivityEvents]
   );
-  const latestActivity = meaningfulActivityEvents[0] ?? null;
+  const latestActivity = latestDatedActivity;
   const summaryText = useMemo(() => {
     if (!hasLatestCheckIn) {
       return t('dashboard.summaryNoCheckIn');
@@ -104,6 +108,8 @@ export default function DashboardPage() {
         return t('nav.exposure');
       case 'medical-support':
         return t('medical.title');
+      case 'medication':
+        return t('nav.medication');
       case 'grounding':
         return t('nav.grounding');
       case 'regulation':
@@ -131,10 +137,10 @@ export default function DashboardPage() {
   };
 
   const nextStep = useMemo(() => {
-    if (userProfile?.latestCheckInLevel === 'severe') {
+    if (userProfile?.latestCheckInUrgentSupport) {
       return {
-        title: t('dashboard.nextStepTitles.severe'),
-        description: t('dashboard.nextStepDescriptions.severe'),
+        title: t('dashboard.nextStepTitles.urgentSupport'),
+        description: t('dashboard.nextStepDescriptions.urgentSupport'),
         primaryHref: '/crisis',
         primaryLabel: t('sidebar.crisisSupport'),
         secondaryHref: '/medical-support',
@@ -172,6 +178,24 @@ export default function DashboardPage() {
           secondaryHref: '/exposure',
           secondaryLabel: t('nav.exposure'),
         };
+      case 'medical-support':
+        return {
+          title: t('dashboard.nextStepTitles.medicalSupport'),
+          description: t('dashboard.nextStepDescriptions.medicalSupport'),
+          primaryHref: '/medication',
+          primaryLabel: t('nav.medication'),
+          secondaryHref: '/progress',
+          secondaryLabel: t('nav.progress'),
+        };
+      case 'medication':
+        return {
+          title: t('dashboard.nextStepTitles.medication'),
+          description: t('dashboard.nextStepDescriptions.medication'),
+          primaryHref: '/progress',
+          primaryLabel: t('nav.progress'),
+          secondaryHref: '/medical-support',
+          secondaryLabel: t('medical.title'),
+        };
       case 'grounding':
       case 'regulation':
         return {
@@ -192,7 +216,7 @@ export default function DashboardPage() {
           secondaryLabel: t('nav.observer'),
         };
     }
-  }, [hasLatestCheckIn, latestActivity?.module, t, userProfile?.latestCheckInLevel]);
+  }, [hasLatestCheckIn, latestActivity?.module, t, userProfile?.latestCheckInLevel, userProfile?.latestCheckInUrgentSupport]);
 
   const stats = [
     { title: t('dashboard.xpEarned'), value: isLoading ? '...' : xpEarned.toLocaleString(locale), icon: <Award className="h-6 w-6 text-primary" /> },
@@ -327,6 +351,7 @@ export default function DashboardPage() {
                         modules: weeklyActiveModuleCount,
                       })}
                 </p>
+                <p className="mt-2 text-xs text-muted-foreground">{t('dashboard.weeklySummarySource')}</p>
               </div>
             </div>
             <div className="rounded-lg border p-4">

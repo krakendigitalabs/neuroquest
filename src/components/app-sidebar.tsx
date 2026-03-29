@@ -19,6 +19,7 @@ import {
   Eye,
   HeartPulse,
   Apple,
+  Pill,
   Route,
   BarChart3,
   LogOut,
@@ -68,6 +69,7 @@ export function AppSidebar() {
     { href: '/reprogram', icon: <Brain />, label: t('nav.reprogram') },
     { href: '/regulation', icon: <HeartPulse />, label: t('nav.regulation') },
     { href: '/wellness', icon: <Apple />, label: t('nav.wellness') },
+    { href: '/medication', icon: <Pill />, label: t('nav.medication') },
     { href: '/grounding', icon: <Zap />, label: t('nav.grounding') },
     { href: '/progress', icon: <BarChart3 />, label: t('nav.progress') },
   ];
@@ -91,7 +93,7 @@ export function AppSidebar() {
               <p className="truncate text-[11px] text-muted-foreground sm:text-xs">
                 {isProfileLoading
                   ? '...'
-                  : t('userProgress.level', { level: userProfile?.level ?? 1 })}
+                  : `${t(`userRoles.${userProfile?.userRole ?? 'patient'}`)} · ${t('userProgress.level', { level: userProfile?.level ?? 1 })}`}
               </p>
             </div>
           </div>

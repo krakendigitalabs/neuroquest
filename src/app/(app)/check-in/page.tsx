@@ -9,6 +9,7 @@ import { useTranslation } from '@/context/language-provider';
 import { useFirebase } from '@/firebase';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { calculateMentalCheckInScore, CHECK_IN_MAX_SCORE, getMentalCheckInLevel, type MentalCheckInLevel } from '@/lib/mental-check-in';
+import { deriveRiskFlags } from '@/lib/clinical-triage';
 import type { CheckupAnswer, Recommendations, RiskFlags } from '@/models/mental-checkup';
 import { persistMentalCheckIn } from '@/lib/check-in-records';
 import { PatientReportActions } from '@/components/patient-report-actions';
@@ -64,6 +65,7 @@ export default function CheckInPage() {
     severity: MentalCheckInLevel;
     mission: MissionResult;
     note: string;
+    riskFlags: RiskFlags;
     generatedAt: Date;
   } | null>(null);
 
@@ -120,10 +122,17 @@ export default function CheckInPage() {
     };
   }, [computedSeverity, currentMission, t]);
 
-  const riskFlags = useMemo<RiskFlags>(() => ({
-    selfHarmRisk: (answers[10] ?? 0) >= 3,
-    needsProfessionalSupport: computedSeverity === 'severe',
-  }), [answers, computedSeverity]);
+  const riskFlags = useMemo<RiskFlags>(() => {
+    if (!computedSeverity) {
+      return {
+        selfHarmRisk: false,
+        needsProfessionalSupport: false,
+        urgentSupportRecommended: false,
+      };
+    }
+
+    return deriveRiskFlags(draftAnswers, computedSeverity);
+  }, [computedSeverity, draftAnswers]);
 
   const handleAnswerChange = (questionId: number, value: number) => {
     setAnswers((current) => ({ ...current, [questionId]: value }));
@@ -176,6 +185,7 @@ export default function CheckInPage() {
         severity: computedSeverity,
         mission: currentMission,
         note: professionalNote,
+        riskFlags,
         generatedAt: new Date(),
       });
     } catch (submitError) {
@@ -366,13 +376,23 @@ export default function CheckInPage() {
               <p className="mt-2 text-muted-foreground">{result.note}</p>
             </div>
 
-            {result.severity === 'severe' ? (
+            {result.riskFlags.urgentSupportRecommended ? (
               <div className="rounded-lg border border-red-400 bg-red-50 p-4">
                 <p className="font-semibold text-red-700">{t('checkIn.alertTitle')}</p>
                 <p className="mt-1 text-red-700">{t('checkIn.alertText')}</p>
                 <div className="mt-4">
                   <Button asChild variant="destructive">
                     <Link href="/crisis">{t('checkIn.openCrisisSupport')}</Link>
+                  </Button>
+                </div>
+              </div>
+            ) : result.riskFlags.needsProfessionalSupport ? (
+              <div className="rounded-lg border border-amber-400 bg-amber-50 p-4">
+                <p className="font-semibold text-amber-800">{t('checkIn.prioritySupportTitle')}</p>
+                <p className="mt-1 text-amber-800">{t('checkIn.prioritySupportText')}</p>
+                <div className="mt-4">
+                  <Button asChild variant="outline">
+                    <Link href="/medical-support">{t('therapist.openMedicalSupport')}</Link>
                   </Button>
                 </div>
               </div>

@@ -29,6 +29,7 @@ function UserProfileInitializer({ user }: { user: User }) {
           email: user.email || '',
           displayName: user.isAnonymous ? t('sidebar.guestUser') : (user.displayName || t('sidebar.anonymousUser')),
           photoURL: user.photoURL || '',
+          userRole: user.email === 'krakendigitalabs@gmail.com' ? 'clinic' : 'patient',
           level: 1,
           currentXp: 0,
           xpToNextLevel: 100,

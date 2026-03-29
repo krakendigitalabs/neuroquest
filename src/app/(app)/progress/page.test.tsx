@@ -79,10 +79,14 @@ vi.mock('@/context/language-provider', () => ({
       if (key === 'progress.sections.activityTitle') return 'Recent activity';
       if (key === 'progress.sections.activityDescription') return 'Recent useful events and cumulative coverage by module.';
       if (key === 'progress.weeklySummary') return `${values?.events ?? 0} useful events across ${values?.modules ?? 0} modules in the last 7 days.`;
+      if (key === 'progress.realDataChartNeedsMorePoints') return 'Not enough real recorded points to render this chart honestly.';
+      if (key === 'progress.chartSourceCheckIns') return 'Source: registered mental_checkups with valid dates.';
+      if (key === 'progress.chartSourceThoughts') return 'Source: registered thoughtRecords with valid dates.';
       if (key === 'progress.noCheckInsYet') return 'No saved check-ins yet.';
       if (key === 'progress.unknownDate') return 'Date unavailable';
       if (key === 'progress.checkInScore') return 'Check-In Score';
       if (key === 'progress.entryLabel') return 'Entry';
+      if (key === 'nav.medication') return 'Prescribed Medication';
       if (key === 'checkIn.results.mild.category') return 'Mild Level';
       if (key === 'checkIn.results.moderate.category') return 'Moderate Level';
       if (key.startsWith('progress.trendStates.')) return key.split('.').at(-1) ?? key;
@@ -147,6 +151,7 @@ describe('ProgressPage', () => {
     expect(screen.getByRole('button', { name: 'Print / PDF' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Send by WhatsApp' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Send by email' })).toBeInTheDocument();
+    expect(screen.getByText('Source: registered mental_checkups with valid dates.')).toBeInTheDocument();
   });
 
   it('keeps opened events out of progress totals while still showing them as engagement', () => {
@@ -199,5 +204,77 @@ describe('ProgressPage', () => {
     expect(screen.getByText('Box Breathing')).toBeInTheDocument();
     expect(screen.getByText('2 useful events across 2 modules in the last 7 days.')).toBeInTheDocument();
     expect(screen.queryByText('Module opened')).not.toBeInTheDocument();
+  });
+
+  it('shows prescribed medication activity as meaningful module activity', () => {
+    useFirebaseMock.mockReturnValue({
+      firestore: {},
+      user: { uid: 'user-1', displayName: 'Pat Doe', email: 'pat@example.com' },
+    });
+    useUserProfileMock.mockReturnValue({
+      userProfile: { displayName: 'Pat Doe' },
+    });
+    useCollectionMock
+      .mockReturnValueOnce({ data: [] })
+      .mockReturnValueOnce({ data: [] })
+      .mockReturnValueOnce({ data: [] })
+      .mockReturnValueOnce({
+        data: [
+          {
+            id: 'event-1',
+            userId: 'user-1',
+            module: 'medication',
+            type: 'saved',
+            detail: 'sertraline · 50 mg · every 24 hours',
+            createdAt: '2026-03-28T09:00:00.000Z',
+          },
+        ],
+      });
+
+    render(<ProgressPage />);
+
+    expect(screen.getAllByText('Prescribed Medication').length).toBeGreaterThan(0);
+    expect(screen.getByText('sertraline · 50 mg · every 24 hours')).toBeInTheDocument();
+  });
+
+  it('does not render charts with a single real point', () => {
+    useFirebaseMock.mockReturnValue({
+      firestore: {},
+      user: { uid: 'user-1', displayName: 'Pat Doe', email: 'pat@example.com' },
+    });
+    useUserProfileMock.mockReturnValue({
+      userProfile: { displayName: 'Pat Doe' },
+    });
+    useCollectionMock
+      .mockReturnValueOnce({
+        data: [
+          {
+            id: 'check-1',
+            createdAt: '2026-03-26T10:00:00.000Z',
+            score: 18,
+            maxScore: 40,
+            level: 'moderate',
+            resultTitle: 'Moderate',
+          },
+        ],
+      })
+      .mockReturnValueOnce({
+        data: [
+          {
+            id: 'thought-1',
+            recordedAt: '2026-03-26T10:00:00.000Z',
+            thoughtText: 'Test thought',
+            intensity: 6,
+            associatedEmotion: 'anxious',
+          },
+        ],
+      })
+      .mockReturnValueOnce({ data: [] })
+      .mockReturnValueOnce({ data: [] });
+
+    render(<ProgressPage />);
+
+    expect(screen.getAllByText('Not enough real recorded points to render this chart honestly.').length).toBeGreaterThan(0);
+    expect(screen.getByText('Source: registered thoughtRecords with valid dates.')).toBeInTheDocument();
   });
 });
