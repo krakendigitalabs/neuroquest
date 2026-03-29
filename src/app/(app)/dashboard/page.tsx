@@ -2,14 +2,15 @@
 
 import { useMemo } from 'react';
 import Link from 'next/link';
-import { Award, ShieldAlert, Star, Target } from 'lucide-react';
+import { Activity, Award, ShieldAlert, Star, Target } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { PersonalizedMissionGenerator } from './_components/personalized-mission-generator';
 import { useTranslation } from '@/context/language-provider';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { collection, limit, orderBy, query } from 'firebase/firestore';
 import type { ExposureMission } from '@/models/exposure-mission';
+import type { ProgressEvent, ProgressModuleKey } from '@/models/progress-event';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CHECK_IN_MAX_SCORE } from '@/lib/mental-check-in';
@@ -35,9 +36,22 @@ export default function DashboardPage() {
 
   const missionsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    return collection(firestore, 'users', user.uid, 'exposureMissions');
+    return query(
+      collection(firestore, 'users', user.uid, 'exposureMissions'),
+      orderBy('createdAt', 'desc'),
+      limit(20)
+    );
   }, [firestore, user]);
   const { data: missions, isLoading: areMissionsLoading } = useCollection<ExposureMission>(missionsQuery);
+  const activityQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(
+      collection(firestore, 'users', user.uid, 'progressEvents'),
+      orderBy('createdAt', 'desc'),
+      limit(8)
+    );
+  }, [firestore, user]);
+  const { data: activityEvents, isLoading: isActivityLoading } = useCollection<ProgressEvent>(activityQuery);
 
   const xpEarned = userProfile?.currentXp ?? 0;
   const level = userProfile?.level ?? 1;
@@ -45,6 +59,15 @@ export default function DashboardPage() {
   const latestCheckInScore = hasLatestCheckIn ? (userProfile?.latestCheckInScore ?? null) : null;
   const activeMission = useMemo(() => getLatestActiveMission(missions), [missions]);
   const latestCheckInDate = toDate(userProfile?.latestCheckInAt);
+  const meaningfulActivityEvents = useMemo(
+    () => (activityEvents ?? []).filter((event) => event.type !== 'opened'),
+    [activityEvents]
+  );
+  const activeModuleCount = useMemo(
+    () => new Set(meaningfulActivityEvents.map((event) => event.module)).size,
+    [meaningfulActivityEvents]
+  );
+  const latestActivity = meaningfulActivityEvents[0] ?? null;
   const summaryText = useMemo(() => {
     if (!hasLatestCheckIn) {
       return t('dashboard.summaryNoCheckIn');
@@ -55,7 +78,43 @@ export default function DashboardPage() {
     return note || t(`dashboard.summaryBySeverity.${severityKey}`);
   }, [hasLatestCheckIn, t, userProfile?.latestCheckInLevel, userProfile?.latestCheckInNote]);
 
-  const isLoading = isProfileLoading || areMissionsLoading;
+  const isLoading = isProfileLoading || areMissionsLoading || isActivityLoading;
+
+  const moduleLabel = (module: ProgressModuleKey) => {
+    switch (module) {
+      case 'check-in':
+        return t('nav.checkIn');
+      case 'observer':
+        return t('nav.observer');
+      case 'exposure':
+        return t('nav.exposure');
+      case 'medical-support':
+        return t('medical.title');
+      case 'grounding':
+        return t('nav.grounding');
+      case 'regulation':
+        return t('nav.regulation');
+      case 'reprogram':
+        return t('nav.reprogram');
+      case 'wellness':
+        return t('nav.wellness');
+      default:
+        return module;
+    }
+  };
+
+  const activityLabel = (event: ProgressEvent) => {
+    switch (event.type) {
+      case 'saved':
+        return t('progress.activityTypes.saved');
+      case 'created':
+        return t('progress.activityTypes.created');
+      case 'completed':
+        return t('progress.activityTypes.completed');
+      default:
+        return event.type;
+    }
+  };
 
   const stats = [
     { title: t('dashboard.xpEarned'), value: isLoading ? '...' : xpEarned.toLocaleString(locale), icon: <Award className="h-6 w-6 text-primary" /> },
@@ -100,7 +159,7 @@ export default function DashboardPage() {
             <CardTitle>{t('dashboard.overviewTitle')}</CardTitle>
             <CardDescription>{t('dashboard.overviewDescription')}</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
+          <CardContent className="grid gap-4 md:grid-cols-3">
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">{t('dashboard.activeMissionTitle')}</p>
               <p className="mt-2 text-lg font-semibold">
@@ -152,6 +211,34 @@ export default function DashboardPage() {
                   </div>
                 </div>
               )}
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="flex items-center gap-2">
+                <Activity className="h-4 w-4 text-primary" />
+                <p className="text-sm text-muted-foreground">{t('dashboard.recentActivityTitle')}</p>
+              </div>
+              <p className="mt-2 text-lg font-semibold">
+                {isLoading
+                  ? '...'
+                  : latestActivity
+                    ? moduleLabel(latestActivity.module)
+                    : t('dashboard.noRecentActivity')}
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {isLoading
+                  ? '...'
+                  : latestActivity
+                    ? `${activityLabel(latestActivity)}${latestActivity.detail ? ` · ${latestActivity.detail}` : ''}`
+                    : t('dashboard.recentActivityHint')}
+              </p>
+              <div className="mt-3 flex items-center gap-2">
+                <Badge variant="outline">
+                  {isLoading ? '...' : t('dashboard.activeModulesCount', { count: activeModuleCount })}
+                </Badge>
+                <Button asChild variant="ghost" size="sm" className="px-2">
+                  <Link href="/progress">{t('nav.progress')}</Link>
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

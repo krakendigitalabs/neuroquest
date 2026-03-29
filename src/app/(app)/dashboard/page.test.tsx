@@ -57,6 +57,9 @@ vi.mock('@/context/language-provider', () => ({
 
 vi.mock('firebase/firestore', () => ({
   collection: (_firestore: unknown, ...segments: string[]) => ({ path: segments.join('/') }),
+  orderBy: (field: string, direction: string) => ({ field, direction }),
+  limit: (value: number) => ({ value }),
+  query: (target: unknown) => target,
 }));
 
 describe('DashboardPage severe flow', () => {
