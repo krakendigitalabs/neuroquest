@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { Activity, LineChart, ShieldAlert, TrendingDown, TrendingUp } from 'lucide-react';
 import { CartesianGrid, ComposedChart, Line, XAxis, YAxis } from 'recharts';
-import { collection } from 'firebase/firestore';
+import { collection, limit, orderBy, query } from 'firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
@@ -46,23 +46,39 @@ export default function ProgressPage() {
 
   const checkupsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    return collection(firestore, 'users', user.uid, 'mental_checkups');
+    return query(
+      collection(firestore, 'users', user.uid, 'mental_checkups'),
+      orderBy('createdAt', 'desc'),
+      limit(50)
+    );
   }, [firestore, user]);
 
   const { data: checkups } = useCollection<MentalCheckup>(checkupsQuery);
   const thoughtsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    return collection(firestore, 'users', user.uid, 'thoughtRecords');
+    return query(
+      collection(firestore, 'users', user.uid, 'thoughtRecords'),
+      orderBy('recordedAt', 'desc'),
+      limit(30)
+    );
   }, [firestore, user]);
   const { data: thoughtHistory } = useCollection<ThoughtRecord>(thoughtsQuery);
   const missionsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    return collection(firestore, 'users', user.uid, 'exposureMissions');
+    return query(
+      collection(firestore, 'users', user.uid, 'exposureMissions'),
+      orderBy('createdAt', 'desc'),
+      limit(30)
+    );
   }, [firestore, user]);
   const { data: missions } = useCollection<ExposureMission>(missionsQuery);
   const activityQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    return collection(firestore, 'users', user.uid, 'progressEvents');
+    return query(
+      collection(firestore, 'users', user.uid, 'progressEvents'),
+      orderBy('createdAt', 'desc'),
+      limit(50)
+    );
   }, [firestore, user]);
   const { data: activityEvents } = useCollection<ProgressEvent>(activityQuery);
 
@@ -174,13 +190,13 @@ export default function ProgressPage() {
   const activityLabel = (event: ProgressEvent) => {
     switch (event.type) {
       case 'saved':
-        return locale === 'es' ? 'Registro guardado' : 'Saved entry';
+        return t('progress.activityTypes.saved');
       case 'created':
-        return locale === 'es' ? 'Creado' : 'Created';
+        return t('progress.activityTypes.created');
       case 'completed':
-        return locale === 'es' ? 'Completado' : 'Completed';
+        return t('progress.activityTypes.completed');
       case 'opened':
-        return locale === 'es' ? 'Módulo usado' : 'Module opened';
+        return t('progress.activityTypes.opened');
       default:
         return event.type;
     }
@@ -248,23 +264,23 @@ export default function ProgressPage() {
           : [t('progress.noMissionsYet')],
       },
       {
-        title: locale === 'es' ? 'Actividad por módulos' : 'Module activity',
+        title: t('progress.moduleActivityTitle'),
         lines: meaningfulActivityEvents.length
           ? meaningfulActivityEvents.slice(0, 8).map((event) => {
               const eventDate = toDate(event.createdAt)?.toLocaleString(locale) ?? t('progress.unknownDate');
               const detail = event.detail ? ` · ${event.detail}` : '';
               return `${eventDate} · ${moduleLabel(event.module)} · ${activityLabel(event)}${detail}`;
             })
-          : [locale === 'es' ? 'Aún no hay actividad relevante registrada.' : 'No meaningful activity has been recorded yet.'],
+          : [t('progress.noMeaningfulActivityYet')],
       },
       {
-        title: locale === 'es' ? 'Accesos a módulos' : 'Module opens',
+        title: t('progress.moduleOpensTitle'),
         lines: engagementEvents.length
           ? engagementEvents.slice(0, 8).map((event) => {
               const eventDate = toDate(event.createdAt)?.toLocaleString(locale) ?? t('progress.unknownDate');
               return `${eventDate} · ${moduleLabel(event.module)} · ${activityLabel(event)}`;
             })
-          : [locale === 'es' ? 'Aún no hay accesos registrados.' : 'No module opens have been recorded yet.'],
+          : [t('progress.noModuleOpensYet')],
       },
     ],
     patientSignatureLabel: t('progress.reportPatientSignature'),
@@ -352,50 +368,32 @@ export default function ProgressPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {locale === 'es' ? 'Módulos activos' : 'Active modules'}
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">{t('progress.activeModulesTitle')}</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{activeModuleCount.toLocaleString(locale)}</div>
-            <p className="text-xs text-muted-foreground">
-              {locale === 'es'
-                ? 'Módulos con acciones reales registradas.'
-                : 'Modules with recorded meaningful actions.'}
-            </p>
+            <p className="text-xs text-muted-foreground">{t('progress.activeModulesDescription')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {locale === 'es' ? 'Actividad registrada' : 'Recorded activity'}
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">{t('progress.recordedActivityTitle')}</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{recentActivityCount.toLocaleString(locale)}</div>
-            <p className="text-xs text-muted-foreground">
-              {locale === 'es'
-                ? 'Eventos de guardado, creación o finalización.'
-                : 'Saved, created, or completed events.'}
-            </p>
+            <p className="text-xs text-muted-foreground">{t('progress.recordedActivityDescription')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {locale === 'es' ? 'Accesos a módulos' : 'Module opens'}
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">{t('progress.moduleOpensTitle')}</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{moduleOpenCount.toLocaleString(locale)}</div>
-            <p className="text-xs text-muted-foreground">
-              {locale === 'es'
-                ? 'Se muestra aparte para no inflar el progreso.'
-                : 'Tracked separately so progress is not inflated.'}
-            </p>
+            <p className="text-xs text-muted-foreground">{t('progress.moduleOpensDescription')}</p>
           </CardContent>
         </Card>
       </div>
@@ -459,18 +457,12 @@ export default function ProgressPage() {
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>{locale === 'es' ? 'Actividad reciente de módulos' : 'Recent module activity'}</CardTitle>
-            <CardDescription>
-              {locale === 'es'
-                ? 'Se actualiza en tiempo real cuando un módulo guarda o registra uso.'
-                : 'Updates in real time when a module saves data or logs usage.'}
-            </CardDescription>
+            <CardTitle>{t('progress.recentModuleActivityTitle')}</CardTitle>
+            <CardDescription>{t('progress.recentModuleActivityDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             {meaningfulActivityEvents.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                {locale === 'es' ? 'Aún no hay actividad relevante registrada.' : 'No meaningful activity has been recorded yet.'}
-              </p>
+              <p className="text-sm text-muted-foreground">{t('progress.noMeaningfulActivityYet')}</p>
             ) : (
               meaningfulActivityEvents.slice(0, 8).map((event) => (
                 <div key={event.id} className="rounded-lg border p-3">
@@ -490,18 +482,12 @@ export default function ProgressPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>{locale === 'es' ? 'Cobertura por módulo' : 'Module coverage'}</CardTitle>
-            <CardDescription>
-              {locale === 'es'
-                ? 'Resumen acumulado de actividad relevante por módulo.'
-                : 'Cumulative summary of meaningful activity by module.'}
-            </CardDescription>
+            <CardTitle>{t('progress.moduleCoverageTitle')}</CardTitle>
+            <CardDescription>{t('progress.moduleCoverageDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             {Object.keys(moduleCounts).length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                {locale === 'es' ? 'Aún no hay actividad relevante registrada.' : 'No meaningful activity has been recorded yet.'}
-              </p>
+              <p className="text-sm text-muted-foreground">{t('progress.noMeaningfulActivityYet')}</p>
             ) : (
               (Object.entries(moduleCounts) as Array<[ProgressModuleKey, number]>)
                 .sort((a, b) => b[1] - a[1])

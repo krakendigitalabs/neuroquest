@@ -5,6 +5,9 @@ import ProgressPage from './page';
 
 vi.mock('firebase/firestore', () => ({
   collection: (_firestore: unknown, ...segments: string[]) => ({ path: segments.join('/') }),
+  orderBy: (field: string, direction: string) => ({ field, direction }),
+  limit: (value: number) => ({ value }),
+  query: (target: unknown) => target,
 }));
 
 const useFirebaseMock = vi.fn();
@@ -52,6 +55,23 @@ vi.mock('@/context/language-provider', () => ({
       if (key === 'progress.reportRecentHistoryTitle') return 'Recent history';
       if (key === 'progress.reportPatientSignature') return 'Patient signature';
       if (key === 'progress.reportTherapistSignature') return 'Therapist signature';
+      if (key === 'progress.activeModulesTitle') return 'Active modules';
+      if (key === 'progress.activeModulesDescription') return 'Modules with recorded meaningful actions.';
+      if (key === 'progress.recordedActivityTitle') return 'Recorded activity';
+      if (key === 'progress.recordedActivityDescription') return 'Saved, created, or completed events.';
+      if (key === 'progress.moduleOpensTitle') return 'Module opens';
+      if (key === 'progress.moduleOpensDescription') return 'Tracked separately so progress is not inflated.';
+      if (key === 'progress.recentModuleActivityTitle') return 'Recent module activity';
+      if (key === 'progress.recentModuleActivityDescription') return 'Updates in real time when a module saves data or logs usage.';
+      if (key === 'progress.moduleCoverageTitle') return 'Module coverage';
+      if (key === 'progress.moduleCoverageDescription') return 'Cumulative summary of meaningful activity by module.';
+      if (key === 'progress.moduleActivityTitle') return 'Module activity';
+      if (key === 'progress.noMeaningfulActivityYet') return 'No meaningful activity has been recorded yet.';
+      if (key === 'progress.noModuleOpensYet') return 'No module opens have been recorded yet.';
+      if (key === 'progress.activityTypes.saved') return 'Saved entry';
+      if (key === 'progress.activityTypes.created') return 'Created';
+      if (key === 'progress.activityTypes.completed') return 'Completed';
+      if (key === 'progress.activityTypes.opened') return 'Module opened';
       if (key === 'progress.noCheckInsYet') return 'No saved check-ins yet.';
       if (key === 'progress.unknownDate') return 'Date unavailable';
       if (key === 'progress.checkInScore') return 'Check-In Score';
