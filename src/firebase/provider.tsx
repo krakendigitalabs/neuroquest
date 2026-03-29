@@ -3,7 +3,7 @@
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useRef, useState, useEffect } from 'react';
 import { FirebaseApp } from 'firebase/app';
 import { Firestore } from 'firebase/firestore';
-import { Auth, User, onAuthStateChanged, onIdTokenChanged } from 'firebase/auth';
+import { Auth, User, onAuthStateChanged, onIdTokenChanged, signOut } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
 
 interface FirebaseProviderProps {
@@ -62,6 +62,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   auth,
 }) => {
   const lastSyncedTokenRef = useRef<string | null>(null);
+  const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
   const [userAuthState, setUserAuthState] = useState<UserAuthState>({
     user: null,
     isUserLoading: true, // Start loading until first auth event
@@ -93,34 +94,61 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   useEffect(() => {
     if (!auth) return;
 
-    const unsubscribe = onIdTokenChanged(auth, async (firebaseUser) => {
+    async function syncSession(method: 'POST' | 'DELETE', token?: string) {
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 10000);
+
       try {
-        if (!firebaseUser) {
-          lastSyncedTokenRef.current = null;
-          await fetch('/api/auth/session', {
-            method: 'DELETE',
-            credentials: 'include',
-          });
-          return;
+        const response = await fetch('/api/auth/session', {
+          method,
+          credentials: 'include',
+          headers: token ? { 'Content-Type': 'application/json' } : undefined,
+          body: token ? JSON.stringify({ token }) : undefined,
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error(`session-sync-failed:${response.status}`);
         }
+      } finally {
+        window.clearTimeout(timeout);
+      }
+    }
+
+    const unsubscribe = onIdTokenChanged(auth, async (firebaseUser) => {
+      if (!firebaseUser) {
+        lastSyncedTokenRef.current = null;
+        setIsSessionLoading(false);
+
+        void syncSession('DELETE').catch((error) => {
+          console.error('FirebaseProvider: failed to clear auth session', error);
+        });
+        return;
+      }
+
+      try {
+        setIsSessionLoading(true);
 
         const token = await firebaseUser.getIdToken();
 
         if (lastSyncedTokenRef.current === token) {
+          setIsSessionLoading(false);
           return;
         }
 
-        await fetch('/api/auth/session', {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ token }),
-        });
+        await syncSession('POST', token);
         lastSyncedTokenRef.current = token;
       } catch (error) {
+        lastSyncedTokenRef.current = null;
         console.error('FirebaseProvider: failed to sync auth session', error);
+
+        if (firebaseUser) {
+          await signOut(auth).catch((signOutError) => {
+            console.error('FirebaseProvider: failed to sign out after session sync error', signOutError);
+          });
+        }
+      } finally {
+        setIsSessionLoading(false);
       }
     });
 
@@ -136,10 +164,10 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       firestore: servicesAvailable ? firestore : null,
       auth: servicesAvailable ? auth : null,
       user: userAuthState.user,
-      isUserLoading: userAuthState.isUserLoading,
+      isUserLoading: userAuthState.isUserLoading || (!!userAuthState.user && isSessionLoading),
       userError: userAuthState.userError,
     };
-  }, [firebaseApp, firestore, auth, userAuthState]);
+  }, [firebaseApp, firestore, auth, isSessionLoading, userAuthState]);
 
   return (
     <FirebaseContext.Provider value={contextValue}>
