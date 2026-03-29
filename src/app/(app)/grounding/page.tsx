@@ -1,18 +1,33 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/context/language-provider';
 import { Zap } from 'lucide-react';
 import { useFirebase } from '@/firebase';
-import { useTrackModuleActivity } from '@/hooks/use-track-module-activity';
+import { logProgressEventNonBlocking } from '@/lib/progress-events';
 
-const ExerciseCard = ({ title, description }: { title: string; description: string }) => (
+const ExerciseCard = ({
+  title,
+  description,
+  actionLabel,
+  onStart,
+}: {
+  title: string;
+  description: string;
+  actionLabel: string;
+  onStart: () => void;
+}) => (
     <Card>
         <CardHeader>
             <CardTitle className="text-lg">{title}</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
             <p className="text-muted-foreground">{description}</p>
+            <Button onClick={onStart} variant="outline" className="w-full">
+              {actionLabel}
+            </Button>
         </CardContent>
     </Card>
 );
@@ -21,8 +36,19 @@ const ExerciseCard = ({ title, description }: { title: string; description: stri
 export default function GroundingPage() {
   const { t } = useTranslation();
   const { firestore, user } = useFirebase();
+  const [lastStartedExercise, setLastStartedExercise] = useState<string | null>(null);
 
-  useTrackModuleActivity({ firestore, userId: user?.uid, module: 'grounding' });
+  const handleStartExercise = (title: string) => {
+    setLastStartedExercise(title);
+    if (!firestore || !user?.uid) return;
+
+    logProgressEventNonBlocking(firestore, {
+      userId: user.uid,
+      module: 'grounding',
+      type: 'saved',
+      detail: title,
+    });
+  };
 
   const mildExercises = [
     { id: 'mild1', title: t('grounding.mild.ex1.title'), description: t('grounding.mild.ex1.desc') },
@@ -61,6 +87,11 @@ export default function GroundingPage() {
       <p className="text-muted-foreground">
         {t('grounding.description')}
       </p>
+      {lastStartedExercise ? (
+        <p className="text-sm text-muted-foreground">
+          {t('grounding.lastStarted', { title: lastStartedExercise })}
+        </p>
+      ) : null}
 
       <section id="mild">
         <h2 className="text-2xl font-bold tracking-tight font-headline mb-4 flex items-center gap-2">
@@ -68,7 +99,15 @@ export default function GroundingPage() {
           {t('grounding.mild.title')}
         </h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {mildExercises.map(ex => <ExerciseCard key={ex.id} title={ex.title} description={ex.description} />)}
+          {mildExercises.map(ex => (
+            <ExerciseCard
+              key={ex.id}
+              title={ex.title}
+              description={ex.description}
+              actionLabel={t('grounding.startExercise')}
+              onStart={() => handleStartExercise(ex.title)}
+            />
+          ))}
         </div>
       </section>
 
@@ -78,7 +117,15 @@ export default function GroundingPage() {
           {t('grounding.moderate.title')}
         </h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {moderateExercises.map(ex => <ExerciseCard key={ex.id} title={ex.title} description={ex.description} />)}
+          {moderateExercises.map(ex => (
+            <ExerciseCard
+              key={ex.id}
+              title={ex.title}
+              description={ex.description}
+              actionLabel={t('grounding.startExercise')}
+              onStart={() => handleStartExercise(ex.title)}
+            />
+          ))}
         </div>
       </section>
 
@@ -88,7 +135,15 @@ export default function GroundingPage() {
           {t('grounding.severe.title')}
         </h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {severeExercises.map(ex => <ExerciseCard key={ex.id} title={ex.title} description={ex.description} />)}
+          {severeExercises.map(ex => (
+            <ExerciseCard
+              key={ex.id}
+              title={ex.title}
+              description={ex.description}
+              actionLabel={t('grounding.startExercise')}
+              onStart={() => handleStartExercise(ex.title)}
+            />
+          ))}
         </div>
       </section>
     </div>

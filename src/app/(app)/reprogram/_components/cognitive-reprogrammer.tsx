@@ -22,6 +22,9 @@ type State = {
 };
 
 const initialState: State = {};
+type CognitiveReprogrammerProps = {
+  onSuccess?: (initialThought: string) => void;
+};
 
 function ReprogramButton() {
   const { pending } = useFormStatus();
@@ -34,7 +37,7 @@ function ReprogramButton() {
   );
 }
 
-export function CognitiveReprogrammer() {
+export function CognitiveReprogrammer({ onSuccess }: CognitiveReprogrammerProps) {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const { t, locale } = useTranslation();
@@ -62,9 +65,10 @@ export function CognitiveReprogrammer() {
           description: t(localizedState.error),
       });
     } else if (localizedState.initialThought) {
+      onSuccess?.(localizedState.initialThought);
       formRef.current?.reset();
     }
-  }, [localizedState, toast, t]);
+  }, [localizedState, onSuccess, toast, t]);
 
   return (
     <Card className="w-full">

@@ -10,9 +10,10 @@ type BreathingExerciseProps = {
   description: string;
   icon: ReactNode;
   steps: string[];
+  onStart?: () => void;
 };
 
-export function BreathingExercise({ title, description, icon, steps }: BreathingExerciseProps) {
+export function BreathingExercise({ title, description, icon, steps, onStart }: BreathingExerciseProps) {
   const { t } = useTranslation();
   const [isActive, setIsActive] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -40,6 +41,9 @@ export function BreathingExercise({ title, description, icon, steps }: Breathing
   }, [isActive, currentStep, steps, stepDurations]);
 
   const handleToggle = () => {
+    if (!isActive) {
+      onStart?.();
+    }
     setIsActive(!isActive);
     if (isActive) {
       setCurrentStep(0);

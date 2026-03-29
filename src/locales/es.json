@@ -682,6 +682,7 @@
   "regulation": {
     "title": "Regulación Emocional",
     "description": "Usa estas herramientas para manejar la ansiedad aguda y devolver tu sistema nervioso a un estado de calma.",
+    "lastPractice": "Práctica iniciada recientemente: {title}.",
     "boxBreathingTitle": "Respiración de Caja",
     "boxBreathingDescription": "Una técnica simple para calmar tu sistema nervioso.",
     "boxStep1": "Inhala por 4s",
@@ -701,7 +702,8 @@
   },
   "reprogram": {
     "title": "Reprogramación Cognitiva",
-    "description": "Desafía patrones de pensamiento catastróficos o mágicos. Ingresa un pensamiento a continuación y nuestra IA te guiará a través de un proceso de reestructuración cognitiva para encontrar una perspectiva más equilibrada."
+    "description": "Desafía patrones de pensamiento catastróficos o mágicos. Ingresa un pensamiento a continuación y nuestra IA te guiará a través de un proceso de reestructuración cognitiva para encontrar una perspectiva más equilibrada.",
+    "lastSavedThought": "Último pensamiento trabajado: {thought}"
   },
   "cognitiveReprogrammer": {
     "title": "Herramienta de Reprogramación",
@@ -921,6 +923,8 @@
   "grounding": {
     "title": "Ejercicios de Anclaje",
     "description": "Una colección de técnicas de anclaje para ayudarte a conectarte con el momento presente durante momentos de angustia.",
+    "startExercise": "Marcar ejercicio",
+    "lastStarted": "Ejercicio iniciado recientemente: {title}.",
     "mild": {
       "title": "Para Crisis Leve",
       "ex1": {

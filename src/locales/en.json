@@ -683,6 +683,7 @@
   "regulation": {
     "title": "Emotional Regulation",
     "description": "Use these tools to manage acute anxiety and bring your nervous system back to a state of calm.",
+    "lastPractice": "Recently started practice: {title}.",
     "boxBreathingTitle": "Box Breathing",
     "boxBreathingDescription": "A simple technique to calm your nervous system.",
     "boxStep1": "Inhale for 4s",
@@ -702,7 +703,8 @@
   },
   "reprogram": {
     "title": "Cognitive Reprogramming",
-    "description": "Challenge catastrophic or magical thinking patterns. Enter a thought below, and our AI will guide you through a cognitive restructuring process to find a more balanced perspective."
+    "description": "Challenge catastrophic or magical thinking patterns. Enter a thought below, and our AI will guide you through a cognitive restructuring process to find a more balanced perspective.",
+    "lastSavedThought": "Latest thought worked on: {thought}"
   },
   "cognitiveReprogrammer": {
     "title": "Reprogramming Tool",
@@ -921,6 +923,8 @@
   "grounding": {
     "title": "Grounding Exercises",
     "description": "A collection of grounding techniques to help you anchor yourself in the present moment during times of distress.",
+    "startExercise": "Mark exercise",
+    "lastStarted": "Recently started exercise: {title}.",
     "mild": {
       "title": "For Mild Crisis",
       "ex1": {
