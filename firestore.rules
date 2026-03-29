@@ -2,74 +2,28 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    /**
-     * Core Philosophy: This ruleset implements a multi-tiered security model.
-     * 1. User-Ownership: Patient data is strictly private and owned by the user, stored in subcollections.
-     * 2. Shared Access: Therapists are granted access to their assigned patients' data through a denormalized relationship.
-     * 3. Global Roles: Administrative privileges are managed by a dedicated 'roles_admin' collection, granting read/write access where appropriate.
-     * 4. Public Content: Global resources like exercise templates are readable by all authenticated users but only writable by administrators.
-     *
-     * Data Structure:
-     * - /users/{userId}/... houses all data private to a specific user (patients).
-     * - /therapists/{therapistId} stores therapist profiles and their list of assigned patients.
-     * - /roles_admin/{adminId} serves as a lookup table for administrator status.
-     * - Top-level collections like /exerciseTemplates and /achievements store global, read-only content.
-     *
-     * Key Security Decisions:
-     * - Default Deny: All paths are closed by default.
-     * - No User Listing: It is not possible for any user to list all documents in the '/users' or '/therapists' collections.
-     * - Therapist Access via Lookup: A therapist's access to a patient's data is verified by looking up the patient's ID in the therapist's own 'patientIds' array, avoiding insecure hierarchical checks.
-     * - Admin Access: Admins have read-only access to all user and therapist data for support and monitoring purposes, and write access to global collections.
-     *
-     * Denormalization for Authorization:
-     * - To allow therapists to query for their patients and for rules to efficiently verify access, relationships are denormalized.
-     * - Each /therapists/{therapistId} document contains a 'patientIds' array.
-     * - Each /users/{userId} document contains a 'therapistIds' array.
-     * This avoids costly and impossible cross-collection queries within security rules.
-     *
-     * Structural Segregation:
-     * - Private user data (e.g., thought records) is segregated into subcollections under the user's document.
-     * - Publicly readable data (e.g., exercise templates) is stored in separate top-level collections.
-     * This separation creates clear and performant security boundaries.
-     */
-
-    // -------------------------------------------------------------------------
-    // Helper Functions
-    // -------------------------------------------------------------------------
-
-    /**
-     * Checks if the user is authenticated.
-     */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /**
-     * Checks if the authenticated user's UID matches the provided userId.
-     * This is the foundation of the user-ownership model.
-     */
     function isOwner(userId) {
-      return request.auth.uid == userId;
+      return isSignedIn() && request.auth.uid == userId;
     }
 
-    /**
-     * Checks if a document exists and if the requesting user is the owner.
-     * Used for safe update and delete operations.
-     */
     function isExistingOwner(userId) {
       return isOwner(userId) && resource != null;
     }
 
-    /**
-     * Checks if the user has administrative privileges by verifying their
-     * UID exists as a document ID in the 'roles_admin' collection.
-     */
     function isAdmin() {
-      return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+    }
+
+    function requesterUserDocExists() {
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
     }
 
     function requesterAccountRole() {
-      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+      return requesterUserDocExists()
         ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.accountRole
         : null;
     }
@@ -93,52 +47,41 @@ service cloud.firestore {
         (requesterAccountRole() == 'administrator' && targetRole in ['editor', 'commentator', 'viewer']);
     }
 
-    function privilegedProfileFieldsAllowedByRequester() {
-      return canAssignAccountRole(request.resource.data.accountRole) &&
-        (
-          isAdmin() ||
-          (
-            request.resource.data.userRole in ['clinic', 'professional', 'patient'] &&
-            request.resource.data.isAdmin == resource.data.isAdmin
-          )
-        );
-    }
-
-    /**
-     * Checks if the requesting user is a therapist assigned to the given patient (userId).
-     * Performs an efficient `get` on the therapist's own document.
-     */
     function isTherapistOfUser(userId) {
       return isSignedIn() &&
         exists(/databases/$(database)/documents/users/$(userId)) &&
         get(/databases/$(database)/documents/users/$(userId)).data.therapistIds.hasAny([request.auth.uid]);
     }
 
-    /**
-     * Validates that the incoming document's 'userId' field matches the owner
-     * specified in the path. Enforces relational integrity on creation.
-     */
     function incomingDataMatchesOwner(userId) {
       return request.resource.data.userId == userId;
     }
 
-    /**
-     * Validates that the 'userId' field is immutable on updates.
-     * Prevents re-assigning a document to a different user.
-     */
     function ownerIsImmutable() {
       return request.resource.data.userId == resource.data.userId;
     }
 
-    /**
-     * Validates denormalized latest mental check-in summary fields stored on the
-     * user profile. This keeps dashboard and therapist list reads cheap while
-     * preserving a predictable shape for owner updates.
-     */
-    function hasValidLatestCheckInSummary() {
-      return (!('latestCheckInScore' in request.resource.data) || request.resource.data.latestCheckInScore is number) &&
+    function hasValidRoleFields() {
+      return (!('role' in request.resource.data) || request.resource.data.role in ['guest', 'patient', 'professional', 'clinic']) &&
         (!('userRole' in request.resource.data) || request.resource.data.userRole in ['clinic', 'professional', 'patient']) &&
         (!('accountRole' in request.resource.data) || request.resource.data.accountRole in ['owner', 'manager', 'administrator', 'editor', 'commentator', 'viewer']) &&
+        (!('isAdmin' in request.resource.data) || request.resource.data.isAdmin is bool);
+    }
+
+    function hasValidPinnedPatientModulesField() {
+      return (!('pinnedPatientModules' in request.resource.data) || request.resource.data.pinnedPatientModules is list);
+    }
+
+    function hasDefaultPatientPinnedModules() {
+      return request.resource.data.pinnedPatientModules == ['check-in', 'observer', 'progress'];
+    }
+
+    function hasNoPinnedPatientModules() {
+      return !('pinnedPatientModules' in request.resource.data) || request.resource.data.pinnedPatientModules.size() == 0;
+    }
+
+    function hasValidLatestCheckInSummary() {
+      return (!('latestCheckInScore' in request.resource.data) || request.resource.data.latestCheckInScore is number) &&
         (!('latestCheckInLevel' in request.resource.data) || request.resource.data.latestCheckInLevel in ['healthy', 'mild', 'moderate', 'severe']) &&
         (!('latestCheckInAt' in request.resource.data) || request.resource.data.latestCheckInAt == null || request.resource.data.latestCheckInAt is timestamp) &&
         (!('latestCheckInNote' in request.resource.data) || request.resource.data.latestCheckInNote is string) &&
@@ -147,11 +90,6 @@ service cloud.firestore {
         (!('latestCheckInUrgentSupport' in request.resource.data) || request.resource.data.latestCheckInUrgentSupport is bool);
     }
 
-    /**
-     * Validates denormalized latest thought summary fields stored on the user
-     * profile so therapist dashboards can show recent observer activity without
-     * loading every subcollection first.
-     */
     function hasValidLatestThoughtSummary() {
       return (!('latestThoughtAt' in request.resource.data) || request.resource.data.latestThoughtAt == null || request.resource.data.latestThoughtAt is timestamp) &&
         (!('latestThoughtEmotion' in request.resource.data) || request.resource.data.latestThoughtEmotion is string) &&
@@ -161,270 +99,192 @@ service cloud.firestore {
         (!('latestThoughtIsIntrusive' in request.resource.data) || request.resource.data.latestThoughtIsIntrusive is bool);
     }
 
-    function nonPrivilegedProfileFieldsRemainImmutable() {
-      return request.resource.data.userRole == resource.data.userRole &&
-        request.resource.data.accountRole == resource.data.accountRole &&
-        request.resource.data.isAdmin == resource.data.isAdmin;
+    function ownerSafeProfileCreate(userId) {
+      return isOwner(userId) &&
+        request.resource.data.id == userId &&
+        request.resource.data.accountRole == 'viewer' &&
+        request.resource.data.isAdmin == false &&
+        (
+          (request.resource.data.role == 'guest' && request.resource.data.userRole == 'patient' && hasNoPinnedPatientModules()) ||
+          (request.resource.data.role == 'patient' && request.resource.data.userRole == 'patient' && hasDefaultPatientPinnedModules())
+        );
     }
 
-    // -------------------------------------------------------------------------
-    // Collection Rules
-    // -------------------------------------------------------------------------
+    function ownerSafeProfileUpdate() {
+      return request.resource.data.role == resource.data.role &&
+        request.resource.data.userRole == resource.data.userRole &&
+        request.resource.data.accountRole == resource.data.accountRole &&
+        request.resource.data.isAdmin == resource.data.isAdmin &&
+        request.resource.data.pinnedPatientModules == resource.data.pinnedPatientModules;
+    }
 
-    /**
-     * @description Manages user profiles. Users can create and manage their own profile.
-     *              Assigned therapists and admins can read user profiles.
-     * @path /users/{userId}
-     * @allow (create) An authenticated user creating their own user document: `request.auth.uid == userId`.
-     * @deny (update) A user trying to update another user's profile: `request.auth.uid != userId`.
-     * @principle Enforces self-management of user profiles and allows read access for authorized staff.
-     */
+    function privilegedProfileFieldsAllowedByRequester() {
+      return hasValidRoleFields() &&
+        hasValidPinnedPatientModulesField() &&
+        canAssignAccountRole(request.resource.data.accountRole);
+    }
+
+    function hasValidModuleOverrideShape() {
+      return request.resource.data.manualAllow is list &&
+        request.resource.data.manualDeny is list &&
+        request.resource.data.pinnedPatientModules is list;
+    }
+
     match /users/{userId} {
       allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
-      allow create: if isOwner(userId) &&
-        request.resource.data.id == userId &&
+      allow list: if isAdmin() || canManageWorkspaceUsers();
+      allow create: if request.resource.data.id == userId &&
+        hasValidRoleFields() &&
+        hasValidPinnedPatientModulesField() &&
         hasValidLatestCheckInSummary() &&
         hasValidLatestThoughtSummary() &&
         (
-          (isAdmin() && request.resource.data.userRole in ['clinic', 'professional', 'patient'] && request.resource.data.accountRole in ['owner', 'manager', 'administrator', 'editor', 'commentator', 'viewer']) ||
-          (!isAdmin() && request.resource.data.userRole == 'patient' && request.resource.data.accountRole == 'viewer' && request.resource.data.isAdmin == false)
+          ownerSafeProfileCreate(userId) ||
+          (isAdmin() &&
+            request.resource.data.role in ['guest', 'patient', 'professional', 'clinic'] &&
+            request.resource.data.userRole in ['clinic', 'professional', 'patient'] &&
+            request.resource.data.accountRole in ['owner', 'manager', 'administrator', 'editor', 'commentator', 'viewer'])
         );
       allow update: if request.resource.data.id == resource.data.id &&
+        hasValidRoleFields() &&
+        hasValidPinnedPatientModulesField() &&
         hasValidLatestCheckInSummary() &&
         hasValidLatestThoughtSummary() &&
         (
-          (isOwner(userId) && nonPrivilegedProfileFieldsRemainImmutable()) ||
+          (isOwner(userId) && ownerSafeProfileUpdate()) ||
           (canManageWorkspaceUsers() && privilegedProfileFieldsAllowedByRequester())
         );
-      allow delete: if isOwner(userId);
+      allow delete: if isOwner(userId) || isAdmin();
     }
 
-    /**
-     * @description Manages therapist profiles. Therapists can create and manage their own profiles.
-     *              Admins can also view therapist profiles.
-     * @path /therapists/{therapistId}
-     * @allow (create) A therapist creating their own profile document: `request.auth.uid == therapistId`.
-     * @deny (list) Any user trying to get a list of all therapists.
-     * @principle Enforces self-management of professional profiles.
-     */
     match /therapists/{therapistId} {
-      allow get: if isOwner(therapistId) || isAdmin() || canManageWorkspaceUsers(); // A patient could also get via `isSignedIn()`
+      allow get: if isOwner(therapistId) || isAdmin() || canManageWorkspaceUsers();
       allow list: if false;
       allow create: if isOwner(therapistId) || canManageWorkspaceUsers();
       allow update: if isExistingOwner(therapistId) || canManageWorkspaceUsers();
       allow delete: if isExistingOwner(therapistId) || canManageWorkspaceUsers();
     }
 
-    /**
-     * @description A dedicated collection for granting admin privileges.
-     *              Existence of a document confers admin rights. This collection is read-only.
-     * @path /roles_admin/{adminId}
-     * @allow (get) Any signed-in user checking if another user is an admin.
-     * @deny (create) Any user trying to make themselves an admin.
-     * @principle Implements global roles via 'Existence over Content'. Managed out-of-band.
-     */
     match /roles_admin/{adminId} {
       allow get: if isOwner(adminId) || isAdmin();
       allow list: if false;
-      allow create: if false; // Must be managed by a trusted backend process
-      allow update: if false;
-      allow delete: if false;
+      allow create, update, delete: if false;
     }
 
-    /**
-     * @description Stores shared workspace-level configuration such as theme,
-     *              default role presets, and crisis routing mode.
-     * @path /workspaceSettings/{settingId}
-     * @principle Restricts read/write access to operational admins only.
-     */
     match /workspaceSettings/{settingId} {
-      allow get: if canManageWorkspaceUsers();
-      allow list: if false;
-      allow create: if canManageWorkspaceUsers();
-      allow update: if canManageWorkspaceUsers();
+      allow get, list: if canManageWorkspaceUsers();
+      allow create, update: if canManageWorkspaceUsers();
       allow delete: if isAdmin() || requesterAccountRole() == 'owner';
     }
 
-    /**
-     * @description Stores user-specific thought records.
-     * @path /users/{userId}/thoughtRecords/{recordId}
-     * @allow (create) A user creating a thought record for themselves: `request.auth.uid == userId`.
-     * @deny (get) A user trying to read another user's thought records.
-     * @principle Restricts access to a user's own data tree, with read-only access for assigned therapists.
-     */
+    match /rolePolicies/{roleId} {
+      allow get, list: if canManageWorkspaceUsers();
+      allow create, update: if canManageWorkspaceUsers();
+      allow delete: if isAdmin() || requesterAccountRole() == 'owner';
+    }
+
+    match /moduleCatalog/{moduleId} {
+      allow get, list: if canManageWorkspaceUsers();
+      allow create, update: if canManageWorkspaceUsers();
+      allow delete: if isAdmin() || requesterAccountRole() == 'owner';
+    }
+
+    match /accessRules/{ruleId} {
+      allow get, list: if canManageWorkspaceUsers();
+      allow create, update: if canManageWorkspaceUsers();
+      allow delete: if isAdmin() || requesterAccountRole() == 'owner';
+    }
+
+    match /userModuleOverrides/{userId} {
+      allow get: if isOwner(userId) || canManageWorkspaceUsers();
+      allow list: if canManageWorkspaceUsers();
+      allow create, update: if canManageWorkspaceUsers() && hasValidModuleOverrideShape();
+      allow delete: if isAdmin() || requesterAccountRole() == 'owner';
+    }
+
+    match /resolvedAccess/{userId} {
+      allow get: if isOwner(userId) || canManageWorkspaceUsers();
+      allow list: if false;
+      allow create, update, delete: if false;
+    }
+
     match /users/{userId}/thoughtRecords/{recordId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow get, list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
       allow create: if isOwner(userId) && incomingDataMatchesOwner(userId);
       allow update: if isExistingOwner(userId) && ownerIsImmutable();
       allow delete: if isExistingOwner(userId) || canManageWorkspaceUsers();
     }
 
-    /**
-     * @description Stores ERP missions for a user. Users can manage their own missions,
-     *              and their assigned therapists can also assign and update missions.
-     * @path /users/{userId}/exposureMissions/{missionId}
-     * @allow (create) A therapist assigning a new mission to one of their patients.
-     * @deny (delete) A therapist trying to delete a patient's mission.
-     * @principle Allows collaborative writes between a user and their assigned therapist on specific data.
-     */
     match /users/{userId}/exposureMissions/{missionId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow get, list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
       allow create: if (isOwner(userId) || isTherapistOfUser(userId) || canManageWorkspaceUsers()) && incomingDataMatchesOwner(userId);
       allow update: if (isExistingOwner(userId) || isTherapistOfUser(userId) || canManageWorkspaceUsers()) && ownerIsImmutable();
       allow delete: if isExistingOwner(userId) || canManageWorkspaceUsers();
     }
 
-    /**
-     * @description Stores logs of a user's mental check-in assessments.
-     * @path /users/{userId}/mental_checkups/{checkupId}
-     * @allow (create) A user creating a checkup log for themselves: `request.auth.uid == userId`.
-     * @deny (get) A user trying to read another user's checkup logs.
-     * @principle Restricts access to a user's own data tree, with read-only access for assigned therapists.
-     */
     match /users/{userId}/mental_checkups/{checkupId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow get, list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
       allow create: if isOwner(userId) && incomingDataMatchesOwner(userId);
       allow update: if isExistingOwner(userId) && ownerIsImmutable();
       allow delete: if isExistingOwner(userId) || canManageWorkspaceUsers();
     }
 
-    /**
-     * @description Stores lightweight activity events used to build a shared real-time
-     *              progress feed across modules.
-     * @path /users/{userId}/progressEvents/{eventId}
-     * @principle Keeps activity scoped to the patient while allowing assigned therapists
-     *            and admins to review longitudinal engagement.
-     */
     match /users/{userId}/progressEvents/{eventId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow get, list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
       allow create: if isOwner(userId) && incomingDataMatchesOwner(userId);
       allow update: if isExistingOwner(userId) && ownerIsImmutable();
       allow delete: if isExistingOwner(userId) || isAdmin() || canManageWorkspaceUsers();
     }
 
-    /**
-     * @description Stores clinician-guided medical support plans for a user.
-     *              Plans may be authored by the user or by their assigned therapist.
-     * @path /users/{userId}/medicalSupportPlans/{planId}
-     * @principle Allows collaborative care documentation while keeping records scoped to the patient.
-     */
     match /users/{userId}/medicalSupportPlans/{planId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow get, list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
       allow create: if (isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers()) && incomingDataMatchesOwner(userId);
       allow update: if (isExistingOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers()) && ownerIsImmutable();
       allow delete: if isExistingOwner(userId) || isAdmin() || canManageWorkspaceUsers();
     }
 
-    /**
-     * @description Stores prescribed medication records documented by the user or their
-     *              treating professional. This is documentation only, not automatic prescribing.
-     * @path /users/{userId}/medicationPrescriptions/{prescriptionId}
-     */
     match /users/{userId}/medicationPrescriptions/{prescriptionId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow get, list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
       allow create: if (isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers()) && incomingDataMatchesOwner(userId);
       allow update: if (isExistingOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers()) && ownerIsImmutable();
       allow delete: if isExistingOwner(userId) || isAdmin() || canManageWorkspaceUsers();
     }
 
-    /**
-     * @description Defines reusable templates for therapeutic exercises.
-     *              Read-only for all users, writable only by admins.
-     * @path /exerciseTemplates/{templateId}
-     * @allow (get) Any signed-in user can read an exercise template.
-     * @deny (create) A non-admin user trying to create a new global template.
-     * @principle Secures global, read-only content with admin-only write access.
-     */
     match /exerciseTemplates/{templateId} {
-      allow get: if isSignedIn();
-      allow list: if isSignedIn();
-      allow create: if canEditWorkspaceContent();
-      allow update: if canEditWorkspaceContent();
-      allow delete: if canEditWorkspaceContent();
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if canEditWorkspaceContent();
     }
 
-    /**
-     * @description Stores user-specific logs of completed exercises.
-     * @path /users/{userId}/exerciseLogs/{logId}
-     * @allow (create) A user logging a completed exercise for themselves: `request.auth.uid == userId`.
-     * @deny (get) A user trying to read another user's exercise logs.
-     * @principle Restricts access to a user's own data tree, with read-only access for assigned therapists.
-     */
     match /users/{userId}/exerciseLogs/{logId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow get, list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
       allow create: if isOwner(userId) && incomingDataMatchesOwner(userId);
       allow update: if isExistingOwner(userId) && ownerIsImmutable();
       allow delete: if isExistingOwner(userId) || canManageWorkspaceUsers();
     }
 
-    /**
-     * @description Stores records of a user's gamified mental combat events.
-     * @path /users/{userId}/mentalCombatEvents/{eventId}
-     * @allow (create) A user logging a mental combat event for themselves: `request.auth.uid == userId`.
-     * @deny (get) A user trying to read another user's combat events.
-     * @principle Restricts access to a user's own data tree, with read-only access for assigned therapists.
-     */
     match /users/{userId}/mentalCombatEvents/{eventId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow get, list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
       allow create: if isOwner(userId) && incomingDataMatchesOwner(userId);
       allow update: if isExistingOwner(userId) && ownerIsImmutable();
       allow delete: if isExistingOwner(userId) || canManageWorkspaceUsers();
     }
 
-    /**
-     * @description Stores user-specific logs of their anxiety levels.
-     * @path /users/{userId}/anxietyLogs/{logId}
-     * @allow (create) A user logging an anxiety event for themselves: `request.auth.uid == userId`.
-     * @deny (get) A user trying to read another user's anxiety logs.
-     * @principle Restricts access to a user's own data tree, with read-only access for assigned therapists.
-     */
     match /users/{userId}/anxietyLogs/{logId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow get, list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
       allow create: if isOwner(userId) && incomingDataMatchesOwner(userId);
       allow update: if isExistingOwner(userId) && ownerIsImmutable();
       allow delete: if isExistingOwner(userId) || canManageWorkspaceUsers();
     }
 
-    /**
-     * @description Defines global achievements that users can earn.
-     *              Read-only for all users, writable only by admins.
-     * @path /achievements/{achievementId}
-     * @allow (get) Any signed-in user can read an achievement's definition.
-     * @deny (create) A non-admin user trying to create a new global achievement.
-     * @principle Secures global, read-only content with admin-only write access.
-     */
     match /achievements/{achievementId} {
-      allow get: if isSignedIn();
-      allow list: if isSignedIn();
-      allow create: if canEditWorkspaceContent();
-      allow update: if canEditWorkspaceContent();
-      allow delete: if canEditWorkspaceContent();
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if canEditWorkspaceContent();
     }
 
-    /**
-     * @description Records which achievements a user has earned. Users can read their own,
-     *              but only admins (or a backend process) can grant them.
-     * @path /users/{userId}/userAchievements/{userAchievementId}
-     * @allow (get) A user reading their own earned achievement: `request.auth.uid == userId`.
-     * @deny (create) A user trying to grant themselves an achievement.
-     * @principle Restricts write access for earned rewards to trusted roles to maintain system integrity.
-     */
     match /users/{userId}/userAchievements/{userAchievementId} {
-      allow get: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
-      allow list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
+      allow get, list: if isOwner(userId) || isTherapistOfUser(userId) || isAdmin() || canManageWorkspaceUsers();
       allow create: if (isAdmin() || canEditWorkspaceContent()) && incomingDataMatchesOwner(userId);
-      allow update: if false; // Achievements are immutable once granted
-      allow delete: if false;
+      allow update, delete: if false;
     }
   }
 }

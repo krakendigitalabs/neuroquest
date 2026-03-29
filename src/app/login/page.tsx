@@ -107,7 +107,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!isUserLoading && user) {
-      router.push('/dashboard');
+      router.push(user.isAnonymous ? '/check-in' : '/dashboard');
     }
   }, [user, isUserLoading, router]);
 
@@ -117,10 +117,7 @@ export default function LoginPage() {
     const nextRole = roleFromQuery ?? roleFromStorage ?? 'patient';
 
     setSelectedRole(nextRole);
-
-    if (roleFromQuery) {
-      persistPendingRequestedRole(roleFromQuery);
-    }
+    persistPendingRequestedRole(nextRole);
   }, [searchParams]);
 
   return (

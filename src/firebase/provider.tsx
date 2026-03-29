@@ -1,9 +1,9 @@
 'use client';
 
-import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
+import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useRef, useState, useEffect } from 'react';
 import { FirebaseApp } from 'firebase/app';
 import { Firestore } from 'firebase/firestore';
-import { Auth, User, onAuthStateChanged } from 'firebase/auth';
+import { Auth, User, onAuthStateChanged, onIdTokenChanged } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
 
 interface FirebaseProviderProps {
@@ -61,6 +61,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   firestore,
   auth,
 }) => {
+  const lastSyncedTokenRef = useRef<string | null>(null);
   const [userAuthState, setUserAuthState] = useState<UserAuthState>({
     user: null,
     isUserLoading: true, // Start loading until first auth event
@@ -88,6 +89,43 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
     );
     return () => unsubscribe(); // Cleanup
   }, [auth]); // Depends on the auth instance
+
+  useEffect(() => {
+    if (!auth) return;
+
+    const unsubscribe = onIdTokenChanged(auth, async (firebaseUser) => {
+      try {
+        if (!firebaseUser) {
+          lastSyncedTokenRef.current = null;
+          await fetch('/api/auth/session', {
+            method: 'DELETE',
+            credentials: 'include',
+          });
+          return;
+        }
+
+        const token = await firebaseUser.getIdToken();
+
+        if (lastSyncedTokenRef.current === token) {
+          return;
+        }
+
+        await fetch('/api/auth/session', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ token }),
+        });
+        lastSyncedTokenRef.current = token;
+      } catch (error) {
+        console.error('FirebaseProvider: failed to sync auth session', error);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [auth]);
 
   // Memoize the context value
   const contextValue = useMemo((): FirebaseContextState => {

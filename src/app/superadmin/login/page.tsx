@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useFirebase } from '@/firebase';
@@ -12,7 +11,7 @@ import { isAllowedSuperadminEmail } from '@/lib/superadmin-config';
 
 export default function SuperadminLoginPage() {
   const router = useRouter();
-  const { auth, firestore, user, isUserLoading } = useFirebase();
+  const { auth, user, isUserLoading } = useFirebase();
   const { canManageWorkspaceUsers, isLoading } = useAccountAccess();
   const [error, setError] = useState('');
   const [signingIn, setSigningIn] = useState(false);
@@ -21,44 +20,19 @@ export default function SuperadminLoginPage() {
   const email = useMemo(() => user?.email?.toLowerCase() ?? '', [user?.email]);
 
   const ensureSuperadminProfile = async (signedInUser: NonNullable<typeof user>) => {
-    if (!firestore) {
-      throw new Error('missing-firestore');
+    const token = await signedInUser.getIdToken(true);
+    const response = await fetch('/api/superadmin/bootstrap', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token }),
+    });
+
+    if (!response.ok) {
+      throw new Error('superadmin-bootstrap-failed');
     }
-
-    const userRef = doc(firestore, 'users', signedInUser.uid);
-    const userDoc = await getDoc(userRef);
-
-    const baseProfile = {
-      id: signedInUser.uid,
-      email: signedInUser.email || '',
-      displayName: signedInUser.displayName || 'Superadministrador',
-      photoURL: signedInUser.photoURL || '',
-      userRole: 'clinic' as const,
-      accountRole: 'owner' as const,
-      requestedRole: 'clinic' as const,
-      level: userDoc.data()?.level ?? 1,
-      currentXp: userDoc.data()?.currentXp ?? 0,
-      xpToNextLevel: userDoc.data()?.xpToNextLevel ?? 100,
-      isAdmin: true,
-      isAnonymous: false,
-      therapistIds: userDoc.data()?.therapistIds ?? [],
-      latestThoughtAt: userDoc.data()?.latestThoughtAt ?? null,
-      latestThoughtEmotion: userDoc.data()?.latestThoughtEmotion ?? '',
-      latestThoughtIntensity: userDoc.data()?.latestThoughtIntensity ?? 0,
-      latestThoughtLabel: userDoc.data()?.latestThoughtLabel ?? '',
-      latestThoughtPreview: userDoc.data()?.latestThoughtPreview ?? '',
-      latestThoughtIsIntrusive: userDoc.data()?.latestThoughtIsIntrusive ?? false,
-    };
-
-    if (!userDoc.exists()) {
-      await setDoc(userRef, {
-        ...baseProfile,
-        createdAt: serverTimestamp(),
-      });
-      return;
-    }
-
-    await setDoc(userRef, baseProfile, { merge: true });
   };
 
   useEffect(() => {
@@ -89,10 +63,10 @@ export default function SuperadminLoginPage() {
         }
       })();
     }
-  }, [auth, canManageWorkspaceUsers, email, firestore, isLoading, isUserLoading, router, user]);
+  }, [auth, canManageWorkspaceUsers, email, isLoading, isUserLoading, router, user]);
 
   const handleGoogleAccess = async () => {
-    if (!auth || !firestore) return;
+    if (!auth) return;
 
     try {
       setSigningIn(true);

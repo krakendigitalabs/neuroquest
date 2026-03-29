@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -37,14 +38,15 @@ import { signOut } from 'firebase/auth';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { UserAvatar } from './user-avatar';
 import { LanguageSwitcher } from '@/components/language-switcher';
-import { useAccountAccess } from '@/hooks/use-account-access';
+import { useAccessMe } from '@/hooks/use-access-me';
+import type { ModuleKey } from '@/modules/access/access.types';
 
 export function AppSidebar() {
   const pathname = usePathname();
   const { t } = useTranslation();
   const { auth, user } = useFirebase();
   const { userProfile, isLoading: isProfileLoading } = useUserProfile();
-  const { canManageWorkspaceUsers } = useAccountAccess();
+  const { access, isLoading: isAccessLoading } = useAccessMe();
   const { isMobile, setOpenMobile } = useSidebar();
 
   const handleLogout = async () => {
@@ -64,19 +66,27 @@ export function AppSidebar() {
     await handleLogout();
   };
 
+  const moduleNavItems: Record<ModuleKey, { href: string; icon: ReactNode; label: string }> = {
+    'check-in': { href: '/check-in', icon: <ClipboardCheck />, label: t('nav.checkIn') },
+    observer: { href: '/observer', icon: <Eye />, label: t('nav.observer') },
+    exposure: { href: '/exposure', icon: <Route />, label: t('nav.exposure') },
+    reprogram: { href: '/reprogram', icon: <Brain />, label: t('nav.reprogram') },
+    regulation: { href: '/regulation', icon: <HeartPulse />, label: t('nav.regulation') },
+    wellness: { href: '/wellness', icon: <Apple />, label: t('nav.wellness') },
+    medication: { href: '/medication', icon: <Pill />, label: t('nav.medication') },
+    grounding: { href: '/grounding', icon: <Zap />, label: t('nav.grounding') },
+    progress: { href: '/progress', icon: <BarChart3 />, label: t('nav.progress') },
+    'medical-support': { href: '/medical-support', icon: <Pill />, label: t('medical.title') },
+  };
+
+  const shouldShowDashboard =
+    !!access && (access.actions.canCreateModules || access.routeAccess.some((route) => route !== '/check-in'));
+
   const navItems = [
-    { href: '/dashboard', icon: <LayoutDashboard />, label: t('nav.dashboard') },
-    { href: '/check-in', icon: <ClipboardCheck />, label: t('nav.checkIn') },
-    { href: '/observer', icon: <Eye />, label: t('nav.observer') },
-    { href: '/exposure', icon: <Route />, label: t('nav.exposure') },
-    { href: '/reprogram', icon: <Brain />, label: t('nav.reprogram') },
-    { href: '/regulation', icon: <HeartPulse />, label: t('nav.regulation') },
-    { href: '/wellness', icon: <Apple />, label: t('nav.wellness') },
-    { href: '/medication', icon: <Pill />, label: t('nav.medication') },
-    { href: '/grounding', icon: <Zap />, label: t('nav.grounding') },
-    { href: '/progress', icon: <BarChart3 />, label: t('nav.progress') },
+    ...(shouldShowDashboard ? [{ href: '/dashboard', icon: <LayoutDashboard />, label: t('nav.dashboard') }] : []),
+    ...((access?.visibleModules ?? []).map((moduleKey) => moduleNavItems[moduleKey]).filter(Boolean)),
   ];
-  const managementItems = canManageWorkspaceUsers
+  const managementItems = access?.actions.canCreateModules
     ? [{ href: '/workspace-users', icon: <Users />, label: t('nav.workspaceUsers') }]
     : [];
 
@@ -92,12 +102,12 @@ export function AppSidebar() {
             <UserAvatar className="h-10 w-10 shrink-0 sm:h-8 sm:w-8" />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold sm:text-base">
-                {isProfileLoading
+                {isProfileLoading || isAccessLoading
                   ? '...'
                   : userProfile?.displayName || user?.displayName || t('sidebar.user')}
               </p>
               <p className="truncate text-[11px] text-muted-foreground sm:text-xs">
-                {isProfileLoading
+                {isProfileLoading || isAccessLoading
                   ? '...'
                   : `${t(`accountRoles.${userProfile?.accountRole ?? 'viewer'}`)} · ${t(`userRoles.${userProfile?.userRole ?? 'patient'}`)} · ${t('userProgress.level', { level: userProfile?.level ?? 1 })}`}
               </p>

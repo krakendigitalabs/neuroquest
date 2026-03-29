@@ -21,6 +21,18 @@ vi.mock('@/hooks/use-user-profile', () => ({
   useUserProfile: () => useUserProfileMock(),
 }));
 
+vi.mock('@/hooks/use-access-me', () => ({
+  useAccessMe: () => ({
+    access: {
+      role: 'patient',
+      visibleModules: ['check-in', 'observer', 'progress', 'medical-support', 'medication'],
+      routeAccess: ['/check-in', '/observer', '/progress', '/medical-support', '/medication'],
+      actions: { canCreateModules: false },
+    },
+    isLoading: false,
+  }),
+}));
+
 vi.mock('./_components/personalized-mission-generator', () => ({
   PersonalizedMissionGenerator: () => <div>Mission generator</div>,
 }));

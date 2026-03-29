@@ -82,9 +82,15 @@ vi.mock('@/hooks/use-user-profile', () => ({
   }),
 }));
 
-vi.mock('@/hooks/use-account-access', () => ({
-  useAccountAccess: () => ({
-    canManageWorkspaceUsers: true,
+vi.mock('@/hooks/use-access-me', () => ({
+  useAccessMe: () => ({
+    access: {
+      role: 'patient',
+      visibleModules: ['check-in', 'observer', 'progress', 'medication'],
+      routeAccess: ['/check-in', '/observer', '/progress', '/medication'],
+      actions: { canCreateModules: false },
+    },
+    isLoading: false,
   }),
 }));
 
@@ -117,7 +123,7 @@ describe('AppSidebar', () => {
     expect(screen.getByText('Progress')).toBeInTheDocument();
     expect(screen.getByText('Observer')).toBeInTheDocument();
     expect(screen.getByText('Prescribed Medication')).toBeInTheDocument();
-    expect(screen.getByText('Workspace users')).toBeInTheDocument();
+    expect(screen.queryByText('Workspace users')).not.toBeInTheDocument();
     expect(screen.getByText('View only · Patient user · Level 3')).toBeInTheDocument();
     expect(screen.queryByText('Challenges')).not.toBeInTheDocument();
   });

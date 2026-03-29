@@ -6,6 +6,7 @@ import { Activity, Award, ShieldAlert, Star, Target } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { PersonalizedMissionGenerator } from './_components/personalized-mission-generator';
 import { useTranslation } from '@/context/language-provider';
+import { useAccessMe } from '@/hooks/use-access-me';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
 import { collection, limit, orderBy, query } from 'firebase/firestore';
@@ -33,6 +34,7 @@ export default function DashboardPage() {
   const { t, locale } = useTranslation();
   const { firestore, user } = useFirebase();
   const { userProfile, isLoading: isProfileLoading } = useUserProfile();
+  const { access, isLoading: isAccessLoading } = useAccessMe();
 
   const missionsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
@@ -96,7 +98,9 @@ export default function DashboardPage() {
     return note || t(`dashboard.summaryBySeverity.${severityKey}`);
   }, [hasLatestCheckIn, t, userProfile?.latestCheckInLevel, userProfile?.latestCheckInNote]);
 
-  const isLoading = isProfileLoading || areMissionsLoading || isActivityLoading;
+  const allowedRoutes = useMemo(() => new Set(access?.routeAccess ?? []), [access?.routeAccess]);
+  const isRouteAllowed = (route: string) => allowedRoutes.has(route);
+  const isLoading = isProfileLoading || areMissionsLoading || isActivityLoading || isAccessLoading;
 
   const moduleLabel = (module: ProgressModuleKey) => {
     switch (module) {
@@ -218,6 +222,24 @@ export default function DashboardPage() {
     }
   }, [hasLatestCheckIn, latestActivity?.module, t, userProfile?.latestCheckInLevel, userProfile?.latestCheckInUrgentSupport]);
 
+  const safeNextStep = useMemo(() => {
+    if (isRouteAllowed(nextStep.primaryHref) && isRouteAllowed(nextStep.secondaryHref)) {
+      return nextStep;
+    }
+
+    if (isRouteAllowed('/check-in')) {
+      return {
+        ...nextStep,
+        primaryHref: '/check-in',
+        primaryLabel: t('nav.checkIn'),
+        secondaryHref: '/dashboard',
+        secondaryLabel: t('nav.dashboard'),
+      };
+    }
+
+    return nextStep;
+  }, [nextStep, t, access?.routeAccess]);
+
   const stats = [
     { title: t('dashboard.xpEarned'), value: isLoading ? '...' : xpEarned.toLocaleString(locale), icon: <Award className="h-6 w-6 text-primary" /> },
     { title: t('dashboard.levelTitle'), value: isLoading ? '...' : t('userProgress.level', { level }), icon: <Star className="h-6 w-6 text-primary" /> },
@@ -234,9 +256,9 @@ export default function DashboardPage() {
             <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
               <Link href="/home">{t('dashboard.returnHome')}</Link>
             </Button>
-            <Button asChild size="sm" className="w-full sm:w-auto">
+            {isRouteAllowed('/check-in') && <Button asChild size="sm" className="w-full sm:w-auto">
               <Link href="/check-in">{t('nav.checkIn')}</Link>
-            </Button>
+            </Button>}
           </div>
         </div>
       </div>
@@ -356,16 +378,16 @@ export default function DashboardPage() {
             </div>
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">{t('dashboard.nextStepCardTitle')}</p>
-              <p className="mt-2 text-lg font-semibold">{isLoading ? '...' : nextStep.title}</p>
+              <p className="mt-2 text-lg font-semibold">{isLoading ? '...' : safeNextStep.title}</p>
               <p className="mt-2 text-sm text-muted-foreground">
-                {isLoading ? '...' : nextStep.description}
+                {isLoading ? '...' : safeNextStep.description}
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <Button asChild size="sm">
-                  <Link href={nextStep.primaryHref}>{nextStep.primaryLabel}</Link>
+                  <Link href={safeNextStep.primaryHref}>{safeNextStep.primaryLabel}</Link>
                 </Button>
                 <Button asChild variant="outline" size="sm">
-                  <Link href={nextStep.secondaryHref}>{nextStep.secondaryLabel}</Link>
+                  <Link href={safeNextStep.secondaryHref}>{safeNextStep.secondaryLabel}</Link>
                 </Button>
               </div>
             </div>
