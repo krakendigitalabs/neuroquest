@@ -233,6 +233,20 @@ service cloud.firestore {
     }
 
     /**
+     * @description Stores shared workspace-level configuration such as theme,
+     *              default role presets, and crisis routing mode.
+     * @path /workspaceSettings/{settingId}
+     * @principle Restricts read/write access to operational admins only.
+     */
+    match /workspaceSettings/{settingId} {
+      allow get: if canManageWorkspaceUsers();
+      allow list: if false;
+      allow create: if canManageWorkspaceUsers();
+      allow update: if canManageWorkspaceUsers();
+      allow delete: if isAdmin() || requesterAccountRole() == 'owner';
+    }
+
+    /**
      * @description Stores user-specific thought records.
      * @path /users/{userId}/thoughtRecords/{recordId}
      * @allow (create) A user creating a thought record for themselves: `request.auth.uid == userId`.

@@ -1102,8 +1102,66 @@
   "workspaceUsers": {
     "title": "Users and access control",
     "description": "Manage operational and clinical roles from a single view.",
+    "consoleBadge": "Superadmin console",
+    "serverControlled": "Server controlled",
     "guardrailsTitle": "Hierarchical permission control",
     "guardrailsDescription": "Owner, manager, and administrator can manage access according to their level. The server blocks self-escalation outside the allowed hierarchy.",
+    "settingsTitle": "Workspace baseline configuration",
+    "settingsDescription": "Five operational decisions worth defining early so the platform behaves consistently.",
+    "settingsSummaryTitle": "Recommended baseline settings",
+    "settingsSummaryDescription": "Theme, language, default role presets, and crisis routing stay aligned for the whole workspace.",
+    "settingsSaved": "Configuration saved.",
+    "saveSettings": "Save configuration",
+    "settings": {
+      "themePreset": "Visual theme",
+      "workspaceLanguage": "Workspace language",
+      "defaultUserRole": "Default clinical role",
+      "defaultAccountRole": "Default account role",
+      "crisisRouting": "Baseline crisis route",
+      "dashboardDensity": "Dashboard density",
+      "followUpMode": "Follow-up mode"
+    },
+    "themeOptions": {
+      "dark-blue": "Dark blue",
+      "clinical-white": "Clinical white",
+      "soft-gold": "Soft gold",
+      "graphite": "Graphite",
+      "ivory": "Ivory"
+    },
+    "languageOptions": {
+      "es": "Global Spanish",
+      "en": "English",
+      "bilingual": "Bilingual",
+      "es-co": "Spanish Colombia",
+      "es-mx": "Spanish Mexico"
+    },
+    "crisisOptions": {
+      "strict": "Strict escalation",
+      "guided": "Guided route",
+      "professional-first": "Professional first",
+      "clinic-review": "Clinic review",
+      "emergency-direct": "Direct to emergency"
+    },
+    "dashboardDensityOptions": {
+      "compact": "Compact",
+      "comfortable": "Comfortable",
+      "focused": "Focused",
+      "clinical": "Clinical",
+      "expanded": "Expanded"
+    },
+    "followUpOptions": {
+      "daily": "Daily",
+      "business-days": "Business days",
+      "weekly": "Weekly",
+      "manual": "Manual",
+      "critical-only": "Critical only"
+    },
+    "stats": {
+      "totalUsers": "Users",
+      "clinics": "Clinics",
+      "professionals": "Professionals",
+      "operators": "Operators"
+    },
     "listTitle": "Workspace users",
     "listDescription": "Adjust each user's account role and clinical role with operational traceability.",
     "currentSummary": "Current account role: {accountRole} · Current clinical role: {userRole}",

@@ -1101,8 +1101,66 @@
   "workspaceUsers": {
     "title": "Usuarios y control de acceso",
     "description": "Gestiona roles operativos y clínicos desde una sola vista.",
+    "consoleBadge": "Consola de superadministración",
+    "serverControlled": "Controlado por servidor",
     "guardrailsTitle": "Control jerárquico de permisos",
     "guardrailsDescription": "Owner, manager y administrator pueden gestionar accesos según su nivel. El servidor bloquea la autoescalación fuera de lo permitido.",
+    "settingsTitle": "Configuración base del workspace",
+    "settingsDescription": "Cinco decisiones operativas que conviene dejar definidas desde el inicio para que la plataforma sea consistente.",
+    "settingsSummaryTitle": "Ajustes básicos recomendados",
+    "settingsSummaryDescription": "Tema, idioma, rol por defecto y lógica de crisis quedan aplicados para la operación del workspace.",
+    "settingsSaved": "Configuración guardada.",
+    "saveSettings": "Guardar configuración",
+    "settings": {
+      "themePreset": "Tema visual",
+      "workspaceLanguage": "Idioma del workspace",
+      "defaultUserRole": "Rol clínico por defecto",
+      "defaultAccountRole": "Rol de cuenta por defecto",
+      "crisisRouting": "Ruta base de crisis",
+      "dashboardDensity": "Densidad del dashboard",
+      "followUpMode": "Seguimiento base"
+    },
+    "themeOptions": {
+      "dark-blue": "Dark blue",
+      "clinical-white": "Clinical white",
+      "soft-gold": "Soft gold",
+      "graphite": "Graphite",
+      "ivory": "Ivory"
+    },
+    "languageOptions": {
+      "es": "Español global",
+      "en": "English",
+      "bilingual": "Bilingüe",
+      "es-co": "Español Colombia",
+      "es-mx": "Español México"
+    },
+    "crisisOptions": {
+      "strict": "Escalamiento estricto",
+      "guided": "Guía gradual",
+      "professional-first": "Primero profesional",
+      "clinic-review": "Revisión clínica",
+      "emergency-direct": "Directo a emergencia"
+    },
+    "dashboardDensityOptions": {
+      "compact": "Compacto",
+      "comfortable": "Cómodo",
+      "focused": "Enfocado",
+      "clinical": "Clínico",
+      "expanded": "Expandido"
+    },
+    "followUpOptions": {
+      "daily": "Diario",
+      "business-days": "Días hábiles",
+      "weekly": "Semanal",
+      "manual": "Manual",
+      "critical-only": "Solo crítico"
+    },
+    "stats": {
+      "totalUsers": "Usuarios",
+      "clinics": "Clínicas",
+      "professionals": "Profesionales",
+      "operators": "Operadores"
+    },
     "listTitle": "Usuarios del workspace",
     "listDescription": "Ajusta el rol de cuenta y el rol clínico de cada usuario con trazabilidad operativa.",
     "currentSummary": "Rol de cuenta actual: {accountRole} · Rol clínico actual: {userRole}",
