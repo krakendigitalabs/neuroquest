@@ -72,6 +72,12 @@ vi.mock('@/context/language-provider', () => ({
       if (key === 'progress.activityTypes.created') return 'Created';
       if (key === 'progress.activityTypes.completed') return 'Completed';
       if (key === 'progress.activityTypes.opened') return 'Module opened';
+      if (key === 'progress.sections.realProgressTitle') return 'Real progress';
+      if (key === 'progress.sections.realProgressDescription') return 'Clinical changes and useful accumulated outcomes for the user.';
+      if (key === 'progress.sections.engagementTitle') return 'Engagement';
+      if (key === 'progress.sections.engagementDescription') return 'Usage and continuity signals, kept separate from clinical progress.';
+      if (key === 'progress.sections.activityTitle') return 'Recent activity';
+      if (key === 'progress.sections.activityDescription') return 'Recent useful events and cumulative coverage by module.';
       if (key === 'progress.noCheckInsYet') return 'No saved check-ins yet.';
       if (key === 'progress.unknownDate') return 'Date unavailable';
       if (key === 'progress.checkInScore') return 'Check-In Score';

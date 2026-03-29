@@ -685,6 +685,14 @@
       "completed": "Completed",
       "opened": "Module opened"
     },
+    "sections": {
+      "realProgressTitle": "Real progress",
+      "realProgressDescription": "Clinical changes and useful accumulated outcomes for the user.",
+      "engagementTitle": "Engagement",
+      "engagementDescription": "Usage and continuity signals, kept separate from clinical progress.",
+      "activityTitle": "Recent activity",
+      "activityDescription": "Recent useful events and cumulative coverage by module."
+    },
     "currentSnapshot": "Current",
     "entryLabel": "Entry",
     "fortitude": "Mental Fortitude",

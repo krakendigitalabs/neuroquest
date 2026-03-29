@@ -684,6 +684,14 @@
       "completed": "Completado",
       "opened": "Módulo usado"
     },
+    "sections": {
+      "realProgressTitle": "Progreso real",
+      "realProgressDescription": "Cambios clínicos y resultados útiles acumulados por el usuario.",
+      "engagementTitle": "Engagement",
+      "engagementDescription": "Señales de uso y continuidad, separadas del progreso clínico real.",
+      "activityTitle": "Actividad reciente",
+      "activityDescription": "Eventos útiles recientes y cobertura acumulada por módulo."
+    },
     "currentSnapshot": "Actual",
     "entryLabel": "Registro",
     "fortitude": "Fortaleza Mental",

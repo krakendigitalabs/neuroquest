@@ -295,7 +295,12 @@ export default function ProgressPage() {
       </div>
       <p className="text-muted-foreground">{t('progress.description')}</p>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-xl font-semibold">{t('progress.sections.realProgressTitle')}</h2>
+          <p className="text-sm text-muted-foreground">{t('progress.sections.realProgressDescription')}</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t('progress.averageScoreTitle')}</CardTitle>
@@ -366,7 +371,16 @@ export default function ProgressPage() {
             <p className="text-xs text-muted-foreground">{t('progress.missionsSummaryDescription')}</p>
           </CardContent>
         </Card>
-        <Card>
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-xl font-semibold">{t('progress.sections.engagementTitle')}</h2>
+          <p className="text-sm text-muted-foreground">{t('progress.sections.engagementDescription')}</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t('progress.activeModulesTitle')}</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
@@ -396,7 +410,71 @@ export default function ProgressPage() {
             <p className="text-xs text-muted-foreground">{t('progress.moduleOpensDescription')}</p>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-xl font-semibold">{t('progress.sections.activityTitle')}</h2>
+          <p className="text-sm text-muted-foreground">{t('progress.sections.activityDescription')}</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{t('progress.recordedActivityTitle')}</CardTitle>
+              <Activity className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{recentActivityCount.toLocaleString(locale)}</div>
+              <p className="text-xs text-muted-foreground">{t('progress.recordedActivityDescription')}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('progress.recentModuleActivityTitle')}</CardTitle>
+              <CardDescription>{t('progress.recentModuleActivityDescription')}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {meaningfulActivityEvents.length === 0 ? (
+                <p className="text-sm text-muted-foreground">{t('progress.noMeaningfulActivityYet')}</p>
+              ) : (
+                meaningfulActivityEvents.slice(0, 8).map((event) => (
+                  <div key={event.id} className="rounded-lg border p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-medium">{moduleLabel(event.module)}</p>
+                      <Badge variant="outline">{activityLabel(event)}</Badge>
+                    </div>
+                    {event.detail ? <p className="mt-2 text-sm text-muted-foreground">{event.detail}</p> : null}
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {toDate(event.createdAt)?.toLocaleString(locale) ?? t('progress.unknownDate')}
+                    </p>
+                  </div>
+                ))
+              )}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('progress.moduleCoverageTitle')}</CardTitle>
+              <CardDescription>{t('progress.moduleCoverageDescription')}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {Object.keys(moduleCounts).length === 0 ? (
+                <p className="text-sm text-muted-foreground">{t('progress.noMeaningfulActivityYet')}</p>
+              ) : (
+                (Object.entries(moduleCounts) as Array<[ProgressModuleKey, number]>)
+                  .sort((a, b) => b[1] - a[1])
+                  .map(([module, count]) => (
+                    <div key={module} className="flex items-center justify-between rounded-lg border p-3 text-sm">
+                      <span>{moduleLabel(module)}</span>
+                      <Badge variant="secondary">{count.toLocaleString(locale)}</Badge>
+                    </div>
+                  ))
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </section>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
@@ -450,54 +528,6 @@ export default function ProgressPage() {
                 </p>
               </div>
             ))}
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('progress.recentModuleActivityTitle')}</CardTitle>
-            <CardDescription>{t('progress.recentModuleActivityDescription')}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {meaningfulActivityEvents.length === 0 ? (
-              <p className="text-sm text-muted-foreground">{t('progress.noMeaningfulActivityYet')}</p>
-            ) : (
-              meaningfulActivityEvents.slice(0, 8).map((event) => (
-                <div key={event.id} className="rounded-lg border p-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-sm font-medium">{moduleLabel(event.module)}</p>
-                    <Badge variant="outline">{activityLabel(event)}</Badge>
-                  </div>
-                  {event.detail ? <p className="mt-2 text-sm text-muted-foreground">{event.detail}</p> : null}
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    {toDate(event.createdAt)?.toLocaleString(locale) ?? t('progress.unknownDate')}
-                  </p>
-                </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('progress.moduleCoverageTitle')}</CardTitle>
-            <CardDescription>{t('progress.moduleCoverageDescription')}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {Object.keys(moduleCounts).length === 0 ? (
-              <p className="text-sm text-muted-foreground">{t('progress.noMeaningfulActivityYet')}</p>
-            ) : (
-              (Object.entries(moduleCounts) as Array<[ProgressModuleKey, number]>)
-                .sort((a, b) => b[1] - a[1])
-                .map(([module, count]) => (
-                  <div key={module} className="flex items-center justify-between rounded-lg border p-3 text-sm">
-                    <span>{moduleLabel(module)}</span>
-                    <Badge variant="secondary">{count.toLocaleString(locale)}</Badge>
-                  </div>
-                ))
-            )}
           </CardContent>
         </Card>
       </div>
