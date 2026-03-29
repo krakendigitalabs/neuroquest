@@ -1,4 +1,4 @@
-import { getAdminDb } from '@/firebase/admin';
+import { getAdminAuth, getAdminDb } from '@/firebase/admin';
 import { getFallbackRolePolicy, getSortedModuleCatalog, MODULE_CATALOG_FALLBACK } from '@/modules/access/module-catalog';
 import { resolveAccess } from '@/modules/access/access.resolver';
 import type { AccessRule, ModuleCatalogEntry, ResolvedAccess, RolePolicy, UserModuleOverrides } from '@/modules/access/access.types';
@@ -39,6 +39,40 @@ function normalizeModuleCatalog(moduleCatalog: ModuleCatalogEntry[]) {
   return getSortedModuleCatalog(moduleCatalog);
 }
 
+async function bootstrapMissingUserProfile(userId: string) {
+  const authUser = await getAdminAuth().getUser(userId);
+  const db = getAdminDb();
+  const isAnonymous = authUser.providerData.length === 0;
+  const role = isAnonymous ? 'guest' : 'patient';
+
+  const fallbackProfile: Partial<UserProfile> = {
+    id: userId,
+    email: authUser.email ?? '',
+    displayName: authUser.displayName || (isAnonymous ? 'Invitado' : 'Usuario'),
+    photoURL: authUser.photoURL ?? '',
+    role,
+    userRole: 'patient',
+    accountRole: 'viewer',
+    requestedRole: 'patient',
+    pinnedPatientModules: role === 'patient' ? ['check-in', 'observer', 'progress'] : [],
+    level: 1,
+    currentXp: 0,
+    xpToNextLevel: 100,
+    isAdmin: false,
+    isAnonymous,
+    therapistIds: [],
+    latestThoughtAt: null,
+    latestThoughtEmotion: '',
+    latestThoughtIntensity: 0,
+    latestThoughtLabel: '',
+    latestThoughtPreview: '',
+    latestThoughtIsIntrusive: false,
+  };
+
+  await db.collection('users').doc(userId).set(fallbackProfile, { merge: true });
+  return fallbackProfile;
+}
+
 export async function getResolvedAccessForUser(userId: string): Promise<ResolvedAccess> {
   const db = getAdminDb();
 
@@ -53,11 +87,9 @@ export async function getResolvedAccessForUser(userId: string): Promise<Resolved
     db.collection('rolePolicies').doc('clinic').get().catch(() => null),
   ]);
 
-  if (!userSnap.exists) {
-    throw new Error('user-not-found');
-  }
-
-  const rawUser = userSnap.data() as Partial<UserProfile>;
+  const rawUser = userSnap.exists
+    ? (userSnap.data() as Partial<UserProfile>)
+    : await bootstrapMissingUserProfile(userId);
   const user = normalizeUserProfile(userSnap.id, rawUser);
 
   const policySnapshots = {

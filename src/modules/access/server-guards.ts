@@ -8,8 +8,12 @@ function getFallbackRoute(access: ResolvedAccess) {
 }
 
 async function getCurrentResolvedAccess() {
-  const serverUser = await requireServerUser();
-  return getResolvedAccessForUser(serverUser.uid);
+  try {
+    const serverUser = await requireServerUser();
+    return await getResolvedAccessForUser(serverUser.uid);
+  } catch {
+    redirect('/login');
+  }
 }
 
 export async function requireModuleRouteAccess(moduleKey: ModuleKey) {
