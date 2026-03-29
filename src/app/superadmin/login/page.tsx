@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useFirebase } from '@/firebase';
@@ -11,12 +12,54 @@ import { isAllowedSuperadminEmail } from '@/lib/superadmin-config';
 
 export default function SuperadminLoginPage() {
   const router = useRouter();
-  const { auth, user, isUserLoading } = useFirebase();
+  const { auth, firestore, user, isUserLoading } = useFirebase();
   const { canManageWorkspaceUsers, isLoading } = useAccountAccess();
   const [error, setError] = useState('');
   const [signingIn, setSigningIn] = useState(false);
+  const [initializingProfile, setInitializingProfile] = useState(false);
 
   const email = useMemo(() => user?.email?.toLowerCase() ?? '', [user?.email]);
+
+  const ensureSuperadminProfile = async (signedInUser: NonNullable<typeof user>) => {
+    if (!firestore) {
+      throw new Error('missing-firestore');
+    }
+
+    const userRef = doc(firestore, 'users', signedInUser.uid);
+    const userDoc = await getDoc(userRef);
+
+    const baseProfile = {
+      id: signedInUser.uid,
+      email: signedInUser.email || '',
+      displayName: signedInUser.displayName || 'Superadministrador',
+      photoURL: signedInUser.photoURL || '',
+      userRole: 'clinic' as const,
+      accountRole: 'owner' as const,
+      requestedRole: 'clinic' as const,
+      level: userDoc.data()?.level ?? 1,
+      currentXp: userDoc.data()?.currentXp ?? 0,
+      xpToNextLevel: userDoc.data()?.xpToNextLevel ?? 100,
+      isAdmin: true,
+      isAnonymous: false,
+      therapistIds: userDoc.data()?.therapistIds ?? [],
+      latestThoughtAt: userDoc.data()?.latestThoughtAt ?? null,
+      latestThoughtEmotion: userDoc.data()?.latestThoughtEmotion ?? '',
+      latestThoughtIntensity: userDoc.data()?.latestThoughtIntensity ?? 0,
+      latestThoughtLabel: userDoc.data()?.latestThoughtLabel ?? '',
+      latestThoughtPreview: userDoc.data()?.latestThoughtPreview ?? '',
+      latestThoughtIsIntrusive: userDoc.data()?.latestThoughtIsIntrusive ?? false,
+    };
+
+    if (!userDoc.exists()) {
+      await setDoc(userRef, {
+        ...baseProfile,
+        createdAt: serverTimestamp(),
+      });
+      return;
+    }
+
+    await setDoc(userRef, baseProfile, { merge: true });
+  };
 
   useEffect(() => {
     if (isUserLoading || isLoading || !user) return;
@@ -33,12 +76,23 @@ export default function SuperadminLoginPage() {
     }
 
     if (email && isAllowedSuperadminEmail(email) && !canManageWorkspaceUsers) {
-      setError('Tu cuenta existe, pero todavía no tiene un rol de cuenta con gestión operativa.');
+      void (async () => {
+        try {
+          setInitializingProfile(true);
+          setError('');
+          await ensureSuperadminProfile(user);
+          router.push('/workspace-users');
+        } catch {
+          setError('No se pudo preparar el perfil de superadministración.');
+        } finally {
+          setInitializingProfile(false);
+        }
+      })();
     }
-  }, [auth, canManageWorkspaceUsers, email, isLoading, isUserLoading, router, user]);
+  }, [auth, canManageWorkspaceUsers, email, firestore, isLoading, isUserLoading, router, user]);
 
   const handleGoogleAccess = async () => {
-    if (!auth) return;
+    if (!auth || !firestore) return;
 
     try {
       setSigningIn(true);
@@ -52,6 +106,9 @@ export default function SuperadminLoginPage() {
         setError('Este correo no está autorizado para superadministración.');
         return;
       }
+
+      await ensureSuperadminProfile(result.user);
+      router.push('/workspace-users');
     } catch {
       setError('No se pudo completar el acceso con Google.');
     } finally {
@@ -93,10 +150,10 @@ export default function SuperadminLoginPage() {
             <Button
               type="button"
               onClick={handleGoogleAccess}
-              disabled={signingIn}
+              disabled={signingIn || initializingProfile}
               className="h-14 w-full rounded-2xl border-0 bg-[#1B2A41] text-white hover:bg-[#24344F]"
             >
-              {signingIn ? 'Validando acceso' : 'Continuar con Google'}
+              {signingIn || initializingProfile ? 'Validando acceso' : 'Continuar con Google'}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
 
