@@ -11,6 +11,7 @@ import { useFirebase } from '@/firebase';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { useTranslation } from '@/context/language-provider';
 import { Logo } from '@/components/logo';
+import { clearPendingRequestedRole, readPendingRequestedRole } from '@/lib/onboarding-role';
 
 function UserProfileInitializer({ user }: { user: User }) {
   const { firestore } = useFirebase();
@@ -22,18 +23,21 @@ function UserProfileInitializer({ user }: { user: User }) {
 
       const userRef = doc(firestore, 'users', user.uid);
       const userDoc = await getDoc(userRef);
+      const requestedRole = readPendingRequestedRole();
 
       if (!userDoc.exists()) {
+        const isClinicAdmin = user.email === 'krakendigitalabs@gmail.com';
         const newUserProfile = {
           id: user.uid,
           email: user.email || '',
           displayName: user.isAnonymous ? t('sidebar.guestUser') : (user.displayName || t('sidebar.anonymousUser')),
           photoURL: user.photoURL || '',
-          userRole: user.email === 'krakendigitalabs@gmail.com' ? 'clinic' : 'patient',
+          userRole: isClinicAdmin ? 'clinic' : 'patient',
+          requestedRole: requestedRole ?? (isClinicAdmin ? 'clinic' : 'patient'),
           level: 1,
           currentXp: 0,
           xpToNextLevel: 100,
-          isAdmin: user.email === 'krakendigitalabs@gmail.com',
+          isAdmin: isClinicAdmin,
           isAnonymous: user.isAnonymous,
           createdAt: serverTimestamp(),
           therapistIds: [],
@@ -46,6 +50,8 @@ function UserProfileInitializer({ user }: { user: User }) {
         };
         setDocumentNonBlocking(userRef, newUserProfile, { merge: false });
       }
+
+      clearPendingRequestedRole();
     };
 
     createUserProfile();

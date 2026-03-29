@@ -473,6 +473,34 @@
         "Tener una lectura más rápida del proceso entre sesiones."
       ]
     },
+    "activation": {
+      "badge": "Entrada guiada por rol",
+      "title": "Cada tipo de usuario entra por un flujo más claro.",
+      "description": "La landing y el login ya preparan la activación según la intención de cuenta, sin inventar permisos clínicos ni mezclar el onboarding.",
+      "cards": [
+        {
+          "role": "patient",
+          "title": "Paciente",
+          "description": "Empieza con check-in, observer, grounding y seguimiento personal desde el primer acceso.",
+          "helper": "Puedes probar como invitado si solo necesitas explorar el flujo personal.",
+          "cta": "Entrar como paciente"
+        },
+        {
+          "role": "professional",
+          "title": "Profesional",
+          "description": "Entra con un flujo orientado a seguimiento de pacientes, soporte clínico y documentación supervisada.",
+          "helper": "La intención profesional se registra en onboarding, pero el acceso clínico sigue requiriendo validación.",
+          "cta": "Entrar como profesional"
+        },
+        {
+          "role": "clinic",
+          "title": "Clínica",
+          "description": "Prepara el acceso para operación clínica, seguimiento transversal y trabajo con varios pacientes.",
+          "helper": "La configuración clínica no se habilita automáticamente desde el login; queda sujeta a revisión interna.",
+          "cta": "Entrar como clínica"
+        }
+      ]
+    },
     "science": {
       "badge": "Seguridad y cuidado",
       "title": "Una herramienta pensada para acompañar, no para reemplazar la atención profesional.",
@@ -1015,6 +1043,40 @@
   "login": {
     "title": "Bienvenido a NeuroQuest",
     "description": "Inicia sesión para comenzar tu viaje hacia el bienestar mental.",
+    "roleSectionTitle": "Selecciona el tipo de acceso que necesitas",
+    "roleSectionDescription": "Esto personaliza el onboarding inicial y deja registrada tu intención de cuenta.",
+    "guestOnlyPatient": "El acceso como invitado solo está disponible para el flujo de paciente.",
+    "roles": {
+      "patient": {
+        "title": "Paciente",
+        "description": "Empieza con seguimiento personal, check-ins y herramientas de autorregistro.",
+        "helper": "Es el único flujo que permite continuar como invitado."
+      },
+      "professional": {
+        "title": "Profesional",
+        "description": "Entra con intención de seguimiento clínico y documentación supervisada.",
+        "helper": "Tu solicitud queda registrada sin otorgar permisos clínicos de forma automática."
+      },
+      "clinic": {
+        "title": "Clínica",
+        "description": "Inicia el onboarding para una operación clínica más amplia y coordinada.",
+        "helper": "La activación clínica requiere revisión y configuración separada."
+      }
+    },
+    "accessNotes": {
+      "patient": {
+        "title": "Flujo personal inmediato",
+        "description": "Tu acceso se orienta a check-in, seguimiento y herramientas personales desde el primer ingreso."
+      },
+      "professional": {
+        "title": "Intención profesional registrada",
+        "description": "Guardamos esta selección para adaptar el onboarding, pero el acceso profesional real sigue bajo validación."
+      },
+      "clinic": {
+        "title": "Intención clínica registrada",
+        "description": "Guardamos esta selección para el embudo comercial y operativo, sin abrir privilegios clínicos por sí sola."
+      }
+    },
     "homeButton": "Inicio",
     "signInWithGoogle": "Iniciar sesión con Google",
     "continueAsGuest": "Continuar como Invitado",

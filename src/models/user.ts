@@ -8,6 +8,7 @@ export interface UserProfile {
   displayName: string;
   photoURL: string;
   userRole: UserRole;
+  requestedRole?: UserRole;
   level: number;
   currentXp: number;
   xpToNextLevel: number;

@@ -474,6 +474,34 @@
         "Get faster visibility into what happened between sessions."
       ]
     },
+    "activation": {
+      "badge": "Role-guided entry",
+      "title": "Each type of user starts from a clearer flow.",
+      "description": "The landing page and login now prepare activation based on account intent, without inventing clinical permissions or mixing onboarding states.",
+      "cards": [
+        {
+          "role": "patient",
+          "title": "Patient",
+          "description": "Start with check-in, observer, grounding, and personal follow-up from the first access.",
+          "helper": "You can try the personal flow as a guest if you only need to explore it.",
+          "cta": "Enter as patient"
+        },
+        {
+          "role": "professional",
+          "title": "Professional",
+          "description": "Enter through a flow oriented to patient follow-up, clinical support, and supervised documentation.",
+          "helper": "Professional intent is captured in onboarding, but real clinical access still requires validation.",
+          "cta": "Enter as professional"
+        },
+        {
+          "role": "clinic",
+          "title": "Clinic",
+          "description": "Prepare access for clinical operations, cross-patient follow-up, and broader team workflows.",
+          "helper": "Clinic setup is not enabled automatically from login; it remains subject to internal review.",
+          "cta": "Enter as clinic"
+        }
+      ]
+    },
     "science": {
       "badge": "Safety and care",
       "title": "A tool designed to support, not replace professional care.",
@@ -1016,6 +1044,40 @@
   "login": {
     "title": "Welcome to NeuroQuest",
     "description": "Sign in to begin your journey to mental wellness.",
+    "roleSectionTitle": "Select the access type you need",
+    "roleSectionDescription": "This personalizes the initial onboarding and records your account intent.",
+    "guestOnlyPatient": "Guest access is only available for the patient flow.",
+    "roles": {
+      "patient": {
+        "title": "Patient",
+        "description": "Start with personal follow-up, check-ins, and self-tracking tools.",
+        "helper": "This is the only flow that can continue as a guest."
+      },
+      "professional": {
+        "title": "Professional",
+        "description": "Enter with intent for clinical follow-up and supervised documentation.",
+        "helper": "Your request is recorded without granting clinical permissions automatically."
+      },
+      "clinic": {
+        "title": "Clinic",
+        "description": "Start onboarding for a broader, coordinated clinical operation.",
+        "helper": "Clinic activation requires separate review and configuration."
+      }
+    },
+    "accessNotes": {
+      "patient": {
+        "title": "Immediate personal flow",
+        "description": "Your access is oriented to check-in, follow-up, and personal tools from the first sign-in."
+      },
+      "professional": {
+        "title": "Professional intent recorded",
+        "description": "We store this selection to adapt onboarding, but real professional access still requires validation."
+      },
+      "clinic": {
+        "title": "Clinic intent recorded",
+        "description": "We store this selection for the commercial and operational funnel without opening clinical privileges by itself."
+      }
+    },
     "homeButton": "Home",
     "signInWithGoogle": "Sign in with Google",
     "continueAsGuest": "Continue as Guest",

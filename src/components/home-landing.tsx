@@ -109,6 +109,12 @@ type LandingCopy = {
     patientItems: string[];
     therapistItems: string[];
   };
+  activation: {
+    badge: string;
+    title: string;
+    description: string;
+    cards: Array<{ role: string; title: string; description: string; helper: string; cta: string }>;
+  };
   science: {
     badge: string;
     title: string;
@@ -366,6 +372,38 @@ export function HomeLanding() {
                 <TabsList className="grid h-auto w-full grid-cols-2 rounded-2xl bg-white/8 p-1 md:w-fit"><TabsTrigger value="patients" className="rounded-xl px-5 py-3 text-sm data-[state=active]:bg-white data-[state=active]:text-[#0F172A]">{copy.audiences.patientTitle}</TabsTrigger><TabsTrigger value="therapists" className="rounded-xl px-5 py-3 text-sm data-[state=active]:bg-white data-[state=active]:text-[#0F172A]">{copy.audiences.therapistTitle}</TabsTrigger></TabsList>
                 {(['patients', 'therapists'] as const).map((tab) => { const Icon = audienceIcons[tab]; const intro = tab === 'patients' ? copy.audiences.patientIntro : copy.audiences.therapistIntro; const items = tab === 'patients' ? copy.audiences.patientItems : copy.audiences.therapistItems; return <TabsContent key={tab} value={tab} className="mt-6"><div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start"><div className="rounded-[1.5rem] border border-white/10 bg-white/6 p-6"><div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10"><Icon className="h-6 w-6 text-[#F2D16B]" /></div><h3 className="mt-4 text-2xl font-semibold">{tab === 'patients' ? copy.audiences.patientTitle : copy.audiences.therapistTitle}</h3><p className="mt-3 text-sm leading-7 text-white/72">{intro}</p></div><div className="grid gap-4">{items.map((item) => <div key={item} className="rounded-2xl border border-white/10 bg-white/6 p-5 transition hover:bg-white/8"><div className="flex gap-3"><div className="mt-1 h-2.5 w-2.5 rounded-full bg-[#D4AF37]" /><p className="text-sm leading-7 text-white/78">{item}</p></div></div>)}</div></div></TabsContent>; })}
               </Tabs>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-12 md:py-20">
+          <div className="container px-4 md:px-6">
+            <div className="mx-auto max-w-3xl text-center">
+              <Badge variant="outline" className="border-[#E6C768]/40 bg-white/80 px-4 py-2 text-sm text-[#1B2A41]">{copy.activation.badge}</Badge>
+              <h2 className="mt-5 text-3xl font-semibold tracking-tight text-[#0F172A] sm:text-5xl">{copy.activation.title}</h2>
+              <p className="mt-5 text-lg leading-8 text-[#4B5563]">{copy.activation.description}</p>
+            </div>
+            <div className="mt-12 grid gap-6 lg:grid-cols-3">
+              {copy.activation.cards.map((card) => {
+                const href = user ? '/dashboard' : `/login?role=${card.role}`;
+
+                return (
+                  <Card key={card.role} className="rounded-[1.75rem] border border-white/80 bg-white/76 shadow-[0_18px_45px_rgba(15,23,42,0.06)] backdrop-blur-2xl">
+                    <CardHeader>
+                      <CardTitle className="text-2xl text-[#1B2A41]">{card.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <p className="text-sm leading-7 text-[#5B6474]">{card.description}</p>
+                      <div className="rounded-2xl border border-[#E6C768]/20 bg-[#FFF9E8] px-4 py-3 text-sm text-[#3A4A63]">
+                        {card.helper}
+                      </div>
+                      <Button asChild className="w-full border-0 bg-[#1B2A41] text-white hover:bg-[#24344F]">
+                        <Link href={href}>{card.cta}</Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </div>
         </section>
