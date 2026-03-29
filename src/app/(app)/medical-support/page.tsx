@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, HeartPulse, ShieldAlert, Stethoscope } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +11,7 @@ import { useFirebase } from '@/firebase';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { PatientReportActions } from '@/components/patient-report-actions';
 import { buildPatientReportText } from '@/lib/patient-report';
-import { useTrackModuleActivity } from '@/hooks/use-track-module-activity';
+import { logProgressEventNonBlocking } from '@/lib/progress-events';
 
 function toDate(value: unknown): Date | null {
   if (!value) return null;
@@ -29,8 +30,7 @@ export default function MedicalSupportPage() {
   const { t, locale } = useTranslation();
   const { user, firestore } = useFirebase();
   const { userProfile, isLoading } = useUserProfile();
-
-  useTrackModuleActivity({ firestore, userId: user?.uid, module: 'medical-support' });
+  const [lastReviewedLabel, setLastReviewedLabel] = useState<string | null>(null);
 
   const latestDate = toDate(userProfile?.latestCheckInAt);
   const hasLatestCheckIn = !!latestDate;
@@ -69,6 +69,22 @@ export default function MedicalSupportPage() {
     therapistSignatureLabel: t('medical.reportTherapistSignature'),
   });
 
+  const handleReviewGuidance = () => {
+    if (!latestLevel) return;
+
+    const label = t(`medical.dynamic.${latestLevel}.title`);
+    setLastReviewedLabel(label);
+
+    if (!firestore || !user?.uid) return;
+
+    logProgressEventNonBlocking(firestore, {
+      userId: user.uid,
+      module: 'medical-support',
+      type: 'saved',
+      detail: label,
+    });
+  };
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
@@ -76,6 +92,11 @@ export default function MedicalSupportPage() {
         <PatientReportActions reportTitle={t('medical.reportTitle')} reportText={reportText} />
       </div>
       <p className="text-muted-foreground">{t('medical.description')}</p>
+      {lastReviewedLabel ? (
+        <p className="text-sm text-muted-foreground">
+          {t('medical.lastReviewedGuidance', { title: lastReviewedLabel })}
+        </p>
+      ) : null}
 
       <Card className="border-destructive/30">
         <CardHeader>
@@ -137,6 +158,9 @@ export default function MedicalSupportPage() {
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
+                <Button type="button" variant="outline" onClick={handleReviewGuidance}>
+                  {t('medical.reviewGuidanceAction')}
+                </Button>
               </>
             )}
           </CardContent>

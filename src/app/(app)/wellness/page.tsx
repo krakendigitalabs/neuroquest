@@ -1,12 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import { AlertTriangle, Apple, Dumbbell, ShieldAlert } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTranslation } from '@/context/language-provider';
 import { useFirebase } from '@/firebase';
-import { useTrackModuleActivity } from '@/hooks/use-track-module-activity';
+import { logProgressEventNonBlocking } from '@/lib/progress-events';
 
 type WellnessSection = {
   id: string;
@@ -31,6 +33,8 @@ type WellnessCopy = {
   exerciseLabel: string;
   nutritionLabel: string;
   precautionsLabel: string;
+  reviewAction: string;
+  lastReviewed: string;
   closing: string;
   sections: WellnessSection[];
 };
@@ -60,6 +64,8 @@ const WELLNESS_COPY: Record<'es' | 'en', WellnessCopy> = {
     exerciseLabel: 'Rutina deportiva',
     nutritionLabel: 'Rutina alimenticia',
     precautionsLabel: 'Precauciones',
+    reviewAction: 'Marcar rutina revisada',
+    lastReviewed: 'Rutina revisada recientemente: {title}.',
     closing:
       'Esta orientación es general y preventiva. Debe adaptarse con profesionales cuando hay tratamiento activo, medicación, lesiones, embarazo, cambios marcados de peso, trastornos alimentarios o síntomas graves.',
     sections: [
@@ -243,6 +249,8 @@ const WELLNESS_COPY: Record<'es' | 'en', WellnessCopy> = {
     exerciseLabel: 'Exercise routine',
     nutritionLabel: 'Nutrition routine',
     precautionsLabel: 'Precautions',
+    reviewAction: 'Mark routine reviewed',
+    lastReviewed: 'Recently reviewed routine: {title}.',
     closing:
       'This is general preventive guidance. It should be adapted with professionals when there is active treatment, medication, injuries, pregnancy, major weight changes, eating disorders, or severe symptoms.',
     sections: [
@@ -408,8 +416,20 @@ export default function WellnessPage() {
   const { locale } = useTranslation();
   const { firestore, user } = useFirebase();
   const copy = WELLNESS_COPY[locale === 'es' ? 'es' : 'en'];
+  const [activeSectionId, setActiveSectionId] = useState(copy.sections[0]?.id ?? 'depression');
+  const [lastReviewedSection, setLastReviewedSection] = useState<string | null>(null);
 
-  useTrackModuleActivity({ firestore, userId: user?.uid, module: 'wellness' });
+  const handleReviewSection = (section: WellnessSection) => {
+    setLastReviewedSection(section.label);
+    if (!firestore || !user?.uid) return;
+
+    logProgressEventNonBlocking(firestore, {
+      userId: user.uid,
+      module: 'wellness',
+      type: 'saved',
+      detail: section.label,
+    });
+  };
 
   return (
     <div className="flex-1 space-y-6 p-4 pt-6 md:p-8">
@@ -419,6 +439,11 @@ export default function WellnessPage() {
         </Badge>
         <h1 className="text-3xl font-bold tracking-tight font-headline">{copy.title}</h1>
         <p className="max-w-4xl text-muted-foreground">{copy.description}</p>
+        {lastReviewedSection ? (
+          <p className="text-sm text-muted-foreground">
+            {copy.lastReviewed.replace('{title}', lastReviewedSection)}
+          </p>
+        ) : null}
       </div>
 
       <Card>
@@ -457,7 +482,7 @@ export default function WellnessPage() {
         </Card>
       </div>
 
-      <Tabs defaultValue={copy.sections[0].id} className="space-y-4">
+      <Tabs value={activeSectionId} onValueChange={setActiveSectionId} className="space-y-4">
         <TabsList className="flex h-auto w-full flex-wrap justify-start gap-2 bg-transparent p-0">
           {copy.sections.map((section) => (
             <TabsTrigger key={section.id} value={section.id} className="rounded-full border px-4 py-2">
@@ -471,7 +496,12 @@ export default function WellnessPage() {
             <div className="grid gap-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>{section.label}</CardTitle>
+                  <div className="flex items-center justify-between gap-3">
+                    <CardTitle>{section.label}</CardTitle>
+                    <Button type="button" variant="outline" onClick={() => handleReviewSection(section)}>
+                      {copy.reviewAction}
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent className="grid gap-4 md:grid-cols-2">
                   <div className="rounded-lg border p-4">

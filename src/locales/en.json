@@ -1267,6 +1267,8 @@
   "medical": {
     "title": "Medical Support",
     "description": "Basic clinical guidance based on your latest Mental Check-In stored in Firestore.",
+    "reviewGuidanceAction": "Mark guidance reviewed",
+    "lastReviewedGuidance": "Recently reviewed guidance: {title}.",
     "printReport": "Print report",
     "reportTitle": "Printable clinical report",
     "reportDescription": "Quick summary for clinical follow-up or discussion with a professional.",

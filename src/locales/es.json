@@ -1267,6 +1267,8 @@
   "medical": {
     "title": "Apoyo Médico",
     "description": "Orientación clínica básica basada en tu último Mental Check-In guardado en Firestore.",
+    "reviewGuidanceAction": "Marcar orientación revisada",
+    "lastReviewedGuidance": "Orientación revisada recientemente: {title}.",
     "printReport": "Imprimir reporte",
     "reportTitle": "Reporte clínico imprimible",
     "reportDescription": "Resumen rápido para seguimiento clínico o conversación con un profesional.",
