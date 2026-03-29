@@ -116,6 +116,70 @@ export default function DashboardPage() {
     }
   };
 
+  const nextStep = useMemo(() => {
+    if (userProfile?.latestCheckInLevel === 'severe') {
+      return {
+        title: t('dashboard.nextStepTitles.severe'),
+        description: t('dashboard.nextStepDescriptions.severe'),
+        primaryHref: '/crisis',
+        primaryLabel: t('sidebar.crisisSupport'),
+        secondaryHref: '/medical-support',
+        secondaryLabel: t('therapist.openMedicalSupport'),
+      };
+    }
+
+    if (!hasLatestCheckIn) {
+      return {
+        title: t('dashboard.nextStepTitles.noCheckIn'),
+        description: t('dashboard.nextStepDescriptions.noCheckIn'),
+        primaryHref: '/check-in',
+        primaryLabel: t('nav.checkIn'),
+        secondaryHref: '/observer',
+        secondaryLabel: t('nav.observer'),
+      };
+    }
+
+    switch (latestActivity?.module) {
+      case 'observer':
+        return {
+          title: t('dashboard.nextStepTitles.observer'),
+          description: t('dashboard.nextStepDescriptions.observer'),
+          primaryHref: '/reprogram',
+          primaryLabel: t('nav.reprogram'),
+          secondaryHref: '/progress',
+          secondaryLabel: t('nav.progress'),
+        };
+      case 'exposure':
+        return {
+          title: t('dashboard.nextStepTitles.exposure'),
+          description: t('dashboard.nextStepDescriptions.exposure'),
+          primaryHref: '/progress',
+          primaryLabel: t('nav.progress'),
+          secondaryHref: '/exposure',
+          secondaryLabel: t('nav.exposure'),
+        };
+      case 'grounding':
+      case 'regulation':
+        return {
+          title: t('dashboard.nextStepTitles.regulation'),
+          description: t('dashboard.nextStepDescriptions.regulation'),
+          primaryHref: '/progress',
+          primaryLabel: t('nav.progress'),
+          secondaryHref: '/observer',
+          secondaryLabel: t('nav.observer'),
+        };
+      default:
+        return {
+          title: t('dashboard.nextStepTitles.default'),
+          description: t('dashboard.nextStepDescriptions.default'),
+          primaryHref: '/progress',
+          primaryLabel: t('nav.progress'),
+          secondaryHref: '/observer',
+          secondaryLabel: t('nav.observer'),
+        };
+    }
+  }, [hasLatestCheckIn, latestActivity?.module, t, userProfile?.latestCheckInLevel]);
+
   const stats = [
     { title: t('dashboard.xpEarned'), value: isLoading ? '...' : xpEarned.toLocaleString(locale), icon: <Award className="h-6 w-6 text-primary" /> },
     { title: t('dashboard.levelTitle'), value: isLoading ? '...' : t('userProgress.level', { level }), icon: <Star className="h-6 w-6 text-primary" /> },
@@ -159,7 +223,7 @@ export default function DashboardPage() {
             <CardTitle>{t('dashboard.overviewTitle')}</CardTitle>
             <CardDescription>{t('dashboard.overviewDescription')}</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-3">
+          <CardContent className="grid gap-4 md:grid-cols-4">
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">{t('dashboard.activeMissionTitle')}</p>
               <p className="mt-2 text-lg font-semibold">
@@ -237,6 +301,21 @@ export default function DashboardPage() {
                 </Badge>
                 <Button asChild variant="ghost" size="sm" className="px-2">
                   <Link href="/progress">{t('nav.progress')}</Link>
+                </Button>
+              </div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <p className="text-sm text-muted-foreground">{t('dashboard.nextStepCardTitle')}</p>
+              <p className="mt-2 text-lg font-semibold">{isLoading ? '...' : nextStep.title}</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {isLoading ? '...' : nextStep.description}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button asChild size="sm">
+                  <Link href={nextStep.primaryHref}>{nextStep.primaryLabel}</Link>
+                </Button>
+                <Button asChild variant="outline" size="sm">
+                  <Link href={nextStep.secondaryHref}>{nextStep.secondaryLabel}</Link>
                 </Button>
               </div>
             </div>

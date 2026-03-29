@@ -37,6 +37,23 @@
     "noRecentActivity": "No recent activity yet",
     "recentActivityHint": "Complete actions in modules to see the latest useful movement here.",
     "activeModulesCount": "{count} modules with meaningful activity",
+    "nextStepCardTitle": "Suggested next step",
+    "nextStepTitles": {
+      "severe": "Stabilize and ask for support now",
+      "noCheckIn": "Start with a real check-in",
+      "observer": "Convert what you noticed into a new perspective",
+      "exposure": "Review what changed after exposure",
+      "regulation": "Turn regulation into follow-up",
+      "default": "Keep the process moving"
+    },
+    "nextStepDescriptions": {
+      "severe": "Use crisis support first and then review medical guidance.",
+      "noCheckIn": "Complete your first check-in to unlock more precise guidance.",
+      "observer": "Use reprogramming to work on the last thought you registered.",
+      "exposure": "Open progress to see how your recent exposure work is accumulating.",
+      "regulation": "Check progress or capture what changed after the practice.",
+      "default": "Open progress or observer to record the next useful step."
+    },
     "crisisBannerTitle": "You need an immediate support path",
     "crisisBannerDescription": "Your latest check-in was marked severe. Open crisis support to view emergency lines and care centers in Medellin.",
     "returnHome": "Return to home",

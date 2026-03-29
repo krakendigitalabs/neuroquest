@@ -45,11 +45,29 @@ vi.mock('@/context/language-provider', () => ({
       if (key === 'dashboard.crisisBannerDescription') return 'Open support routes now.';
       if (key === 'dashboard.nextMissionTitle') return 'Next mission';
       if (key === 'dashboard.nextMissionDescription') return 'Next mission description';
+      if (key === 'dashboard.recentActivityTitle') return 'Recent meaningful activity';
+      if (key === 'dashboard.noRecentActivity') return 'No recent activity yet';
+      if (key === 'dashboard.recentActivityHint') return 'Complete actions in modules to see the latest useful movement here.';
+      if (key === 'dashboard.activeModulesCount') return `${values?.count ?? 0} modules with meaningful activity`;
+      if (key === 'dashboard.nextStepCardTitle') return 'Suggested next step';
+      if (key === 'dashboard.nextStepTitles.severe') return 'Stabilize and ask for support now';
+      if (key === 'dashboard.nextStepDescriptions.severe') return 'Use crisis support first and then review medical guidance.';
+      if (key === 'dashboard.nextStepTitles.noCheckIn') return 'Start with a real check-in';
+      if (key === 'dashboard.nextStepDescriptions.noCheckIn') return 'Complete your first check-in to unlock more precise guidance.';
+      if (key === 'dashboard.nextStepTitles.observer') return 'Convert what you noticed into a new perspective';
+      if (key === 'dashboard.nextStepDescriptions.observer') return 'Use reprogramming to work on the last thought you registered.';
+      if (key === 'dashboard.nextStepTitles.exposure') return 'Review what changed after exposure';
+      if (key === 'dashboard.nextStepDescriptions.exposure') return 'Open progress to see how your recent exposure work is accumulating.';
+      if (key === 'dashboard.nextStepTitles.regulation') return 'Turn regulation into follow-up';
+      if (key === 'dashboard.nextStepDescriptions.regulation') return 'Check progress or capture what changed after the practice.';
+      if (key === 'dashboard.nextStepTitles.default') return 'Keep the process moving';
+      if (key === 'dashboard.nextStepDescriptions.default') return 'Open progress or observer to record the next useful step.';
       if (key === 'therapist.openMedicalSupport') return 'Open Medical Support';
       if (key === 'sidebar.crisisSupport') return 'Crisis Support';
       if (key === 'userProgress.level') return `Level ${values?.level ?? 1}`;
       if (key === 'checkIn.results.severe.category') return 'Severe Level';
       if (key === 'progress.active') return 'Active';
+      if (key === 'progress.activityTypes.saved') return 'Saved entry';
       return key;
     },
   }),
@@ -79,16 +97,32 @@ describe('DashboardPage severe flow', () => {
         latestCheckInNote: '',
       },
     });
-    useCollectionMock.mockReturnValue({
-      data: [],
-      isLoading: false,
-    });
+    useCollectionMock
+      .mockReturnValueOnce({
+        data: [],
+        isLoading: false,
+      })
+      .mockReturnValueOnce({
+        data: [
+          {
+            id: 'event-1',
+            userId: 'user-1',
+            module: 'medical-support',
+            type: 'saved',
+            detail: 'Basic recommendations',
+            createdAt: '2026-03-27T12:00:00.000Z',
+          },
+        ],
+        isLoading: false,
+      });
 
     render(<DashboardPage />);
 
     expect(screen.getByText('You need an immediate support path')).toBeInTheDocument();
-    expect(screen.getByText('Open Medical Support')).toBeInTheDocument();
-    expect(screen.getByText('Crisis Support')).toBeInTheDocument();
+    expect(screen.getAllByText('Open Medical Support').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Crisis Support').length).toBeGreaterThan(0);
     expect(screen.getByText('31/40')).toBeInTheDocument();
+    expect(screen.getByText('Suggested next step')).toBeInTheDocument();
+    expect(screen.getByText('Stabilize and ask for support now')).toBeInTheDocument();
   });
 });

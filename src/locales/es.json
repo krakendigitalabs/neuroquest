@@ -36,6 +36,23 @@
     "noRecentActivity": "Aún no hay actividad reciente",
     "recentActivityHint": "Completa acciones en módulos para ver aquí el último movimiento útil.",
     "activeModulesCount": "{count} módulos con actividad real",
+    "nextStepCardTitle": "Siguiente paso sugerido",
+    "nextStepTitles": {
+      "severe": "Estabiliza y busca apoyo ahora",
+      "noCheckIn": "Empieza con un check-in real",
+      "observer": "Convierte lo que observaste en una nueva perspectiva",
+      "exposure": "Revisa qué cambió después de la exposición",
+      "regulation": "Convierte la regulación en seguimiento",
+      "default": "Mantén el proceso en movimiento"
+    },
+    "nextStepDescriptions": {
+      "severe": "Usa primero apoyo en crisis y luego revisa la orientación médica.",
+      "noCheckIn": "Completa tu primer check-in para desbloquear guía más precisa.",
+      "observer": "Usa reprogramación para trabajar el último pensamiento que registraste.",
+      "exposure": "Abre progreso para ver cómo se está acumulando tu trabajo reciente de exposición.",
+      "regulation": "Revisa progreso o registra qué cambió después de la práctica.",
+      "default": "Abre progreso u observer para registrar el siguiente paso útil."
+    },
     "crisisBannerTitle": "Necesitas una ruta de apoyo inmediata",
     "crisisBannerDescription": "Tu último check-in quedó en nivel severo. Abre apoyo en crisis para ver líneas de emergencia y centros de atención en Medellín.",
     "returnHome": "Regresar al inicio",
