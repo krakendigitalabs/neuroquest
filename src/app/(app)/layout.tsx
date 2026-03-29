@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { doc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { User } from 'firebase/auth';
@@ -70,13 +70,9 @@ function UserProfileInitializer({ user, onReady }: { user: User; onReady: () => 
   const { t } = useTranslation();
 
   useEffect(() => {
-    let cancelled = false;
-
     const createUserProfile = async () => {
       if (!user || !firestore) {
-        if (!cancelled) {
-          onReady();
-        }
+        onReady();
         return;
       }
 
@@ -131,17 +127,11 @@ function UserProfileInitializer({ user, onReady }: { user: User; onReady: () => 
 
         clearPendingRequestedRole();
       } finally {
-        if (!cancelled) {
-          onReady();
-        }
+        onReady();
       }
     };
 
     void createUserProfile();
-
-    return () => {
-      cancelled = true;
-    };
   }, [user, firestore, onReady, t]);
 
   return null;
@@ -153,6 +143,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { t } = useTranslation();
   const [isProfileReady, setIsProfileReady] = useState(false);
+  const handleProfileReady = useCallback(() => {
+    setIsProfileReady(true);
+  }, []);
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -177,7 +170,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   if (!isProfileReady) {
     return (
       <>
-        <UserProfileInitializer user={user} onReady={() => setIsProfileReady(true)} />
+        <UserProfileInitializer user={user} onReady={handleProfileReady} />
         <div>{t('layout.loading')}</div>
       </>
     );
@@ -185,7 +178,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-      <UserProfileInitializer user={user} onReady={() => setIsProfileReady(true)} />
       <AppSidebar />
       <SidebarInset>
         <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-border/60 bg-background/95 px-4 py-3 backdrop-blur md:hidden">

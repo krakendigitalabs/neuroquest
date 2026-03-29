@@ -3,7 +3,7 @@
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useRef, useState, useEffect } from 'react';
 import { FirebaseApp } from 'firebase/app';
 import { Firestore } from 'firebase/firestore';
-import { Auth, User, onAuthStateChanged, onIdTokenChanged, signOut } from 'firebase/auth';
+import { Auth, User, onAuthStateChanged, onIdTokenChanged } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
 
 interface FirebaseProviderProps {
@@ -141,12 +141,6 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       } catch (error) {
         lastSyncedTokenRef.current = null;
         console.error('FirebaseProvider: failed to sync auth session', error);
-
-        if (firebaseUser) {
-          await signOut(auth).catch((signOutError) => {
-            console.error('FirebaseProvider: failed to sign out after session sync error', signOutError);
-          });
-        }
       } finally {
         setIsSessionLoading(false);
       }
