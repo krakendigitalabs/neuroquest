@@ -70,7 +70,12 @@ Required Vercel environment variables:
 - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
 - `NEXT_PUBLIC_FIREBASE_APP_ID`
 - `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID`
+- `FIREBASE_ADMIN_PROJECT_ID`
+- `FIREBASE_ADMIN_CLIENT_EMAIL`
+- `FIREBASE_ADMIN_PRIVATE_KEY`
 - `GEMINI_API_KEY`
+
+The admin credentials power `/api/auth/session` and must target the same Firebase project as the public `NEXT_PUBLIC_FIREBASE_PROJECT_ID`. Follow `.env.example` for the correct private-key formatting (wrap it in quotes and keep the literal `\n` sequences or use Vercel's multiline editor so the key remains intact).
 
 Recommended deployment split:
 

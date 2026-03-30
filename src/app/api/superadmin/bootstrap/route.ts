@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
-import { getAdminAuth, getAdminDb } from '@/firebase/admin';
+import { getAdminAuth, getAdminDb } from '@/lib/firebase-admin';
 import { isAllowedSuperadminEmail } from '@/lib/superadmin-config';
 
 export const runtime = 'nodejs';

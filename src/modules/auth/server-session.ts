@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import type { DecodedIdToken } from 'firebase-admin/auth';
-import { getAdminAuth } from '@/firebase/admin';
+import { getAdminAuth } from '@/lib/firebase-admin';
 
 export const AUTH_COOKIE_NAME = 'nq_id_token';
 

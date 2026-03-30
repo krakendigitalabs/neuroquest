@@ -22,7 +22,12 @@ As of March 27, 2026, NeuroQuest uses:
 - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
 - `NEXT_PUBLIC_FIREBASE_APP_ID`
 - `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID`
+- `FIREBASE_ADMIN_PROJECT_ID`
+- `FIREBASE_ADMIN_CLIENT_EMAIL`
+- `FIREBASE_ADMIN_PRIVATE_KEY`
 - `GEMINI_API_KEY`
+
+Use the `.env.example` file as your template so the admin private key keeps the literal `\n` sequences that Vercel requires or paste it through their multiline editor. The admin and public project IDs must match exactly; otherwise `/api/auth/session` cannot verify Firebase tokens.
 
 ## Release Flow
 

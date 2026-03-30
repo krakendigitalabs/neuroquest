@@ -1,4 +1,4 @@
-import { getAdminAuth, getAdminDb } from '@/firebase/admin';
+import { getAdminAuth, getAdminDb } from '@/lib/firebase-admin';
 import { getFallbackRolePolicy, getSortedModuleCatalog, MODULE_CATALOG_FALLBACK } from '@/modules/access/module-catalog';
 import { resolveAccess } from '@/modules/access/access.resolver';
 import type { AccessRule, ModuleCatalogEntry, ResolvedAccess, RolePolicy, UserModuleOverrides } from '@/modules/access/access.types';
