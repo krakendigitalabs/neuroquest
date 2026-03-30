@@ -20,12 +20,12 @@ export function UserProgress({ level, currentXp, xpToNextLevel }: UserProgressPr
   }, [currentXp, xpToNextLevel]);
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex justify-between items-center">
-        <span className="text-sm font-medium text-sidebar-foreground">{level}</span>
-        <span className="text-xs font-semibold text-sidebar-primary">{currentXp} / {xpToNextLevel} XP</span>
+    <div className="flex min-w-0 flex-col gap-2">
+      <div className="flex min-w-0 items-center justify-between gap-3">
+        <span className="truncate text-sm font-medium text-sidebar-foreground">{level}</span>
+        <span className="shrink-0 text-[11px] font-semibold text-sidebar-primary sm:text-xs">{currentXp} / {xpToNextLevel} XP</span>
       </div>
-      <Progress value={progress} className="h-2" />
+      <Progress value={progress} className="h-2 w-full" />
     </div>
   )
 }

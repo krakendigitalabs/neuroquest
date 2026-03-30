@@ -16,6 +16,9 @@ const ThoughtAnalysisInputSchema = z.object({
     .describe(
       'A distressing or intrusive thought logged by the user for analysis.'
     ),
+  locale: z
+    .enum(['es', 'en'])
+    .describe('The active UI language to use in the response.'),
 });
 export type ThoughtAnalysisInput = z.infer<typeof ThoughtAnalysisInputSchema>;
 
@@ -49,6 +52,9 @@ const thoughtAnalysisPrompt = ai.definePrompt({
 Your task is to analyze a user's distressing or intrusive thought. Provide a clear and concise analysis, determine if it aligns with common OCD/anxiety thought patterns, and offer a practical cognitive reframing suggestion to help the user identify it as a 'TOC thought' and practice mental separation without reacting.
 
 Thought to analyze: """{{{thought}}}"""
+
+Use the same language indicated by locale (es = Spanish, en = English) for every output field.
+Keep the tone calm, supportive, clinically clear, and consistent with the user's language.
 
 Focus on validating the user's experience while gently guiding them towards a healthier perspective. Your output should be structured as follows:
 

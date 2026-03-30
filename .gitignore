@@ -32,6 +32,7 @@ yarn-error.log*
 
 # vercel
 .vercel
+.vscode/
 
 # typescript
 *.tsbuildinfo
@@ -47,3 +48,4 @@ node_modules
 .next
 .env
 *.tar.gz
+.vercel

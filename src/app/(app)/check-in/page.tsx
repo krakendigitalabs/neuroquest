@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { addDoc, collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +9,11 @@ import { useTranslation } from '@/context/language-provider';
 import { useFirebase } from '@/firebase';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { calculateMentalCheckInScore, CHECK_IN_MAX_SCORE, getMentalCheckInLevel, type MentalCheckInLevel } from '@/lib/mental-check-in';
-import type { CheckupAnswer, MentalCheckup, Recommendations, RiskFlags } from '@/models/mental-checkup';
+import { deriveRiskFlags } from '@/lib/clinical-triage';
+import type { CheckupAnswer, Recommendations, RiskFlags } from '@/models/mental-checkup';
+import { persistMentalCheckIn } from '@/lib/check-in-records';
+import { PatientReportActions } from '@/components/patient-report-actions';
+import { buildPatientReportText } from '@/lib/patient-report';
 
 type MissionResult = {
   category: string;
@@ -30,23 +33,27 @@ type OptionItem = {
 };
 
 export default function CheckInPage() {
-  const { t } = useTranslation();
+  const { t, tm, locale } = useTranslation();
   const { user, firestore } = useFirebase();
   const { userProfile } = useUserProfile();
 
   const questions = useMemo<QuestionItem[]>(() => (
-    Array.from({ length: 10 }, (_, index) => ({
-      id: index + 1,
-      text: t(`checkIn.questions.${index}.text`),
-    }))
-  ), [t]);
+    tm<QuestionItem[]>('checkIn.questions')
+      .map((question, index) => ({
+        id: Number(question?.id ?? index + 1),
+        text: String(question?.text ?? ''),
+      }))
+      .filter((question) => question.text.length > 0)
+  ), [tm]);
 
   const options = useMemo<OptionItem[]>(() => (
-    Array.from({ length: 5 }, (_, index) => ({
-      value: index,
-      label: t(`checkIn.options.${index}.label`),
-    }))
-  ), [t]);
+    tm<OptionItem[]>('checkIn.options')
+      .map((option, index) => ({
+        value: Number(option?.value ?? index),
+        label: String(option?.label ?? ''),
+      }))
+      .filter((option) => option.label.length > 0)
+  ), [tm]);
 
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [notes, setNotes] = useState('');
@@ -57,6 +64,9 @@ export default function CheckInPage() {
     score: number;
     severity: MentalCheckInLevel;
     mission: MissionResult;
+    note: string;
+    riskFlags: RiskFlags;
+    generatedAt: Date;
   } | null>(null);
 
   const answeredAllQuestions = questions.every((question) => typeof answers[question.id] === 'number');
@@ -112,10 +122,17 @@ export default function CheckInPage() {
     };
   }, [computedSeverity, currentMission, t]);
 
-  const riskFlags = useMemo<RiskFlags>(() => ({
-    selfHarmRisk: (answers[10] ?? 0) >= 3,
-    needsProfessionalSupport: computedSeverity === 'severe',
-  }), [answers, computedSeverity]);
+  const riskFlags = useMemo<RiskFlags>(() => {
+    if (!computedSeverity) {
+      return {
+        selfHarmRisk: false,
+        needsProfessionalSupport: false,
+        urgentSupportRecommended: false,
+      };
+    }
+
+    return deriveRiskFlags(draftAnswers, computedSeverity);
+  }, [computedSeverity, draftAnswers]);
 
   const handleAnswerChange = (questionId: number, value: number) => {
     setAnswers((current) => ({ ...current, [questionId]: value }));
@@ -142,40 +159,34 @@ export default function CheckInPage() {
       return;
     }
 
-    const payload: MentalCheckup = {
-      userId: user.uid,
-      patientName: userProfile?.displayName || user.displayName || user.email || t('sidebar.guestUser'),
-      score: computedScore,
-      maxScore: CHECK_IN_MAX_SCORE,
-      level: computedSeverity,
-      resultTitle: currentMission.category,
-      mission: currentMission.mission,
-      summary: currentMission.description,
-      answers: draftAnswers,
-      recommendations,
-      activatedModules: ['check-in'],
-      riskFlags,
-      professionalNote: notes.trim() || t('checkIn.defaultProfessionalNote'),
-      createdAt: serverTimestamp(),
-    };
-
     try {
       setSaving(true);
+      const professionalNote = notes.trim() || t('checkIn.defaultProfessionalNote');
 
-      await addDoc(collection(firestore, 'users', user.uid, 'mental_checkups'), payload);
-
-      await setDoc(doc(firestore, 'users', user.uid), {
-        latestCheckInScore: computedScore,
-        latestCheckInLevel: computedSeverity,
-        latestCheckInAt: serverTimestamp(),
-        latestCheckInNote: notes.trim() || t('checkIn.defaultProfessionalNote'),
-      }, { merge: true });
+      await persistMentalCheckIn({
+        firestore,
+        userId: user.uid,
+        patientName: userProfile?.displayName || user.displayName || user.email || t('sidebar.guestUser'),
+        score: computedScore,
+        maxScore: CHECK_IN_MAX_SCORE,
+        level: computedSeverity,
+        resultTitle: currentMission.category,
+        mission: currentMission.mission,
+        summary: currentMission.description,
+        answers: draftAnswers,
+        recommendations,
+        riskFlags,
+        professionalNote,
+      });
 
       setSaved(true);
       setResult({
         score: computedScore,
         severity: computedSeverity,
         mission: currentMission,
+        note: professionalNote,
+        riskFlags,
+        generatedAt: new Date(),
       });
     } catch (submitError) {
       console.error('Error saving check-in:', submitError);
@@ -184,6 +195,38 @@ export default function CheckInPage() {
       setSaving(false);
     }
   };
+
+  const reportPatient = userProfile?.displayName || user?.displayName || user?.email || t('sidebar.guestUser');
+  const resultReportText = useMemo(() => {
+    if (!result) return '';
+
+    return buildPatientReportText({
+      title: t('checkIn.reportTitle'),
+      patientLabel: t('checkIn.reportPatientLabel'),
+      patient: reportPatient,
+      generatedAtLabel: t('checkIn.reportGeneratedAtLabel'),
+      generatedAt: result.generatedAt.toLocaleString(locale),
+      summaryTitle: t('checkIn.reportClinicalSummaryTitle'),
+      summary: t('checkIn.reportClinicalSummary', {
+        category: result.mission.category,
+        score: result.score,
+        maxScore: CHECK_IN_MAX_SCORE,
+        mission: result.mission.mission,
+      }),
+      sections: [
+        {
+          title: t('checkIn.reportTasksTitle'),
+          lines: result.mission.tasks,
+        },
+        {
+          title: t('checkIn.reportNotesTitle'),
+          lines: [result.note],
+        },
+      ],
+      patientSignatureLabel: t('checkIn.reportPatientSignature'),
+      therapistSignatureLabel: t('checkIn.reportTherapistSignature'),
+    });
+  }, [locale, reportPatient, result, t]);
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -257,7 +300,7 @@ export default function CheckInPage() {
               </p>
             </div>
 
-            <Button type="submit" disabled={saving}>
+            <Button type="submit" disabled={saving || !answeredAllQuestions}>
               {saving ? t('checkIn.saving') : t('checkIn.saveButton')}
             </Button>
 
@@ -278,7 +321,10 @@ export default function CheckInPage() {
 
       {result ? (
         <section className="rounded-xl border bg-card p-6 shadow-sm space-y-4">
-          <h2 className="text-2xl font-bold">{t('checkIn.resultTitle')}</h2>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-2xl font-bold">{t('checkIn.resultTitle')}</h2>
+            <PatientReportActions reportTitle={t('checkIn.reportTitle')} reportText={resultReportText} />
+          </div>
           <div className="grid gap-3">
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">{t('checkIn.totalScore')}</p>
@@ -305,7 +351,32 @@ export default function CheckInPage() {
               </ul>
             </div>
 
-            {result.severity === 'severe' ? (
+            <div className="rounded-lg border p-4 text-sm">
+              <p className="font-medium">{t('checkIn.reportHeaderTitle')}</p>
+              <div className="mt-3 grid gap-2 md:grid-cols-2">
+                <p><span className="font-medium">{t('checkIn.reportPatientLabel')}:</span> {reportPatient}</p>
+                <p><span className="font-medium">{t('checkIn.reportGeneratedAtLabel')}:</span> {result.generatedAt.toLocaleString(locale)}</p>
+              </div>
+            </div>
+
+            <div className="rounded-lg border p-4 text-sm">
+              <p className="font-medium">{t('checkIn.reportClinicalSummaryTitle')}</p>
+              <p className="mt-2">
+                {t('checkIn.reportClinicalSummary', {
+                  category: result.mission.category,
+                  score: result.score,
+                  maxScore: CHECK_IN_MAX_SCORE,
+                  mission: result.mission.mission,
+                })}
+              </p>
+            </div>
+
+            <div className="rounded-lg border p-4 text-sm">
+              <p className="font-medium">{t('checkIn.reportNotesTitle')}</p>
+              <p className="mt-2 text-muted-foreground">{result.note}</p>
+            </div>
+
+            {result.riskFlags.urgentSupportRecommended ? (
               <div className="rounded-lg border border-red-400 bg-red-50 p-4">
                 <p className="font-semibold text-red-700">{t('checkIn.alertTitle')}</p>
                 <p className="mt-1 text-red-700">{t('checkIn.alertText')}</p>
@@ -315,7 +386,26 @@ export default function CheckInPage() {
                   </Button>
                 </div>
               </div>
+            ) : result.riskFlags.needsProfessionalSupport ? (
+              <div className="rounded-lg border border-amber-400 bg-amber-50 p-4">
+                <p className="font-semibold text-amber-800">{t('checkIn.prioritySupportTitle')}</p>
+                <p className="mt-1 text-amber-800">{t('checkIn.prioritySupportText')}</p>
+                <div className="mt-4">
+                  <Button asChild variant="outline">
+                    <Link href="/medical-support">{t('therapist.openMedicalSupport')}</Link>
+                  </Button>
+                </div>
+              </div>
             ) : null}
+
+            <div className="grid gap-6 pt-4 md:grid-cols-2">
+              <div className="border-t pt-3">
+                <p className="text-xs text-muted-foreground">{t('checkIn.reportPatientSignature')}</p>
+              </div>
+              <div className="border-t pt-3">
+                <p className="text-xs text-muted-foreground">{t('checkIn.reportTherapistSignature')}</p>
+              </div>
+            </div>
           </div>
         </section>
       ) : null}

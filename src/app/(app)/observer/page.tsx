@@ -10,6 +10,9 @@ import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import type { ThoughtRecord } from '@/models/thought-record';
 import { buildThoughtInsights, buildThoughtTimeline, getThoughtRiskLevel, toDate } from '@/lib/thought-insights';
+import { normalizeThoughtRecords } from '@/lib/thought-records';
+import { PatientReportActions } from '@/components/patient-report-actions';
+import { buildPatientReportText } from '@/lib/patient-report';
 
 function translateLabel(t: (key: string) => string, label?: string) {
   if (!label) return '';
@@ -44,7 +47,7 @@ function ThoughtHistoryItem({ item }: { item: ThoughtRecord }) {
       <CardHeader className="gap-3">
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div className="space-y-1">
-            <CardTitle className="text-lg leading-snug">"{item.thoughtText}"</CardTitle>
+            <CardTitle className="text-lg leading-snug">&quot;{item.thoughtText}&quot;</CardTitle>
             <CardDescription>{formattedDate || ' '}</CardDescription>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -103,22 +106,74 @@ export default function ObserverPage() {
   }, [firestore, user]);
 
   const { data: thoughtHistory, isLoading } = useCollection<ThoughtRecord>(thoughtsQuery);
+  const normalizedThoughtHistory = useMemo(() => normalizeThoughtRecords(thoughtHistory), [thoughtHistory]);
 
   const sortedThoughts = useMemo(
     () =>
-      [...(thoughtHistory ?? [])].sort(
+      [...normalizedThoughtHistory].sort(
         (a, b) => (toDate(b.recordedAt)?.getTime() ?? 0) - (toDate(a.recordedAt)?.getTime() ?? 0)
       ),
-    [thoughtHistory]
+    [normalizedThoughtHistory]
   );
 
   const insights = useMemo(() => buildThoughtInsights(sortedThoughts), [sortedThoughts]);
   const timeline = useMemo(() => buildThoughtTimeline(sortedThoughts, 7), [sortedThoughts]);
+  const generatedAt = useMemo(() => new Date(), []);
+  const reportPatient = user?.displayName || user?.email || t('sidebar.guestUser');
+  const observerSummary = useMemo(() => {
+    if (!sortedThoughts.length) {
+      return t('observer.reportSummaryEmpty');
+    }
+
+    return t('observer.reportSummaryWithStats', {
+      total: insights.totalCount,
+      recent: insights.recentCount,
+      intensity: insights.averageIntensity.toLocaleString(locale),
+      risk: insights.highRiskCount,
+    });
+  }, [insights.averageIntensity, insights.highRiskCount, insights.recentCount, insights.totalCount, locale, sortedThoughts.length, t]);
+  const reportText = useMemo(() => buildPatientReportText({
+    title: t('observer.reportTitle'),
+    patientLabel: t('observer.reportPatientLabel'),
+    patient: reportPatient,
+    generatedAtLabel: t('observer.reportGeneratedAtLabel'),
+    generatedAt: generatedAt.toLocaleString(locale),
+    summaryTitle: t('observer.reportSummaryTitle'),
+    summary: observerSummary,
+    sections: [
+      {
+        title: t('observer.reportPatternsTitle'),
+        lines: [
+          `${t('observer.averageCompulsionUrge')}: ${insights.averageCompulsionUrge.toLocaleString(locale)}`,
+          `${t('observer.highRiskThoughts')}: ${insights.highRiskCount.toLocaleString(locale)}`,
+          insights.topEmotion
+            ? t('observer.topEmotionDesc', { emotion: translateEmotion(t, insights.topEmotion) })
+            : t('observer.noEmotionTrend'),
+        ],
+      },
+      {
+        title: t('observer.recentThoughts'),
+        lines: sortedThoughts.length
+          ? sortedThoughts.slice(0, 5).map((item) => {
+              const date = toDate(item.recordedAt)?.toLocaleString(locale) ?? t('progress.unknownDate');
+              const emotion = translateEmotion(t, item.associatedEmotion);
+              const label = translateLabel(t, item.cognitiveLabel);
+              return `${date} · ${item.thoughtText} · ${emotion} · ${label} · ${t('observer.intensity')}: ${item.intensity}/10`;
+            })
+          : [t('observer.noThoughts')],
+      },
+    ],
+    patientSignatureLabel: t('observer.reportPatientSignature'),
+    therapistSignatureLabel: t('observer.reportTherapistSignature'),
+  }), [generatedAt, insights.averageCompulsionUrge, insights.highRiskCount, insights.topEmotion, locale, observerSummary, reportPatient, sortedThoughts, t]);
 
   return (
     <div className="flex-1 space-y-6 p-4 pt-6 md:p-8">
       <div className="flex items-center justify-between space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight font-headline">{t('observer.title')}</h1>
+        <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-3xl font-bold tracking-tight font-headline">{t('observer.title')}</h1>
+          <PatientReportActions reportTitle={t('observer.reportTitle')} reportText={reportText} />
+        </div>
       </div>
       <p className="text-muted-foreground">
         {t('observer.description')}

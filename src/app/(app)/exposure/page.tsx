@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Target, CheckCircle, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -15,6 +15,11 @@ import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { PatientReportActions } from '@/components/patient-report-actions';
+import { buildPatientReportText } from '@/lib/patient-report';
+import { toDate } from '@/lib/thought-insights';
+import { logProgressEventNonBlocking } from '@/lib/progress-events';
+import { useTrackModuleActivity } from '@/hooks/use-track-module-activity';
 
 const MissionCard = ({ mission, onComplete }: { mission: WithId<ExposureMission>, onComplete: (missionId: string, xp: number) => void }) => {
   const { t } = useTranslation();
@@ -25,7 +30,25 @@ const MissionCard = ({ mission, onComplete }: { mission: WithId<ExposureMission>
     return t('exposure.difficultyHard');
   }
 
-  const missionTypeKey = (mission.missionType || '').toLowerCase().replace(/ /g, '_');
+  const normalizedMissionType = (mission.missionType || '').toLowerCase().replace(/ /g, '_');
+  const missionTypeKey = (() => {
+    switch (normalizedMissionType) {
+      case 'observer':
+      case 'observador_mental':
+        return 'observer';
+      case 'exposure':
+      case 'exposición':
+        return 'exposure';
+      case 'regulation':
+      case 'regulación_emocional':
+        return 'regulation';
+      case 'reprogram':
+      case 'reprogramación_cognitiva':
+        return 'reprogram';
+      default:
+        return normalizedMissionType;
+    }
+  })();
 
   return (
     <Card className={`transition-all ${mission.status === 'completed' ? 'bg-secondary/30' : 'hover:shadow-lg hover:-translate-y-1'}`}>
@@ -56,7 +79,7 @@ const MissionCard = ({ mission, onComplete }: { mission: WithId<ExposureMission>
 
 
 export default function ExposurePage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { firestore, user } = useFirebase();
   const { toast } = useToast();
   const [showCustomMissionForm, setShowCustomMissionForm] = useState(false);
@@ -66,6 +89,8 @@ export default function ExposurePage() {
   const [targetBehavior, setTargetBehavior] = useState('');
   const [resistanceTarget, setResistanceTarget] = useState('');
   const [isSavingMission, setIsSavingMission] = useState(false);
+
+  useTrackModuleActivity({ firestore, userId: user?.uid, module: 'exposure' });
 
   const missionsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
@@ -122,6 +147,12 @@ export default function ExposurePage() {
         title: t('exposure.missionCompletedToast'),
         description: t('exposure.missionCompletedToastDesc', { xp }),
       });
+      logProgressEventNonBlocking(firestore, {
+        userId: user.uid,
+        module: 'exposure',
+        type: 'completed',
+        detail: `XP ${xp}`,
+      });
     } catch (e) {
       console.error("Transaction failed: ", e);
       toast({
@@ -148,7 +179,7 @@ export default function ExposurePage() {
       const parsedDifficulty = Number(difficultyLevel);
       const xpReward = 20 + parsedDifficulty * 5;
 
-      await addDoc(collection(firestore, 'users', user.uid, 'exposureMissions'), {
+      const missionPayload = {
         userId: user.uid,
         title: missionTitle.trim(),
         description: missionDescription.trim(),
@@ -161,7 +192,15 @@ export default function ExposurePage() {
         isAiGenerated: false,
         missionType: 'exposición',
         createdAt: serverTimestamp(),
-      } satisfies Omit<ExposureMission, 'id'>);
+      } satisfies Omit<ExposureMission, 'id'>;
+
+      await addDoc(collection(firestore, 'users', user.uid, 'exposureMissions'), missionPayload);
+      logProgressEventNonBlocking(firestore, {
+        userId: user.uid,
+        module: 'exposure',
+        type: 'created',
+        detail: missionPayload.title,
+      });
 
       toast({
         title: t('exposure.customMissionCreatedTitle'),
@@ -188,14 +227,57 @@ export default function ExposurePage() {
   const completedCount = completedMissions.length;
   const totalMissions = (missions || []).length;
   const progressValue = totalMissions > 0 ? (completedCount / totalMissions) * 100 : 0;
+  const generatedAt = useMemo(() => new Date(), []);
+  const reportPatient = user?.displayName || user?.email || t('sidebar.guestUser');
+  const reportText = useMemo(() => buildPatientReportText({
+    title: t('exposure.reportTitle'),
+    patientLabel: t('exposure.reportPatientLabel'),
+    patient: reportPatient,
+    generatedAtLabel: t('exposure.reportGeneratedAtLabel'),
+    generatedAt: generatedAt.toLocaleString(locale),
+    summaryTitle: t('exposure.reportSummaryTitle'),
+    summary: totalMissions
+      ? t('exposure.reportSummaryWithProgress', {
+          completed: completedCount,
+          total: totalMissions,
+          xp: completedMissions.reduce((sum, mission) => sum + mission.xpReward, 0),
+        })
+      : t('exposure.reportSummaryEmpty'),
+    sections: [
+      {
+        title: t('exposure.completedMissions'),
+        lines: completedMissions.length
+          ? completedMissions.map((mission) => {
+              const completionDate = toDate(mission.completionDate)?.toLocaleString(locale) ?? t('progress.unknownDate');
+              const missionTypeKey = (mission.missionType || '').toLowerCase().replace(/ /g, '_');
+              const translatedType = t(`missionTypes.${missionTypeKey}`);
+              return `${completionDate} · ${mission.title} · ${translatedType === `missionTypes.${missionTypeKey}` ? mission.missionType || t('nav.exposure') : translatedType} · XP ${mission.xpReward}`;
+            })
+          : [t('exposure.noCompletedMissions')],
+      },
+      {
+        title: t('exposure.availableMissions'),
+        lines: availableMissions.length
+          ? availableMissions.slice(0, 5).map((mission) => `${mission.title} · ${t(`progress.${mission.status}`)}`)
+          : [t('exposure.noAvailableMissions')],
+      },
+    ],
+    patientSignatureLabel: t('exposure.reportPatientSignature'),
+    therapistSignatureLabel: t('exposure.reportTherapistSignature'),
+  }), [availableMissions, completedCount, completedMissions, generatedAt, locale, reportPatient, t, totalMissions]);
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight font-headline">{t('exposure.title')}</h1>
-        <Button onClick={() => setShowCustomMissionForm((value) => !value)}>
-          <Plus className="mr-2 h-4 w-4" /> {t('exposure.customMission')}
-        </Button>
+        <div className="flex flex-1 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <h1 className="text-3xl font-bold tracking-tight font-headline">{t('exposure.title')}</h1>
+          <div className="flex flex-wrap gap-2">
+            <PatientReportActions reportTitle={t('exposure.reportTitle')} reportText={reportText} />
+            <Button onClick={() => setShowCustomMissionForm((value) => !value)}>
+              <Plus className="mr-2 h-4 w-4" /> {t('exposure.customMission')}
+            </Button>
+          </div>
+        </div>
       </div>
       <p className="text-muted-foreground">
         {t('exposure.description')}
@@ -259,6 +341,7 @@ export default function ExposurePage() {
         <Card>
           <CardHeader>
             <CardTitle>{t('exposure.progressTitle')}</CardTitle>
+            <CardDescription>{t('exposure.reportDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Progress value={progressValue} className="h-3" />

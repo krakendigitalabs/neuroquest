@@ -9,17 +9,20 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Logo } from '@/components/logo';
+import { PatientReportActions } from '@/components/patient-report-actions';
 import { useTranslation } from '@/context/language-provider';
-import { useAdmin } from '@/hooks/use-admin';
+import { useTherapistAccess } from '@/hooks/use-therapist-access';
 import { useCollection, useDoc, useFirebase, useMemoFirebase } from '@/firebase';
 import type { ExposureMission } from '@/models/exposure-mission';
 import type { MentalCheckup } from '@/models/mental-checkup';
 import type { ThoughtRecord } from '@/models/thought-record';
 import type { UserProfile } from '@/models/user';
-import { getPatientStatus } from '@/app/therapist/_lib/therapist-utils';
+import { CHECK_IN_MAX_SCORE } from '@/lib/mental-check-in';
+import { getLatestPatientActivityDate, getPatientStatus } from '@/app/therapist/_lib/therapist-utils';
 import { buildThoughtInsights, buildThoughtTimeline, getThoughtRiskLevel, toDate } from '@/lib/thought-insights';
-
-const CHECK_IN_MAX_SCORE = 21;
+import { buildPatientReportText } from '@/lib/patient-report';
+import { normalizeThoughtRecords } from '@/lib/thought-records';
+import { isAssignedTherapist } from '@/lib/therapist-access';
 
 function translateEmotion(t: (key: string) => string, emotion?: string) {
   if (!emotion) return '';
@@ -30,54 +33,55 @@ function translateEmotion(t: (key: string) => string, emotion?: string) {
 
 export default function TherapistPatientDetailPage() {
   const { t, locale } = useTranslation();
-  const { isAdmin, isLoading } = useAdmin();
+  const { canManageClinicalWorkspace, hasTherapistAccess, isAdmin, isLoading } = useTherapistAccess();
   const { firestore, user } = useFirebase();
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const patientId = params?.id;
 
   const patientDocRef = useMemoFirebase(() => {
-    if (!firestore || !patientId) return null;
+    if (!firestore || !patientId || !hasTherapistAccess) return null;
     return doc(firestore, 'users', patientId);
-  }, [firestore, patientId]);
+  }, [firestore, hasTherapistAccess, patientId]);
   const { data: patient, isLoading: isPatientLoading } = useDoc<UserProfile>(patientDocRef);
 
-  const isAssignedPatient = !!user && !!patient && Array.isArray(patient.therapistIds) && patient.therapistIds.includes(user.uid);
+  const canViewPatient = isAdmin || canManageClinicalWorkspace || isAssignedTherapist(patient, user?.uid);
 
   const checkupsQuery = useMemoFirebase(() => {
-    if (!firestore || !patientId || !isAssignedPatient) return null;
+    if (!firestore || !patientId || !canViewPatient) return null;
     return collection(firestore, 'users', patientId, 'mental_checkups');
-  }, [firestore, patientId, isAssignedPatient]);
+  }, [canViewPatient, firestore, patientId]);
   const { data: checkups, isLoading: areCheckupsLoading } = useCollection<MentalCheckup>(checkupsQuery);
 
   const thoughtsQuery = useMemoFirebase(() => {
-    if (!firestore || !patientId || !isAssignedPatient) return null;
+    if (!firestore || !patientId || !canViewPatient) return null;
     return collection(firestore, 'users', patientId, 'thoughtRecords');
-  }, [firestore, patientId, isAssignedPatient]);
+  }, [canViewPatient, firestore, patientId]);
   const { data: thoughts, isLoading: areThoughtsLoading } = useCollection<ThoughtRecord>(thoughtsQuery);
+  const normalizedThoughts = useMemo(() => normalizeThoughtRecords(thoughts), [thoughts]);
 
   const missionsQuery = useMemoFirebase(() => {
-    if (!firestore || !patientId || !isAssignedPatient) return null;
+    if (!firestore || !patientId || !canViewPatient) return null;
     return collection(firestore, 'users', patientId, 'exposureMissions');
-  }, [firestore, patientId, isAssignedPatient]);
+  }, [canViewPatient, firestore, patientId]);
   const { data: missions, isLoading: areMissionsLoading } = useCollection<ExposureMission>(missionsQuery);
 
   useEffect(() => {
-    if (!isLoading && !isAdmin) {
+    if (!isLoading && !hasTherapistAccess) {
       router.push('/dashboard');
     }
-  }, [isAdmin, isLoading, router]);
+  }, [hasTherapistAccess, isLoading, router]);
 
   useEffect(() => {
-    if (!isLoading && !isPatientLoading && patient && user && !isAssignedPatient) {
+    if (!isLoading && !isPatientLoading && patient && user && !canViewPatient) {
       router.push('/therapist');
     }
-  }, [isAssignedPatient, isLoading, isPatientLoading, patient, router, user]);
+  }, [canViewPatient, isLoading, isPatientLoading, patient, router, user]);
 
   const sortedCheckups = [...(checkups ?? [])].sort(
     (a, b) => (toDate(b.createdAt)?.getTime() ?? 0) - (toDate(a.createdAt)?.getTime() ?? 0)
   );
-  const sortedThoughts = [...(thoughts ?? [])].sort(
+  const sortedThoughts = [...normalizedThoughts].sort(
     (a, b) => (toDate(b.recordedAt)?.getTime() ?? 0) - (toDate(a.recordedAt)?.getTime() ?? 0)
   );
   const sortedMissions = [...(missions ?? [])]
@@ -91,17 +95,58 @@ export default function TherapistPatientDetailPage() {
   const activeMissions = (missions ?? []).filter((mission) => mission.status === 'active').length;
   const hasLatestCheckIn = !!patient?.latestCheckInAt;
   const patientStatus = getPatientStatus(patient?.latestCheckInLevel);
-  const lastActivity = patient?.latestThoughtAt
-    ? toDate(patient.latestThoughtAt)?.toLocaleDateString(locale)
-    : patient?.latestCheckInAt
-      ? toDate(patient.latestCheckInAt)?.toLocaleDateString(locale)
-      : t('therapist.noRecentActivity');
+  const lastActivityDate = patient ? getLatestPatientActivityDate(patient) : null;
+  const lastActivity = lastActivityDate ? lastActivityDate.toLocaleDateString(locale) : t('therapist.noRecentActivity');
+  const generatedAt = useMemo(() => new Date(), []);
+  const patientLabel = patient?.displayName || patient?.email || t('therapist.patientDetail');
+  const currentRisk = sortedThoughts[0]
+    ? t(`observer.riskLevels.${getThoughtRiskLevel(sortedThoughts[0])}`)
+    : hasLatestCheckIn
+      ? patient?.latestCheckInLevel ?? t('therapist.noCheckInYet')
+      : t('therapist.noCheckInYet');
+  const therapistReportSummary = t('therapist.reportClinicalSummary', {
+    level: patient?.latestCheckInLevel ?? t('therapist.noCheckInYet'),
+    score: typeof patient?.latestCheckInScore === 'number' ? `${patient.latestCheckInScore}/${CHECK_IN_MAX_SCORE}` : t('therapist.noCheckInYet'),
+    risk: currentRisk,
+    activity: lastActivity,
+  });
+  const therapistReportText = useMemo(() => buildPatientReportText({
+    title: t('therapist.reportTitle'),
+    patientLabel: t('therapist.reportPatientLabel'),
+    patient: patientLabel,
+    generatedAtLabel: t('therapist.reportGeneratedAtLabel'),
+    generatedAt: generatedAt.toLocaleString(locale),
+    summaryTitle: t('therapist.reportClinicalSummaryTitle'),
+    summary: therapistReportSummary,
+    sections: [
+      {
+        title: t('therapist.reportCheckInHistoryTitle'),
+        lines: sortedCheckups.length === 0
+          ? [t('therapist.noCheckInsYet')]
+          : sortedCheckups.slice(0, 5).map((checkup) => `${toDate(checkup.createdAt)?.toLocaleString(locale) ?? t('therapist.noRecentActivity')} · ${checkup.resultTitle} · ${t('therapist.scoreLabel')}: ${checkup.score}/${checkup.maxScore}`),
+      },
+      {
+        title: t('therapist.reportThoughtsTitle'),
+        lines: sortedThoughts.length === 0
+          ? [t('therapist.noThoughtsYet')]
+          : sortedThoughts.slice(0, 5).map((thought) => `${toDate(thought.recordedAt)?.toLocaleString(locale) ?? t('therapist.noRecentActivity')} · ${thought.thoughtText} · ${t('observer.intensity')}: ${thought.intensity}/10`),
+      },
+      {
+        title: t('therapist.reportMissionsTitle'),
+        lines: sortedMissions.length === 0
+          ? [t('therapist.noMissionsYet')]
+          : sortedMissions.slice(0, 5).map((mission) => `${mission.title} · ${t(`progress.${mission.status}`)}`),
+      },
+    ],
+    patientSignatureLabel: t('therapist.reportPatientSignature'),
+    therapistSignatureLabel: t('therapist.reportTherapistSignature'),
+  }), [generatedAt, locale, patientLabel, sortedCheckups, sortedMissions, sortedThoughts, t, therapistReportSummary]);
 
   if (isLoading || isPatientLoading || areCheckupsLoading || areThoughtsLoading || areMissionsLoading) {
     return <div>{t('loading')}</div>;
   }
 
-  if (!patient || !isAssignedPatient) {
+  if (!patient || !canViewPatient) {
     return (
       <div className="flex min-h-screen items-center justify-center p-6">
         <Card className="w-full max-w-lg">
@@ -143,9 +188,12 @@ export default function TherapistPatientDetailPage() {
             <h1 className="break-words text-2xl font-semibold md:text-3xl">{patient.displayName || patient.email}</h1>
             <p className="break-all text-sm text-muted-foreground">{patient.email}</p>
           </div>
-          <Badge className="w-fit" variant={patientStatus === 'active' ? 'secondary' : 'destructive'}>
-            {t(`therapist.statuses.${patientStatus}`)}
-          </Badge>
+          <div className="flex flex-col gap-2 md:items-end">
+            <Badge className="w-fit" variant={patientStatus === 'active' ? 'secondary' : 'destructive'}>
+              {t(`therapist.statuses.${patientStatus}`)}
+            </Badge>
+            <PatientReportActions reportTitle={t('therapist.reportTitle')} reportText={therapistReportText} />
+          </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -358,6 +406,76 @@ export default function TherapistPatientDetailPage() {
             </Card>
           </div>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('therapist.reportTitle')}</CardTitle>
+            <CardDescription>{t('therapist.reportDescription')}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <div className="rounded-lg border p-4">
+              <p className="font-semibold">{t('therapist.reportHeaderTitle')}</p>
+              <div className="mt-3 grid gap-2 md:grid-cols-2">
+                <p><span className="font-medium">{t('therapist.reportPatientLabel')}:</span> {patientLabel}</p>
+                <p><span className="font-medium">{t('therapist.reportGeneratedAtLabel')}:</span> {generatedAt.toLocaleString(locale)}</p>
+              </div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <p className="font-medium">{t('therapist.reportClinicalSummaryTitle')}</p>
+              <p className="mt-2">{therapistReportSummary}</p>
+            </div>
+            <div className="rounded-lg border p-4">
+              <p className="font-medium">{t('therapist.reportCheckInHistoryTitle')}</p>
+              <div className="mt-3 space-y-2">
+                {sortedCheckups.length === 0 ? (
+                  <p className="text-muted-foreground">{t('therapist.noCheckInsYet')}</p>
+                ) : (
+                  sortedCheckups.slice(0, 5).map((checkup) => (
+                    <p key={`therapist-report-checkup-${checkup.id}`}>
+                      {toDate(checkup.createdAt)?.toLocaleString(locale) ?? t('therapist.noRecentActivity')} · {checkup.resultTitle} · {t('therapist.scoreLabel')}: {checkup.score}/{checkup.maxScore}
+                    </p>
+                  ))
+                )}
+              </div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <p className="font-medium">{t('therapist.reportThoughtsTitle')}</p>
+              <div className="mt-3 space-y-2">
+                {sortedThoughts.length === 0 ? (
+                  <p className="text-muted-foreground">{t('therapist.noThoughtsYet')}</p>
+                ) : (
+                  sortedThoughts.slice(0, 5).map((thought) => (
+                    <p key={`therapist-report-thought-${thought.id}`}>
+                      {toDate(thought.recordedAt)?.toLocaleString(locale) ?? t('therapist.noRecentActivity')} · {thought.thoughtText} · {t('observer.intensity')}: {thought.intensity}/10
+                    </p>
+                  ))
+                )}
+              </div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <p className="font-medium">{t('therapist.reportMissionsTitle')}</p>
+              <div className="mt-3 space-y-2">
+                {sortedMissions.length === 0 ? (
+                  <p className="text-muted-foreground">{t('therapist.noMissionsYet')}</p>
+                ) : (
+                  sortedMissions.slice(0, 5).map((mission) => (
+                    <p key={`therapist-report-mission-${mission.id}`}>
+                      {mission.title} · {t(`progress.${mission.status}`)}
+                    </p>
+                  ))
+                )}
+              </div>
+            </div>
+            <div className="grid gap-6 pt-6 md:grid-cols-2">
+              <div className="border-t pt-3">
+                <p className="text-xs text-muted-foreground">{t('therapist.reportPatientSignature')}</p>
+              </div>
+              <div className="border-t pt-3">
+                <p className="text-xs text-muted-foreground">{t('therapist.reportTherapistSignature')}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>

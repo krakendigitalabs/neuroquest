@@ -55,6 +55,9 @@ const PersonalizedMissionGenerationInputSchema = z.object({
     .describe(
       "The user's current gamified level (e.g., Novato Mental, Explorador Mental)."
     ),
+  locale: z
+    .enum(['es', 'en'])
+    .describe('The active UI language to use in generated content.'),
 });
 
 export type PersonalizedMissionGenerationInput = z.infer<
@@ -72,6 +75,9 @@ const PersonalizedMissionGenerationPromptInputSchema = z.object({
     .describe(
       "The user's current gamified level (e.g., Novato Mental, Explorador Mental)."
     ),
+  locale: z
+    .enum(['es', 'en'])
+    .describe('The active UI language to use in generated content.'),
 });
 
 const PersonalizedMissionGenerationOutputSchema = z.object({
@@ -84,15 +90,15 @@ const PersonalizedMissionGenerationOutputSchema = z.object({
       .describe('A detailed description of the mission and how to complete it.'),
     type: z
       .enum([
-        'Observador Mental',
-        'Exposición',
-        'Regulación Emocional',
-        'Reprogramación Cognitiva',
+        'observer',
+        'exposure',
+        'regulation',
+        'reprogram',
       ])
-      .describe('The therapeutic module this mission belongs to.'),
+      .describe('A stable mission-type code for the therapeutic module this mission belongs to.'),
     difficulty: z
-      .enum(['Fácil', 'Media', 'Difícil'])
-      .describe('The difficulty level of the mission.'),
+      .enum(['easy', 'medium', 'hard'])
+      .describe('A stable difficulty code for the mission.'),
     xpReward: z
       .number()
       .int()
@@ -136,17 +142,20 @@ Thoughts: {{{thoughtRecords}}}
 Anxiety Logs: {{{anxietyLogs}}}
 Compulsion Records: {{{compulsionRecords}}}
 Current User Level: {{{userLevel}}}
+Active Locale: {{{locale}}}
 
 Based on this data, identify patterns in their intrusive thoughts, anxiety triggers, and compulsion behaviors.
 Then, generate ONE highly personalized therapeutic mission and ONE cognitive coaching suggestion.
+Write all user-facing text fields in the language indicated by locale (es = Spanish, en = English).
 
 The mission should align with one of the four therapeutic modules:
-1. Observador Mental: Focus on identifying thoughts without reacting.
-2. Modo Exposición (ERP): Focus on progressive exposure to feared situations.
-3. Regulación Emocional: Focus on techniques like breathing, grounding, or relaxation.
-4. Reprogramación Cognitiva: Focus on challenging cognitive distortions like catastrophization.
+1. observer: Focus on identifying thoughts without reacting.
+2. exposure: Focus on progressive exposure to feared situations.
+3. regulation: Focus on techniques like breathing, grounding, or relaxation.
+4. reprogram: Focus on challenging cognitive distortions like catastrophization.
 
 Consider the user's current level and recent struggles/successes when determining the difficulty and type of the mission. The XP reward should be appropriate for the difficulty.
+For difficulty, only return one of these stable codes: easy, medium, hard.
 
 Ensure the output strictly adheres to the JSON schema provided.`,
 });
@@ -163,6 +172,7 @@ const personalizedMissionGenerationFlow = ai.defineFlow(
       anxietyLogs: JSON.stringify(input.anxietyLogs ?? [], null, 2),
       compulsionRecords: JSON.stringify(input.compulsionRecords ?? [], null, 2),
       userLevel: input.userLevel,
+      locale: input.locale,
     });
 
     if (!output) {

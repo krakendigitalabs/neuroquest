@@ -8,3 +8,5 @@ export const CLINICAL_MENTAL_CHECK_IN_THRESHOLDS: MentalCheckInThreshold[] = [
 ];
 
 export const CLINICAL_LEVEL_ORDER: MentalCheckInLevel[] = ['healthy', 'mild', 'moderate', 'severe'];
+export const CLINICAL_MENTAL_CHECK_IN_MAX_SCORE =
+  CLINICAL_MENTAL_CHECK_IN_THRESHOLDS[CLINICAL_MENTAL_CHECK_IN_THRESHOLDS.length - 1]?.maxScore ?? 40;

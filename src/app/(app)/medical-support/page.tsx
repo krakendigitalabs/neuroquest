@@ -1,13 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { AlertTriangle, HeartPulse, Printer, ShieldAlert, Stethoscope } from 'lucide-react';
+import { AlertTriangle, HeartPulse, ShieldAlert, Stethoscope } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from '@/context/language-provider';
 import { useFirebase } from '@/firebase';
 import { useUserProfile } from '@/hooks/use-user-profile';
+import { PatientReportActions } from '@/components/patient-report-actions';
+import { buildPatientReportText } from '@/lib/patient-report';
+import { logProgressEventNonBlocking } from '@/lib/progress-events';
 
 function toDate(value: unknown): Date | null {
   if (!value) return null;
@@ -24,33 +28,82 @@ function toDate(value: unknown): Date | null {
 
 export default function MedicalSupportPage() {
   const { t, locale } = useTranslation();
-  const { user } = useFirebase();
+  const { user, firestore } = useFirebase();
   const { userProfile, isLoading } = useUserProfile();
+  const [lastReviewedLabel, setLastReviewedLabel] = useState<string | null>(null);
 
-  const latestLevel = userProfile?.latestCheckInLevel ?? null;
-  const latestScore = userProfile?.latestCheckInScore ?? null;
   const latestDate = toDate(userProfile?.latestCheckInAt);
+  const hasLatestCheckIn = !!latestDate;
+  const latestLevel = hasLatestCheckIn ? (userProfile?.latestCheckInLevel ?? null) : null;
+  const latestScore = hasLatestCheckIn ? (userProfile?.latestCheckInScore ?? null) : null;
+  const urgentSupportRecommended = hasLatestCheckIn
+    ? (userProfile?.latestCheckInUrgentSupport ?? latestLevel === 'severe')
+    : false;
+  const needsProfessionalSupport = hasLatestCheckIn
+    ? (userProfile?.latestCheckInNeedsProfessionalSupport ?? (latestLevel === 'moderate' || latestLevel === 'severe'))
+    : false;
 
   const currentItems = latestLevel
     ? Array.from({ length: 3 }, (_, index) => t(`medical.dynamic.${latestLevel}.items.${index}`))
     : [];
+  const urgentWarningSigns = Array.from({ length: 4 }, (_, index) => t(`medical.warningSigns.items.${index}`));
   const generatedAt = toDate(new Date());
   const reportPatient = userProfile?.displayName || user?.displayName || user?.email || t('sidebar.guestUser');
+  const reportClinicalSummary = latestLevel
+    ? t('medical.reportClinicalSummaryWithLevel', {
+        level: t(`checkIn.results.${latestLevel}.category`),
+        guidance: t(`medical.dynamic.${latestLevel}.title`),
+      })
+    : t('medical.reportClinicalSummaryEmpty');
 
-  const handlePrint = () => {
-    window.print();
+  const reportText = buildPatientReportText({
+    title: t('medical.reportTitle'),
+    patientLabel: t('medical.reportPatientLabel'),
+    patient: reportPatient,
+    generatedAtLabel: t('medical.reportGeneratedAtLabel'),
+    generatedAt: generatedAt?.toLocaleString(locale) ?? t('progress.unknownDate'),
+    summaryTitle: t('medical.reportClinicalSummaryTitle'),
+    summary: reportClinicalSummary,
+    sections: [
+      {
+        title: t('medical.guidanceTitle'),
+        lines: latestLevel
+          ? [t(`medical.dynamic.${latestLevel}.title`), ...currentItems]
+          : [t('medical.completeCheckInFirst')],
+      },
+    ],
+    patientSignatureLabel: t('medical.reportPatientSignature'),
+    therapistSignatureLabel: t('medical.reportTherapistSignature'),
+  });
+
+  const handleReviewGuidance = () => {
+    if (!latestLevel) return;
+
+    const label = t(`medical.dynamic.${latestLevel}.title`);
+    setLastReviewedLabel(label);
+
+    if (!firestore || !user?.uid) return;
+
+    logProgressEventNonBlocking(firestore, {
+      userId: user.uid,
+      module: 'medical-support',
+      type: 'saved',
+      detail: label,
+    });
   };
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
         <h1 className="text-3xl font-bold tracking-tight font-headline">{t('medical.title')}</h1>
-        <Button type="button" variant="outline" className="print:hidden" onClick={handlePrint}>
-          <Printer className="h-4 w-4" />
-          {t('medical.printReport')}
-        </Button>
+        <PatientReportActions reportTitle={t('medical.reportTitle')} reportText={reportText} />
       </div>
       <p className="text-muted-foreground">{t('medical.description')}</p>
+      {lastReviewedLabel ? (
+        <p className="text-sm text-muted-foreground">
+          {t('medical.lastReviewedGuidance', { title: lastReviewedLabel })}
+        </p>
+      ) : null}
 
       <Card className="border-destructive/30">
         <CardHeader>
@@ -112,20 +165,28 @@ export default function MedicalSupportPage() {
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" variant="outline" onClick={handleReviewGuidance}>
+                    {t('medical.reviewGuidanceAction')}
+                  </Button>
+                  <Button asChild variant="secondary">
+                    <Link href="/medication">{t('medical.openMedicationModule')}</Link>
+                  </Button>
+                </div>
               </>
             )}
           </CardContent>
         </Card>
       </div>
 
-      {latestLevel === 'severe' ? (
+      {urgentSupportRecommended ? (
         <Card className="border-destructive/40 bg-destructive/5">
           <CardHeader>
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-destructive" />
-              <CardTitle>{t('medical.severeAlertTitle')}</CardTitle>
+              <CardTitle>{t('medical.urgentSupportTitle')}</CardTitle>
             </div>
-            <CardDescription>{t('medical.severeAlertDescription')}</CardDescription>
+            <CardDescription>{t('medical.urgentSupportDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild variant="destructive">
@@ -133,7 +194,34 @@ export default function MedicalSupportPage() {
             </Button>
           </CardContent>
         </Card>
+      ) : needsProfessionalSupport ? (
+        <Card className="border-amber-400 bg-amber-50">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-700" />
+              <CardTitle>{t('medical.priorityReviewTitle')}</CardTitle>
+            </div>
+            <CardDescription>{t('medical.priorityReviewDescription')}</CardDescription>
+          </CardHeader>
+        </Card>
       ) : null}
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-primary" />
+            <CardTitle>{t('medical.warningSignsTitle')}</CardTitle>
+          </div>
+          <CardDescription>{t('medical.warningSignsDescription')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            {urgentWarningSigns.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -147,6 +235,10 @@ export default function MedicalSupportPage() {
               <p><span className="font-medium">{t('medical.reportPatientLabel')}:</span> {reportPatient}</p>
               <p><span className="font-medium">{t('medical.reportGeneratedAtLabel')}:</span> {generatedAt?.toLocaleString(locale) ?? t('progress.unknownDate')}</p>
             </div>
+          </div>
+          <div className="rounded-lg border p-4">
+            <p className="font-medium">{t('medical.reportClinicalSummaryTitle')}</p>
+            <p className="mt-2">{reportClinicalSummary}</p>
           </div>
           <p>
             <span className="font-medium">{t('medical.latestCheckInTitle')}:</span>{' '}

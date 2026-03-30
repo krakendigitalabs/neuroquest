@@ -8,12 +8,14 @@
     "observer": "Mental Observer",
     "exposure": "Exposure Mode",
     "regulation": "Emotion Regulation",
+    "wellness": "Preventive Wellness",
     "reprogram": "Cognitive Reprogramming",
     "progress": "Progress",
     "grounding": "Grounding",
     "challenges": "Challenges",
-    "medication": "Medical Support",
-    "checkIn": "Mental Check-In"
+    "medication": "Prescribed Medication",
+    "checkIn": "Mental Check-In",
+    "workspaceUsers": "Users and access"
   },
   "dashboard": {
     "welcome": "Welcome back, Explorer!",
@@ -32,8 +34,39 @@
     "summaryTitle": "Brief Summary",
     "latestCheckInDate": "Latest check-in: {date}",
     "summaryNoCheckIn": "Complete your first mental check-in to unlock a personalized summary here.",
+    "recentActivityTitle": "Recent meaningful activity",
+    "noRecentActivity": "No recent activity yet",
+    "recentActivityHint": "Complete actions in modules to see the latest useful movement here.",
+    "activeModulesCount": "{count} modules with meaningful activity",
+    "weeklySummaryTitle": "Weekly summary",
+    "weeklySummaryBody": "{events} useful events across {modules} modules this week.",
+    "weeklySummarySource": "Source: registered progressEvents from the last 7 days.",
+    "nextStepCardTitle": "Suggested next step",
+    "nextStepTitles": {
+      "urgentSupport": "Seek urgent support now",
+      "severe": "Stabilize and ask for support now",
+      "noCheckIn": "Start with a real check-in",
+      "observer": "Convert what you noticed into a new perspective",
+      "exposure": "Review what changed after exposure",
+      "medicalSupport": "Document prescribed treatment",
+      "medication": "Follow medication with recorded progress",
+      "regulation": "Turn regulation into follow-up",
+      "default": "Keep the process moving"
+    },
+    "nextStepDescriptions": {
+      "urgentSupport": "Your recent signals require prioritizing crisis support and immediate clinical review.",
+      "severe": "Use crisis support first and then review medical guidance.",
+      "noCheckIn": "Complete your first check-in to unlock more precise guidance.",
+      "observer": "Use reprogramming to work on the last thought you registered.",
+      "exposure": "Open progress to see how your recent exposure work is accumulating.",
+      "medicalSupport": "Open the prescribed medication module if a clinician already documented a treatment plan.",
+      "medication": "Review progress and return to medical support if the documented prescription changes.",
+      "regulation": "Check progress or capture what changed after the practice.",
+      "default": "Open progress or observer to record the next useful step."
+    },
     "crisisBannerTitle": "You need an immediate support path",
     "crisisBannerDescription": "Your latest check-in was marked severe. Open crisis support to view emergency lines and care centers in Medellin.",
+    "returnHome": "Return to home",
     "summaryBySeverity": {
       "healthy": "Your latest check-in looks stable. Keep reinforcing the routines that are working.",
       "mild": "Your latest check-in shows mild strain. Stay consistent with grounding and short recovery habits.",
@@ -42,6 +75,78 @@
     },
     "nextMissionTitle": "Your Next Personalized Mission",
     "nextMissionDescription": "Our AI has analyzed your recent activity to create a new challenge for you."
+  },
+  "medicationModule": {
+    "title": "Prescribed Medication",
+    "description": "Structured documentation of medications already prescribed by a professional, plus an educational catalog of medication families. It does not prescribe or auto-adjust treatment.",
+    "disclaimerTitle": "Documentation and education only",
+    "disclaimerDescription": "This module does not prescribe, calculate doses, or replace medical judgment. It records medication already prescribed by a professional and summarizes expected effects, side effects, and alerts.",
+    "formTitle": "Record prescribed medication",
+    "formDescription": "Complete this form only with information already indicated by an authorized professional.",
+    "educationTitle": "Educational catalog by clinical group",
+    "educationDescription": "General information about medication families commonly used in practice. Educational only, not a treatment recommendation.",
+    "historyTitle": "Recorded prescriptions",
+    "historyDescription": "Recent history of documented prescribed medication for this user.",
+    "reportTitle": "Prescribed medication report",
+    "reportPatientLabel": "Patient",
+    "reportGeneratedAtLabel": "Issued at",
+    "reportSummaryTitle": "Summary",
+    "reportSummaryWithCount": "{count} prescriptions recorded.",
+    "reportSummaryEmpty": "No prescriptions have been recorded yet.",
+    "reportPatientSignature": "Patient signature",
+    "reportProfessionalSignature": "Professional signature",
+    "emptyTitle": "No prescriptions recorded",
+    "emptyDescription": "There is no documented prescribed medication yet.",
+    "save": "Save prescription",
+    "saving": "Saving prescription...",
+    "saved": "The prescription was saved successfully.",
+    "days": "days",
+    "errors": {
+      "session": "There is no active session or Firestore is unavailable.",
+      "required": "Complete every required prescription field before saving.",
+      "duration": "Duration must be a valid number of days greater than zero.",
+      "save": "The prescription could not be saved. Please try again."
+    },
+    "disorderGroups": {
+      "depression": "Depression",
+      "anxiety": "Anxiety / panic",
+      "bipolar": "Bipolar disorder",
+      "adhd": "ADHD",
+      "psychosis": "Schizophrenia / psychosis",
+      "insomnia": "Insomnia / burnout",
+      "eating-disorders": "Eating disorders"
+    },
+    "form": {
+      "disorderGroup": "Clinical group",
+      "medicationName": "Prescribed medication",
+      "medicationClass": "Medication family or class",
+      "prescribedDose": "Prescribed dose",
+      "frequency": "Frequency",
+      "durationDays": "Duration",
+      "route": "Route",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "prescribedFor": "Clinical indication",
+      "expectedEffects": "Expected effects",
+      "commonSideEffects": "Common side effects",
+      "keyAlerts": "Key alerts",
+      "notes": "Notes",
+      "professionalName": "Professional name",
+      "professionalLicense": "Professional license",
+      "doctorSignature": "Professional signature",
+      "patientSignature": "Patient signature"
+    },
+    "placeholders": {
+      "dose": "e.g. 50 mg",
+      "frequency": "e.g. every 24 hours"
+    },
+    "education": {
+      "examples": "Examples",
+      "intendedUse": "Typical use",
+      "expectedEffects": "Expected effects",
+      "commonSideEffects": "Common side effects",
+      "majorAlerts": "Key alerts"
+    }
   },
   "upcoming": {
     "badge": "Coming soon",
@@ -64,24 +169,411 @@
     "english": "English",
     "spanish": "Spanish"
   },
+  "userRoles": {
+    "clinic": "Clinic user",
+    "professional": "Professional user",
+    "patient": "Patient user"
+  },
+  "accountRoles": {
+    "owner": "Owner",
+    "manager": "Manager",
+    "administrator": "Administrator",
+    "editor": "Editor",
+    "commentator": "Commentator",
+    "viewer": "View only"
+  },
+  "ui": {
+    "close": "Close",
+    "previousSlide": "Previous slide",
+    "nextSlide": "Next slide",
+    "toggleSidebar": "Toggle sidebar"
+  },
+  "reports": {
+    "printPdf": "Print / PDF",
+    "sendWhatsApp": "Send by WhatsApp",
+    "sendEmail": "Send by email",
+    "emailSubjectPrefix": "NeuroQuest report"
+  },
   "landing": {
-    "therapistPortal": "Therapist Portal",
-    "launchApp": "Launch App",
-    "headline": "Transform Your Mind, Conquer Your Quest",
-    "subheadline": "NeuroQuest is a gamified mental wellness platform designed to help you manage intrusive thoughts, anxiety, and compulsions through proven therapeutic techniques.",
-    "keyFeatures": "Key Features",
-    "approachTitle": "A New Approach to Mental Wellness",
-    "approachDescription": "Our platform integrates principles from CBT, ERP, and neuroscience into a structured, engaging, and supportive experience.",
-    "feature1Title": "Therapeutic Modules",
-    "feature1Description": "Engage with exercises for thought logging, exposure therapy, and emotional regulation.",
-    "feature2Title": "Gamified Progression",
-    "feature2Description": "Earn XP, level up, and unlock achievements as you build mental resilience.",
-    "feature3Title": "AI Personalization",
-    "feature3Description": "Receive personalized missions and coaching based on your unique patterns.",
-    "feature4Title": "Therapist Dashboard",
-    "feature4Description": "Allow professionals to monitor progress and provide guided support.",
-    "footerRights": "© 2024 NeuroQuest. All rights reserved.",
-    "footerDisclaimer": "This system does not replace clinical therapy."
+    "brand": {
+      "tagline": "Health-tech / mental health SaaS"
+    },
+    "nav": {
+      "howItWorks": "How it works",
+      "modules": "Real modules",
+      "science": "Clinical basis",
+      "therapist": "Therapist portal",
+      "cta": "Open the app"
+    },
+    "hero": {
+      "badge": "A mental-health tracking platform with clinical structure",
+      "title": "Your mind, supported every day",
+      "description": "Understand how you feel, record what you think, and follow your progress with clarity.",
+      "primaryCta": "Start now",
+      "secondaryCta": "See how it works",
+      "trustPoints": [
+        "How you feel today",
+        "What you are thinking",
+        "How you have evolved"
+      ],
+      "productViewEyebrow": "Immersive product view",
+      "productViewTitle": "NeuroQuest MVP",
+      "previewTabs": [
+        {
+          "value": "dashboard",
+          "label": "Dashboard",
+          "badge": "Real dashboard",
+          "title": "Immediate visibility into current state",
+          "body": "Users see their latest check-in, level, XP, active mission, and a short summary that clarifies the next step.",
+          "chips": [
+            "Latest check-in",
+            "XP",
+            "Active mission"
+          ],
+          "metrics": [
+            {
+              "label": "Current state",
+              "value": "Moderate",
+              "tone": "67%"
+            },
+            {
+              "label": "Accumulated XP",
+              "value": "1,280",
+              "tone": "82%"
+            },
+            {
+              "label": "Active mission",
+              "value": "Guided ERP",
+              "tone": "74%"
+            }
+          ]
+        },
+        {
+          "value": "checkin",
+          "label": "Check-In",
+          "badge": "Clinical check-in",
+          "title": "10 questions, real scoring, complete flow closure",
+          "body": "Every answer feeds healthy, mild, moderate, or severe classification and updates denormalized user fields.",
+          "chips": [
+            "10 questions",
+            "0-4",
+            "Severity"
+          ],
+          "metrics": [
+            {
+              "label": "Total score",
+              "value": "0-40",
+              "tone": "90%"
+            },
+            {
+              "label": "Clinical levels",
+              "value": "4",
+              "tone": "68%"
+            },
+            {
+              "label": "Persistence",
+              "value": "Firestore",
+              "tone": "88%"
+            }
+          ]
+        },
+        {
+          "value": "therapist",
+          "label": "Therapist",
+          "badge": "Therapist portal",
+          "title": "Per-patient review with useful context",
+          "body": "Therapists can review check-ins, thoughts, missions, and a basic risk signal within the same workflow.",
+          "chips": [
+            "Real patients",
+            "Clinical detail",
+            "Basic risk"
+          ],
+          "metrics": [
+            {
+              "label": "Real source",
+              "value": "users",
+              "tone": "70%"
+            },
+            {
+              "label": "Thoughts",
+              "value": "Observer",
+              "tone": "83%"
+            },
+            {
+              "label": "Follow-up",
+              "value": "Longitudinal",
+              "tone": "76%"
+            }
+          ]
+        }
+      ],
+      "followUpEyebrow": "Longitudinal follow-up",
+      "followUpTitle": "Clinical state remains legible between sessions.",
+      "guardrailsEyebrow": "Clinical guardrails",
+      "highlights": [
+        {
+          "title": "Clinical flow with real closure",
+          "body": "Check-in, observer, progress, and support work as one connected system."
+        },
+        {
+          "title": "Visual baseline",
+          "body": "White, clinical blue, soft gray, and restrained gold accents with light depth."
+        },
+        {
+          "title": "Calm clinical motion",
+          "body": "Subtle, organic, performant motion inspired by Three.js without overload."
+        }
+      ]
+    },
+    "proof": {
+      "badge": "Concrete MVP signals",
+      "title": "Clinical visibility, continuity, and flow closure inside one system.",
+      "stats": [
+        [
+          "10",
+          "clinical questions per check-in",
+          "Real Mental Check-In with 0-4 answers and total 0-40 scoring."
+        ],
+        [
+          "4",
+          "severity levels",
+          "Healthy, mild, moderate, and severe with proportional reading."
+        ],
+        [
+          "6",
+          "connected functional modules",
+          "Dashboard, Check-In, Progress, Observer, Therapist, and Medical Support."
+        ]
+      ],
+      "trustStrip": [
+        "CBT",
+        "ERP",
+        "Firestore",
+        "Longitudinal history",
+        "Printable summary",
+        "Medellin Crisis Support"
+      ]
+    },
+    "logoExperience": {
+      "badge": "Living identity",
+      "title": "An organic visual signature for a contemporary clinical platform.",
+      "description": "This animated mark uses WebGL and soft deformation to express movement, adaptation, and continuous follow-up without breaking the product's calm visual language.",
+      "caption": "Subtle interaction: on hover, the shape slightly increases its distortion."
+    },
+    "why": {
+      "badge": "What NeuroQuest does",
+      "title": "NeuroQuest supports you between sessions so you do not lose the thread of your process.",
+      "description": "NeuroQuest helps you make sense of your mental state in a simple and continuous way. It turns what you feel and think into clearer information so you can understand yourself better and move forward step by step. It does not replace your therapist. It helps you arrive better prepared and with more clarity.",
+      "cards": [
+        {
+          "title": "Clear current state",
+          "description": "See how you are today without getting lost in confusing data or crowded screens."
+        },
+        {
+          "title": "Progress over time",
+          "description": "Follow changes, gains, and variations across the process with real context."
+        },
+        {
+          "title": "Patterns and signals",
+          "description": "Identify repeated thoughts, important signals, and moments worth reviewing."
+        }
+      ],
+      "caseReadingEyebrow": "Case reading",
+      "caseReadingTitle": "One view integrates recent severity, observer, progress, and active tasks."
+    },
+    "modules": {
+      "badge": "What you can see",
+      "title": "Clear information to understand what is happening to you",
+      "description": "NeuroQuest organizes your information so you can see it more clearly and act in time.",
+      "cards": [
+        [
+          "checkin",
+          "Clear current state",
+          "Understand how you feel today with a simple structured view."
+        ],
+        [
+          "progress",
+          "Progress over time",
+          "See changes and real evolution without losing continuity."
+        ],
+        [
+          "observer",
+          "Thought patterns",
+          "Record thoughts and context to recognize recurring patterns."
+        ],
+        [
+          "support",
+          "Important signals",
+          "Identify moments when it is worth acting or asking for support."
+        ]
+      ]
+    },
+    "journey": {
+      "badge": "How it works",
+      "title": "A simple flow to understand yourself better, step by step.",
+      "steps": [
+        {
+          "step": "01",
+          "title": "Assess yourself in minutes",
+          "description": "Answer a simple check-in to understand how you are today."
+        },
+        {
+          "step": "02",
+          "title": "Record what is on your mind",
+          "description": "Save thoughts, situations, and meaningful emotions."
+        },
+        {
+          "step": "03",
+          "title": "Visualize your progress",
+          "description": "See how you change over time without losing context."
+        },
+        {
+          "step": "04",
+          "title": "Share with your therapist",
+          "description": "Your process becomes clearer and more useful in each session."
+        }
+      ]
+    },
+    "therapistDemo": {
+      "badge": "For therapists",
+      "title": "A clearer way to understand each patient between sessions.",
+      "description": "NeuroQuest offers a clearer view of the patient process to support clinical decision-making.",
+      "panelTitle": "Therapist view",
+      "panelHeading": "Patient overview",
+      "panelSummary": "Access real patient evolution, emotional context, and visible signals to intervene with more clarity.",
+      "latestCheckInLabel": "Latest check-in",
+      "latestCheckInValue": "Moderate · 24/40",
+      "latestCheckInRelative": "2 days ago",
+      "observerLabel": "Recent observer",
+      "observerBody": "Trigger: contamination. Compulsion urge: high. Recent situation documented.",
+      "activityLabel": "Recent activity",
+      "activityBody": "Active ERP mission, longitudinal progress available, and basic risk visible.",
+      "timeline": [
+        [
+          "Patient evolution",
+          "Real follow-up of changes and continuity between sessions."
+        ],
+        [
+          "Clear clinical context",
+          "Thoughts, emotions, and relevant situations in one place."
+        ],
+        [
+          "Risk signals",
+          "Visible indicators to support timely clinical decisions."
+        ]
+      ]
+    },
+    "audiences": {
+      "badge": "Patients and therapists",
+      "title": "One platform, with useful views for patients and professionals.",
+      "patientTitle": "For patients",
+      "therapistTitle": "For therapists",
+      "patientIntro": "A clearer experience to understand mental state, sustain adherence, and lower follow-up friction.",
+      "therapistIntro": "A faster clinical reading of what happened between sessions, without reconstructing everything manually.",
+      "patientItems": [
+        "Understand current state with a check-in that is clear and measurable.",
+        "Record thoughts, context, and repeated signals without losing continuity.",
+        "See progress, trends, and active tasks with less noise.",
+        "Receive contextual support and crisis routes when needed."
+      ],
+      "therapistItems": [
+        "Review real patients directly from Firestore.",
+        "Read the latest check-in, recent history, and case thoughts.",
+        "Observe recent missions and a basic clinical risk signal.",
+        "Get faster visibility into what happened between sessions."
+      ]
+    },
+    "activation": {
+      "badge": "Role-guided entry",
+      "title": "Each type of user starts from a clearer flow.",
+      "description": "The landing page and login now prepare activation based on account intent, without inventing clinical permissions or mixing onboarding states.",
+      "cards": [
+        {
+          "role": "patient",
+          "title": "Patient",
+          "description": "Start with check-in, observer, grounding, and personal follow-up from the first access.",
+          "helper": "You can try the personal flow as a guest if you only need to explore it.",
+          "cta": "Enter as patient"
+        },
+        {
+          "role": "professional",
+          "title": "Professional",
+          "description": "Enter through a flow oriented to patient follow-up, clinical support, and supervised documentation.",
+          "helper": "Professional intent is captured in onboarding, but real clinical access still requires validation.",
+          "cta": "Enter as professional"
+        },
+        {
+          "role": "clinic",
+          "title": "Clinic",
+          "description": "Prepare access for clinical operations, cross-patient follow-up, and broader team workflows.",
+          "helper": "Clinic setup is not enabled automatically from login; it remains subject to internal review.",
+          "cta": "Enter as clinic"
+        }
+      ]
+    },
+    "science": {
+      "badge": "Safety and care",
+      "title": "A tool designed to support, not replace professional care.",
+      "description": "NeuroQuest works as a support tool for follow-up and emotional understanding. It keeps clear limits and does not replace clinical care.",
+      "pillars": [
+        [
+          "Continuous support",
+          "It accompanies you between sessions so you arrive with more clarity to each therapeutic space."
+        ],
+        [
+          "Process traceability",
+          "It organizes your evolution so you do not lose context over time."
+        ],
+        [
+          "Explicit safety",
+          "It does not replace professional care or perform medical diagnosis."
+        ]
+      ],
+      "safetyTitle": "Visible guardrails",
+      "safetyIntro": "The public narrative also keeps explicit clinical limits.",
+      "safetyItems": [
+        "NeuroQuest is a support tool.",
+        "It does not replace professional care or perform medical diagnosis.",
+        "It keeps clear messaging when a situation requires more support.",
+        "It preserves a calm and useful reading of the process."
+      ]
+    },
+    "finalCta": {
+      "badge": "Start today",
+      "title": "Start understanding your mind with more clarity, without doing it alone.",
+      "description": "A simple and continuous space to understand how you feel, record what you think, and follow your progress.",
+      "primaryCta": "Start",
+      "secondaryCta": "Explore modules"
+    },
+    "donation": {
+      "badge": "Donate to help",
+      "title": "Your support can open follow-up and care for more people affected by mental distress.",
+      "description": "Every donation helps sustain a platform built to support real processes with more clarity, continuity, and access. If you want to support this mission, leave your details and continue to the secure donation link.",
+      "formTitle": "Before donating",
+      "fields": {
+        "name": "Full name",
+        "email": "Email address",
+        "phone": "Phone number"
+      },
+      "helper": "Your contribution helps expand access, follow-up, and support for people who need mental-health care today.",
+      "cta": "Go to donate",
+      "linkLabel": "Open donation link"
+    },
+    "footer": {
+      "productDescription": "Mental-health follow-up with clinical structure, therapeutic gamification, and contextual support for patients and therapists.",
+      "linksTitle": "Sections",
+      "links": [
+        "How it works",
+        "Real modules",
+        "Clinical basis",
+        "Therapist portal"
+      ],
+      "safetyTitle": "Important",
+      "safetyDescription": "NeuroQuest is a support and follow-up tool. It does not replace professional treatment or medical instruction.",
+      "rightsPrefix": "© 2026 NeuroQuest. All rights reserved by",
+      "ownerName": "Yessy Alejandro Lotero Hernandez",
+      "disclaimer": "No self-medication. No dose prescribing. Guidance proportional to risk."
+    }
   },
   "personalizedMissionGenerator": {
     "generating": "Generating...",
@@ -96,6 +588,15 @@
     "title": "Exposure Mode (ERP)",
     "customMission": "Custom Mission",
     "description": "Engage in progressively challenging Exposure and Response Prevention (ERP) missions. This is a core part of overcoming OCD and anxiety.",
+    "reportTitle": "Exposure mission report",
+    "reportDescription": "Printable summary of active and completed missions.",
+    "reportPatientLabel": "Patient",
+    "reportGeneratedAtLabel": "Issued at",
+    "reportSummaryTitle": "Progress summary",
+    "reportSummaryWithProgress": "Completed missions: {completed} out of {total}. Total XP earned in exposure: {xp}.",
+    "reportSummaryEmpty": "There are no missions recorded yet to generate a summary.",
+    "reportPatientSignature": "Patient signature",
+    "reportTherapistSignature": "Therapist signature",
     "progressTitle": "Your ERP Progress",
     "progressDescription": "You've completed {completed} out of {total} available missions.",
     "availableMissions": "Available Missions",
@@ -163,6 +664,15 @@
   "observer": {
     "title": "Mental Observer",
     "description": "Log your intrusive or distressing thoughts below. Our AI will help you analyze and reframe them from a CBT/ERP perspective.",
+    "reportTitle": "Mental observer report",
+    "reportPatientLabel": "Patient",
+    "reportGeneratedAtLabel": "Issued at",
+    "reportSummaryTitle": "Clinical summary",
+    "reportSummaryEmpty": "There are no saved thoughts yet to generate a support diagnosis.",
+    "reportSummaryWithStats": "Logged thoughts: {total}. Last 7 days: {recent}. Average intensity: {intensity}/10. High-load thoughts: {risk}.",
+    "reportPatternsTitle": "Observed patterns",
+    "reportPatientSignature": "Patient signature",
+    "reportTherapistSignature": "Therapist signature",
     "recentThoughts": "Your Recent Thoughts",
     "patternsTitle": "Recent Patterns",
     "patternsDescription": "A compact view of frequency, intensity, and compulsive pressure to understand how the week is unfolding.",
@@ -221,6 +731,25 @@
     "description": "Visualize your journey. Track your stats to see how far you've come.",
     "averageScoreTitle": "Recent average",
     "averageScoreDescription": "Average across your last 5 saved check-ins.",
+    "observerSummaryTitle": "Observer",
+    "observerSummaryDescription": "Average intensity of saved thoughts from Mental Observer.",
+    "missionsSummaryTitle": "Completed missions",
+    "missionsSummaryDescription": "Completed ERP missions recorded so far.",
+    "activeModulesTitle": "Active modules",
+    "activeModulesDescription": "Modules with recorded meaningful actions.",
+    "recordedActivityTitle": "Recorded activity",
+    "recordedActivityDescription": "Saved, created, or completed events.",
+    "moduleOpensTitle": "Module opens",
+    "moduleOpensDescription": "Tracked separately so progress is not inflated.",
+    "recentModuleActivityTitle": "Recent module activity",
+    "recentModuleActivityDescription": "Updates in real time when a module saves data or logs usage.",
+    "moduleCoverageTitle": "Module coverage",
+    "moduleCoverageDescription": "Cumulative summary of meaningful activity by module.",
+    "moduleActivityTitle": "Module activity",
+    "noMeaningfulActivityYet": "No meaningful activity has been recorded yet.",
+    "noModuleOpensYet": "No module opens have been recorded yet.",
+    "observerChartTitle": "Observer trend",
+    "observerChartDescription": "Intensity of recent thoughts stored in Firestore.",
     "printReport": "Print report",
     "reportTitle": "Printable report",
     "reportDescription": "Brief clinical summary based on your saved check-ins.",
@@ -229,10 +758,18 @@
     "reportGeneratedAtLabel": "Issued at",
     "reportCheckInCount": "Total check-ins",
     "reportRecentHistoryTitle": "Recent history",
+    "reportObserverTitle": "Recent observer",
+    "reportMissionsTitle": "Recent missions",
+    "reportClinicalSummaryTitle": "Clinical summary",
+    "reportClinicalSummaryEmpty": "No clinical summary is available yet because there are no saved check-ins.",
+    "reportClinicalSummaryNoTrend": "Latest clinical level: {level}. There is still not enough historical information to estimate a reliable trend.",
+    "reportClinicalSummaryWithTrend": "Latest clinical level: {level}. Recent trajectory: {trend} by {delta} points versus the previous comparable block.",
     "reportPatientSignature": "Patient signature",
     "reportTherapistSignature": "Therapist signature",
     "trendTitle": "Trend",
     "trendDescription": "Change versus the previous block: {value} points.",
+    "trendUnavailableTitle": "Not enough history",
+    "trendUnavailableDescription": "At least two blocks of check-ins are required to calculate a real trend.",
     "latestLevelTitle": "Latest level",
     "latestLevelDescription": "Severity recorded in your most recent check-in.",
     "missionCompletionRate": "Mission Completion Rate",
@@ -265,6 +802,24 @@
     "active": "Active",
     "pending": "Pending",
     "failed": "Failed",
+    "activityTypes": {
+      "saved": "Saved entry",
+      "created": "Created",
+      "completed": "Completed",
+      "opened": "Module opened"
+    },
+    "sections": {
+      "realProgressTitle": "Real progress",
+      "realProgressDescription": "Clinical changes and useful accumulated outcomes for the user.",
+      "engagementTitle": "Engagement",
+      "engagementDescription": "Usage and continuity signals, kept separate from clinical progress.",
+      "activityTitle": "Recent activity",
+      "activityDescription": "Recent useful events and cumulative coverage by module."
+    },
+    "weeklySummary": "{events} useful events across {modules} modules in the last 7 days.",
+    "realDataChartNeedsMorePoints": "There are not enough real recorded points to show this chart honestly.",
+    "chartSourceCheckIns": "Source: registered mental_checkups with valid dates.",
+    "chartSourceThoughts": "Source: registered thoughtRecords with valid dates.",
     "currentSnapshot": "Current",
     "entryLabel": "Entry",
     "fortitude": "Mental Fortitude",
@@ -284,6 +839,7 @@
   "regulation": {
     "title": "Emotional Regulation",
     "description": "Use these tools to manage acute anxiety and bring your nervous system back to a state of calm.",
+    "lastPractice": "Recently started practice: {title}.",
     "boxBreathingTitle": "Box Breathing",
     "boxBreathingDescription": "A simple technique to calm your nervous system.",
     "boxStep1": "Inhale for 4s",
@@ -303,7 +859,8 @@
   },
   "reprogram": {
     "title": "Cognitive Reprogramming",
-    "description": "Challenge catastrophic or magical thinking patterns. Enter a thought below, and our AI will guide you through a cognitive restructuring process to find a more balanced perspective."
+    "description": "Challenge catastrophic or magical thinking patterns. Enter a thought below, and our AI will guide you through a cognitive restructuring process to find a more balanced perspective.",
+    "lastSavedThought": "Latest thought worked on: {thought}"
   },
   "cognitiveReprogrammer": {
     "title": "Reprogramming Tool",
@@ -445,6 +1002,18 @@
     "patientNotAssigned": "This patient is not assigned to your therapist view.",
     "checkInHistory": "Check-In History",
     "checkInHistoryDesc": "Full mental check-in timeline for this patient.",
+    "reportTitle": "Patient clinical report",
+    "reportDescription": "Clinical summary ready for printing, PDF, or quick sharing from the therapist view.",
+    "reportHeaderTitle": "Report header",
+    "reportPatientLabel": "Patient",
+    "reportGeneratedAtLabel": "Issued at",
+    "reportClinicalSummaryTitle": "Clinical summary",
+    "reportClinicalSummary": "Latest check-in: {level} with score {score}. Current risk: {risk}. Latest recorded activity: {activity}.",
+    "reportCheckInHistoryTitle": "Recent check-ins",
+    "reportThoughtsTitle": "Recent thoughts",
+    "reportMissionsTitle": "Recent missions",
+    "reportPatientSignature": "Patient signature",
+    "reportTherapistSignature": "Therapist signature",
     "latestNote": "Latest note",
     "riskLevel": "Risk Level",
     "riskLevelDesc": "Based on the latest denormalized check-in severity.",
@@ -484,6 +1053,41 @@
   "login": {
     "title": "Welcome to NeuroQuest",
     "description": "Sign in to begin your journey to mental wellness.",
+    "roleSectionTitle": "Select the access type you need",
+    "roleSectionDescription": "This personalizes the initial onboarding and records your account intent.",
+    "guestOnlyPatient": "Guest access is only available for the patient flow.",
+    "roles": {
+      "patient": {
+        "title": "Patient",
+        "description": "Start with personal follow-up, check-ins, and self-tracking tools.",
+        "helper": "This is the only flow that can continue as a guest."
+      },
+      "professional": {
+        "title": "Professional",
+        "description": "Enter with intent for clinical follow-up and supervised documentation.",
+        "helper": "Your request is recorded without granting clinical permissions automatically."
+      },
+      "clinic": {
+        "title": "Clinic",
+        "description": "Start onboarding for a broader, coordinated clinical operation.",
+        "helper": "Clinic activation requires separate review and configuration."
+      }
+    },
+    "accessNotes": {
+      "patient": {
+        "title": "Immediate personal flow",
+        "description": "Your access is oriented to check-in, follow-up, and personal tools from the first sign-in."
+      },
+      "professional": {
+        "title": "Professional intent recorded",
+        "description": "We store this selection to adapt onboarding, but real professional access still requires validation."
+      },
+      "clinic": {
+        "title": "Clinic intent recorded",
+        "description": "We store this selection for the commercial and operational funnel without opening clinical privileges by itself."
+      }
+    },
+    "homeButton": "Home",
     "signInWithGoogle": "Sign in with Google",
     "continueAsGuest": "Continue as Guest",
     "signInErrorTitle": "Sign-In Failed",
@@ -495,8 +1099,82 @@
     "loading": "Loading...",
     "redirecting": "Redirecting to login..."
   },
+  "workspaceUsers": {
+    "title": "Users and access control",
+    "description": "Manage operational and clinical roles from a single view.",
+    "consoleBadge": "Superadmin console",
+    "serverControlled": "Server controlled",
+    "guardrailsTitle": "Hierarchical permission control",
+    "guardrailsDescription": "Owner, manager, and administrator can manage access according to their level. The server blocks self-escalation outside the allowed hierarchy.",
+    "settingsTitle": "Workspace baseline configuration",
+    "settingsDescription": "Five operational decisions worth defining early so the platform behaves consistently.",
+    "settingsSummaryTitle": "Recommended baseline settings",
+    "settingsSummaryDescription": "Theme, language, default role presets, and crisis routing stay aligned for the whole workspace.",
+    "settingsSaved": "Configuration saved.",
+    "saveSettings": "Save configuration",
+    "settings": {
+      "themePreset": "Visual theme",
+      "workspaceLanguage": "Workspace language",
+      "defaultUserRole": "Default clinical role",
+      "defaultAccountRole": "Default account role",
+      "crisisRouting": "Baseline crisis route",
+      "dashboardDensity": "Dashboard density",
+      "followUpMode": "Follow-up mode"
+    },
+    "themeOptions": {
+      "dark-blue": "Dark blue",
+      "clinical-white": "Clinical white",
+      "soft-gold": "Soft gold",
+      "graphite": "Graphite",
+      "ivory": "Ivory"
+    },
+    "languageOptions": {
+      "es": "Global Spanish",
+      "en": "English",
+      "bilingual": "Bilingual",
+      "es-co": "Spanish Colombia",
+      "es-mx": "Spanish Mexico"
+    },
+    "crisisOptions": {
+      "strict": "Strict escalation",
+      "guided": "Guided route",
+      "professional-first": "Professional first",
+      "clinic-review": "Clinic review",
+      "emergency-direct": "Direct to emergency"
+    },
+    "dashboardDensityOptions": {
+      "compact": "Compact",
+      "comfortable": "Comfortable",
+      "focused": "Focused",
+      "clinical": "Clinical",
+      "expanded": "Expanded"
+    },
+    "followUpOptions": {
+      "daily": "Daily",
+      "business-days": "Business days",
+      "weekly": "Weekly",
+      "manual": "Manual",
+      "critical-only": "Critical only"
+    },
+    "stats": {
+      "totalUsers": "Users",
+      "clinics": "Clinics",
+      "professionals": "Professionals",
+      "operators": "Operators"
+    },
+    "listTitle": "Workspace users",
+    "listDescription": "Adjust each user's account role and clinical role with operational traceability.",
+    "currentSummary": "Current account role: {accountRole} · Current clinical role: {userRole}",
+    "accountRoleLabel": "Account role",
+    "userRoleLabel": "Clinical role",
+    "save": "Save access"
+  },
   "loading": "Loading...",
   "missionTypes": {
+    "observer": "Mental Observer",
+    "exposure": "Exposure",
+    "regulation": "Emotional Regulation",
+    "reprogram": "Cognitive Reprogramming",
     "observador_mental": "Mental Observer",
     "exposición": "Exposure",
     "regulación_emocional": "Emotional Regulation",
@@ -505,6 +1183,8 @@
   "grounding": {
     "title": "Grounding Exercises",
     "description": "A collection of grounding techniques to help you anchor yourself in the present moment during times of distress.",
+    "startExercise": "Mark exercise",
+    "lastStarted": "Recently started exercise: {title}.",
     "mild": {
       "title": "For Mild Crisis",
       "ex1": {
@@ -733,6 +1413,8 @@
     "dailyMission": "Personalized Daily Mission",
     "alertTitle": "Important Alert",
     "alertText": "Your response suggests significant discomfort or possible emotional risk. Seek professional support as soon as possible and contact a trusted person right now.",
+    "prioritySupportTitle": "Professional support should be prioritized",
+    "prioritySupportText": "Your current record justifies timely professional follow-up and prudent clinical review.",
     "openCrisisSupport": "Open crisis support",
     "disclaimerTitle": "Guideline",
     "disclaimerText": "This tool provides general guidance based on self-reported symptoms. It does not substitute for a professional medical, psychiatric, or psychological diagnosis.",
@@ -759,6 +1441,16 @@
       "sessionError": "No active user session was found.",
       "firestoreUnavailable": "Firestore is not available in this session.",
       "previewTitle": "Preview",
+    "reportTitle": "Mental check-in report",
+    "reportPatientLabel": "Patient",
+    "reportGeneratedAtLabel": "Issued at",
+    "reportHeaderTitle": "Report header",
+    "reportClinicalSummaryTitle": "Clinical summary",
+    "reportClinicalSummary": "Current result: {category}. Recorded score: {score}/{maxScore}. Suggested mission: {mission}.",
+    "reportTasksTitle": "Suggested tasks",
+    "reportNotesTitle": "Recorded note",
+    "reportPatientSignature": "Patient signature",
+    "reportTherapistSignature": "Therapist signature",
     "pendingAnswers": "Pending",
     "completeAllQuestions": "Answer every question to see a real result before saving.",
     "moods": {
@@ -837,12 +1529,17 @@
   "medical": {
     "title": "Medical Support",
     "description": "Basic clinical guidance based on your latest Mental Check-In stored in Firestore.",
+    "reviewGuidanceAction": "Mark guidance reviewed",
+    "lastReviewedGuidance": "Recently reviewed guidance: {title}.",
     "printReport": "Print report",
     "reportTitle": "Printable clinical report",
     "reportDescription": "Quick summary for clinical follow-up or discussion with a professional.",
     "reportHeaderTitle": "Report header",
     "reportPatientLabel": "Patient",
     "reportGeneratedAtLabel": "Issued at",
+    "reportClinicalSummaryTitle": "Clinical summary",
+    "reportClinicalSummaryEmpty": "There is no saved clinical summary yet because no real check-in has been recorded.",
+    "reportClinicalSummaryWithLevel": "Latest recorded level: {level}. Suggested guidance category: {guidance}.",
     "reportRecommendationsTitle": "Active recommendations",
     "reportPatientSignature": "Patient signature",
     "reportTherapistSignature": "Therapist signature",
@@ -856,8 +1553,23 @@
     "guidanceTitle": "Suggested guidance",
     "guidanceDescription": "Content changes based on your latest recorded level.",
     "completeCheckInFirst": "Complete your Mental Check-In first to unlock this clinical view.",
+    "openMedicationModule": "Open prescribed medication",
+    "urgentSupportTitle": "Urgent support path",
+    "urgentSupportDescription": "Your latest records suggest you should prioritize crisis support and immediate professional help.",
+    "priorityReviewTitle": "Priority professional review",
+    "priorityReviewDescription": "Your latest records justify timely professional follow-up, even if they do not necessarily indicate an immediate crisis route.",
+    "warningSignsTitle": "Warning signs that should escalate help",
+    "warningSignsDescription": "Seek urgent professional help or crisis support if any of these major clinical warning signs are also present.",
     "severeAlertTitle": "Immediate support is required",
     "severeAlertDescription": "Your latest level is severe. Prioritize professional help and use crisis support if there is risk or loss of control.",
+    "warningSigns": {
+      "items": [
+        "Suicidal thoughts, a self-harm plan, or feeling unable to stay safe.",
+        "Hearing voices, clearly unusual beliefs, or losing contact with reality.",
+        "Several days of almost no sleep together with unusually high energy, agitation, or marked impulsivity.",
+        "Fainting, purging, or severe food restriction that puts physical safety at risk."
+      ]
+    },
     "dynamic": {
       "mild": {
         "title": "Basic recommendations",

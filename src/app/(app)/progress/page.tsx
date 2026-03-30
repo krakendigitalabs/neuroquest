@@ -1,38 +1,26 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Activity, LineChart, Printer, ShieldAlert, TrendingDown, TrendingUp } from 'lucide-react';
+import { Activity, LineChart, ShieldAlert, TrendingDown, TrendingUp } from 'lucide-react';
 import { CartesianGrid, ComposedChart, Line, XAxis, YAxis } from 'recharts';
-import { collection } from 'firebase/firestore';
-import { Button } from '@/components/ui/button';
+import { collection, limit, orderBy, query } from 'firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
 import { useTranslation } from '@/context/language-provider';
 import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
 import { useUserProfile } from '@/hooks/use-user-profile';
-import { getCheckInTrendLabel } from '@/lib/mental-check-in';
 import type { MentalCheckup } from '@/models/mental-checkup';
+import type { ThoughtRecord } from '@/models/thought-record';
+import type { ExposureMission } from '@/models/exposure-mission';
+import type { ProgressEvent, ProgressModuleKey } from '@/models/progress-event';
 import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import type { TooltipProps } from 'recharts';
-
-function toDate(value: unknown): Date | null {
-  if (!value) return null;
-  if (value instanceof Date) return value;
-  if (typeof value === 'string' || typeof value === 'number') {
-    const parsed = new Date(value);
-    return Number.isNaN(parsed.getTime()) ? null : parsed;
-  }
-  if (typeof value === 'object' && value !== null && 'toDate' in value && typeof (value as { toDate: () => Date }).toDate === 'function') {
-    return (value as { toDate: () => Date }).toDate();
-  }
-  return null;
-}
-
-function average(numbers: number[]) {
-  if (!numbers.length) return 0;
-  return numbers.reduce((sum, value) => sum + value, 0) / numbers.length;
-}
+import { getProgressMetrics, normalizeProgressCheckups } from '@/lib/progress-checkups';
+import { PatientReportActions } from '@/components/patient-report-actions';
+import { buildPatientReportText } from '@/lib/patient-report';
+import { normalizeThoughtRecords } from '@/lib/thought-records';
+import { toDate } from '@/lib/thought-insights';
 
 const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
   if (active && payload && payload.length) {
@@ -58,64 +46,291 @@ export default function ProgressPage() {
 
   const checkupsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    return collection(firestore, 'users', user.uid, 'mental_checkups');
+    return query(
+      collection(firestore, 'users', user.uid, 'mental_checkups'),
+      orderBy('createdAt', 'desc'),
+      limit(50)
+    );
   }, [firestore, user]);
 
   const { data: checkups } = useCollection<MentalCheckup>(checkupsQuery);
+  const thoughtsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(
+      collection(firestore, 'users', user.uid, 'thoughtRecords'),
+      orderBy('recordedAt', 'desc'),
+      limit(30)
+    );
+  }, [firestore, user]);
+  const { data: thoughtHistory } = useCollection<ThoughtRecord>(thoughtsQuery);
+  const missionsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(
+      collection(firestore, 'users', user.uid, 'exposureMissions'),
+      orderBy('createdAt', 'desc'),
+      limit(30)
+    );
+  }, [firestore, user]);
+  const { data: missions } = useCollection<ExposureMission>(missionsQuery);
+  const activityQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(
+      collection(firestore, 'users', user.uid, 'progressEvents'),
+      orderBy('createdAt', 'desc'),
+      limit(50)
+    );
+  }, [firestore, user]);
+  const { data: activityEvents } = useCollection<ProgressEvent>(activityQuery);
 
-  const sortedCheckups = useMemo(() => (
-    [...(checkups ?? [])].sort((a, b) => (toDate(b.createdAt)?.getTime() ?? 0) - (toDate(a.createdAt)?.getTime() ?? 0))
-  ), [checkups]);
+  const sortedCheckups = useMemo(() => normalizeProgressCheckups(checkups), [checkups]);
+  const metrics = useMemo(() => getProgressMetrics(sortedCheckups), [sortedCheckups]);
+  const sortedThoughts = useMemo(
+    () =>
+      [...normalizeThoughtRecords(thoughtHistory)].sort(
+        (a, b) => (toDate(b.recordedAt)?.getTime() ?? 0) - (toDate(a.recordedAt)?.getTime() ?? 0)
+      ),
+    [thoughtHistory]
+  );
+  const sortedMissions = useMemo(
+    () =>
+      [...(missions ?? [])].sort(
+        (a, b) => (toDate(b.completionDate ?? b.createdAt)?.getTime() ?? 0) - (toDate(a.completionDate ?? a.createdAt)?.getTime() ?? 0)
+      ),
+    [missions]
+  );
+  const completedMissionCount = useMemo(
+    () => sortedMissions.filter((mission) => mission.status === 'completed').length,
+    [sortedMissions]
+  );
+  const averageThoughtIntensity = useMemo(() => {
+    if (!sortedThoughts.length) return null;
+    const total = sortedThoughts.reduce((sum, thought) => sum + thought.intensity, 0);
+    return Math.round((total / sortedThoughts.length) * 10) / 10;
+  }, [sortedThoughts]);
+  const sortedActivityEvents = useMemo(
+    () =>
+      [...(activityEvents ?? [])].sort(
+        (a, b) => (toDate(b.createdAt)?.getTime() ?? 0) - (toDate(a.createdAt)?.getTime() ?? 0)
+      ),
+    [activityEvents]
+  );
+  const meaningfulActivityEvents = useMemo(
+    () => sortedActivityEvents.filter((event) => event.type !== 'opened'),
+    [sortedActivityEvents]
+  );
+  const weeklyMeaningfulActivityEvents = useMemo(() => {
+    const now = new Date();
+    const sevenDaysAgo = new Date(now);
+    sevenDaysAgo.setDate(now.getDate() - 7);
 
-  const latestCheckup = sortedCheckups[0] ?? null;
-  const latestFive = sortedCheckups.slice(0, 5);
-  const latestAverage = Math.round(average(sortedCheckups.slice(0, 5).map((checkup) => checkup.score)) * 10) / 10;
-  const previousAverage = Math.round(average(sortedCheckups.slice(5, 10).map((checkup) => checkup.score)) * 10) / 10;
-  const trendDirection = getCheckInTrendLabel(latestAverage, previousAverage);
-  const trendDelta = Math.round((latestAverage - previousAverage) * 10) / 10;
+    return meaningfulActivityEvents.filter((event) => {
+      const eventDate = toDate(event.createdAt);
+      return !!eventDate && eventDate >= sevenDaysAgo;
+    });
+  }, [meaningfulActivityEvents]);
+  const engagementEvents = useMemo(
+    () => sortedActivityEvents.filter((event) => event.type === 'opened'),
+    [sortedActivityEvents]
+  );
+  const activeModuleCount = useMemo(
+    () => new Set(meaningfulActivityEvents.map((event) => event.module)).size,
+    [meaningfulActivityEvents]
+  );
+  const recentActivityCount = meaningfulActivityEvents.length;
+  const moduleOpenCount = engagementEvents.length;
+  const moduleCounts = useMemo(() => {
+    return meaningfulActivityEvents.reduce<Record<string, number>>((accumulator, event) => {
+      accumulator[event.module] = (accumulator[event.module] ?? 0) + 1;
+      return accumulator;
+    }, {});
+  }, [meaningfulActivityEvents]);
+  const weeklyActiveModuleCount = useMemo(
+    () => new Set(weeklyMeaningfulActivityEvents.map((event) => event.module)).size,
+    [weeklyMeaningfulActivityEvents]
+  );
+  const thoughtTrendData = useMemo(
+    () =>
+      sortedThoughts
+        .slice(0, 7)
+        .map((thought) => {
+          const recordedAt = toDate(thought.recordedAt);
+          if (!recordedAt) return null;
+          return {
+            day: recordedAt.toLocaleDateString(locale, { month: 'short', day: 'numeric' }),
+            intensity: thought.intensity,
+          };
+        })
+        .filter((thought): thought is { day: string; intensity: number } => thought !== null)
+        .reverse(),
+    [locale, sortedThoughts]
+  );
 
   const trendData = useMemo(() => (
-    [...sortedCheckups]
-      .reverse()
-      .slice(-7)
-      .map((checkup, index) => {
-        const date = toDate(checkup.createdAt);
+    [...metrics.trendData]
+      .map((checkup) => {
+        if (!checkup.createdAt) return null;
         return {
-          day: date ? date.toLocaleDateString(locale, { month: 'short', day: 'numeric' }) : `${t('progress.entryLabel')} ${index + 1}`,
+          day: checkup.createdAt.toLocaleDateString(locale, { month: 'short', day: 'numeric' }),
           score: checkup.score,
         };
       })
-  ), [locale, sortedCheckups, t]);
+      .filter((checkup): checkup is { day: string; score: number } => checkup !== null)
+      .reverse()
+  ), [locale, metrics.trendData]);
+  const hasEnoughCheckInTrendData = trendData.length >= 2;
+  const hasEnoughThoughtTrendData = thoughtTrendData.length >= 2;
 
   const chartConfig = {
     score: { label: t('progress.checkInScore'), color: 'hsl(var(--destructive))' },
+    intensity: { label: t('observer.intensity'), color: 'hsl(var(--primary))' },
+  };
+  const moduleLabel = (module: ProgressModuleKey) => {
+    switch (module) {
+      case 'check-in':
+        return t('nav.checkIn');
+      case 'observer':
+        return t('nav.observer');
+      case 'exposure':
+        return t('nav.exposure');
+      case 'medical-support':
+        return t('medical.title');
+      case 'medication':
+        return t('nav.medication');
+      case 'grounding':
+        return t('nav.grounding');
+      case 'regulation':
+        return t('nav.regulation');
+      case 'reprogram':
+        return t('nav.reprogram');
+      case 'wellness':
+        return t('nav.wellness');
+      default:
+        return module;
+    }
+  };
+  const activityLabel = (event: ProgressEvent) => {
+    switch (event.type) {
+      case 'saved':
+        return t('progress.activityTypes.saved');
+      case 'created':
+        return t('progress.activityTypes.created');
+      case 'completed':
+        return t('progress.activityTypes.completed');
+      case 'opened':
+        return t('progress.activityTypes.opened');
+      default:
+        return event.type;
+    }
   };
   const generatedAt = useMemo(() => new Date(), []);
   const reportPatient = userProfile?.displayName || user?.displayName || user?.email || t('sidebar.guestUser');
+  const reportClinicalSummary = useMemo(() => {
+    if (!metrics.latestLevel) {
+      return t('progress.reportClinicalSummaryEmpty');
+    }
 
-  const handlePrint = () => {
-    window.print();
-  };
+    if (!metrics.trendDirection || metrics.trendDelta === null) {
+      return t('progress.reportClinicalSummaryNoTrend', {
+        level: t(`checkIn.results.${metrics.latestLevel}.category`),
+      });
+    }
+
+    return t('progress.reportClinicalSummaryWithTrend', {
+      level: t(`checkIn.results.${metrics.latestLevel}.category`),
+      trend: t(`progress.trendStates.${metrics.trendDirection}`).toLowerCase(),
+      delta: metrics.trendDelta.toLocaleString(locale),
+    });
+  }, [locale, metrics.latestLevel, metrics.trendDelta, metrics.trendDirection, t]);
+
+  const reportText = useMemo(() => buildPatientReportText({
+    title: t('progress.reportTitle'),
+    patientLabel: t('progress.reportPatientLabel'),
+    patient: reportPatient,
+    generatedAtLabel: t('progress.reportGeneratedAtLabel'),
+    generatedAt: generatedAt.toLocaleString(locale),
+    summaryTitle: t('progress.reportClinicalSummaryTitle'),
+    summary: reportClinicalSummary,
+    sections: [
+      {
+        title: t('progress.reportRecentHistoryTitle'),
+        lines: metrics.latestFive.length === 0
+          ? [t('progress.noCheckInsYet')]
+          : metrics.latestFive.map((checkup) => [
+              checkup.createdAt?.toLocaleString(locale) ?? t('progress.unknownDate'),
+              `${t('progress.checkInScore')}: ${checkup.score}/${checkup.maxScore || '—'}`,
+              t(`checkIn.results.${checkup.level}.category`),
+            ].join(' · ')),
+      },
+      {
+        title: t('progress.trendTitle'),
+        lines: [
+          metrics.trendDirection && metrics.trendDelta !== null
+            ? `${t(`progress.trendStates.${metrics.trendDirection}`)} (${metrics.trendDelta.toLocaleString(locale)})`
+            : t('progress.trendUnavailableDescription'),
+        ],
+      },
+      {
+        title: t('progress.reportObserverTitle'),
+        lines: sortedThoughts.length
+          ? sortedThoughts.slice(0, 5).map((thought) => {
+              const thoughtDate = toDate(thought.recordedAt)?.toLocaleString(locale) ?? t('progress.unknownDate');
+              return `${thoughtDate} · ${thought.thoughtText} · ${t('observer.intensity')}: ${thought.intensity}/10`;
+            })
+          : [t('observer.noThoughts')],
+      },
+      {
+        title: t('progress.reportMissionsTitle'),
+        lines: sortedMissions.length
+          ? sortedMissions.slice(0, 5).map((mission) => `${mission.title} · ${t(`progress.${mission.status}`)} · XP ${mission.xpReward}`)
+          : [t('progress.noMissionsYet')],
+      },
+      {
+        title: t('progress.moduleActivityTitle'),
+        lines: meaningfulActivityEvents.length
+          ? meaningfulActivityEvents.slice(0, 8).map((event) => {
+              const eventDate = toDate(event.createdAt)?.toLocaleString(locale) ?? t('progress.unknownDate');
+              const detail = event.detail ? ` · ${event.detail}` : '';
+              return `${eventDate} · ${moduleLabel(event.module)} · ${activityLabel(event)}${detail}`;
+            })
+          : [t('progress.noMeaningfulActivityYet')],
+      },
+      {
+        title: t('progress.moduleOpensTitle'),
+        lines: engagementEvents.length
+          ? engagementEvents.slice(0, 8).map((event) => {
+              const eventDate = toDate(event.createdAt)?.toLocaleString(locale) ?? t('progress.unknownDate');
+              return `${eventDate} · ${moduleLabel(event.module)} · ${activityLabel(event)}`;
+            })
+          : [t('progress.noModuleOpensYet')],
+      },
+    ],
+    patientSignatureLabel: t('progress.reportPatientSignature'),
+    therapistSignatureLabel: t('progress.reportTherapistSignature'),
+  }), [engagementEvents, generatedAt, locale, meaningfulActivityEvents, metrics.latestFive, metrics.trendDelta, metrics.trendDirection, reportClinicalSummary, reportPatient, sortedMissions, sortedThoughts, t]);
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
         <h1 className="text-3xl font-bold tracking-tight font-headline">{t('progress.title')}</h1>
-        <Button type="button" variant="outline" className="print:hidden" onClick={handlePrint}>
-          <Printer className="h-4 w-4" />
-          {t('progress.printReport')}
-        </Button>
+        <PatientReportActions reportTitle={t('progress.reportTitle')} reportText={reportText} />
       </div>
       <p className="text-muted-foreground">{t('progress.description')}</p>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-xl font-semibold">{t('progress.sections.realProgressTitle')}</h2>
+          <p className="text-sm text-muted-foreground">{t('progress.sections.realProgressDescription')}</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t('progress.averageScoreTitle')}</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{latestAverage.toLocaleString(locale)}</div>
+            <div className="text-2xl font-bold">
+              {metrics.latestAverage !== null ? metrics.latestAverage.toLocaleString(locale) : t('progress.noCheckInsYet')}
+            </div>
             <p className="text-xs text-muted-foreground">{t('progress.averageScoreDescription')}</p>
           </CardContent>
         </Card>
@@ -123,17 +338,23 @@ export default function ProgressPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t('progress.trendTitle')}</CardTitle>
-            {trendDirection === 'up' ? (
+            {metrics.trendDirection === 'up' ? (
               <TrendingUp className="h-4 w-4 text-destructive" />
-            ) : trendDirection === 'down' ? (
+            ) : metrics.trendDirection === 'down' ? (
               <TrendingDown className="h-4 w-4 text-primary" />
             ) : (
               <LineChart className="h-4 w-4 text-muted-foreground" />
             )}
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{t(`progress.trendStates.${trendDirection}`)}</div>
-            <p className="text-xs text-muted-foreground">{t('progress.trendDescription', { value: trendDelta.toLocaleString(locale) })}</p>
+            <div className="text-2xl font-bold">
+              {metrics.trendDirection ? t(`progress.trendStates.${metrics.trendDirection}`) : t('progress.trendUnavailableTitle')}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {metrics.trendDelta !== null
+                ? t('progress.trendDescription', { value: metrics.trendDelta.toLocaleString(locale) })
+                : t('progress.trendUnavailableDescription')}
+            </p>
           </CardContent>
         </Card>
 
@@ -144,12 +365,143 @@ export default function ProgressPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {latestCheckup ? t(`checkIn.results.${latestCheckup.level}.category`) : t('progress.noCheckInsYet')}
+              {metrics.latestLevel ? t(`checkIn.results.${metrics.latestLevel}.category`) : t('progress.noCheckInsYet')}
             </div>
             <p className="text-xs text-muted-foreground">{t('progress.latestLevelDescription')}</p>
           </CardContent>
         </Card>
-      </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('progress.observerSummaryTitle')}</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {averageThoughtIntensity !== null ? averageThoughtIntensity.toLocaleString(locale) : t('observer.noThoughts')}
+            </div>
+            <p className="text-xs text-muted-foreground">{t('progress.observerSummaryDescription')}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('progress.missionsSummaryTitle')}</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{completedMissionCount.toLocaleString(locale)}</div>
+            <p className="text-xs text-muted-foreground">{t('progress.missionsSummaryDescription')}</p>
+          </CardContent>
+        </Card>
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-xl font-semibold">{t('progress.sections.engagementTitle')}</h2>
+          <p className="text-sm text-muted-foreground">{t('progress.sections.engagementDescription')}</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('progress.activeModulesTitle')}</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{activeModuleCount.toLocaleString(locale)}</div>
+            <p className="text-xs text-muted-foreground">{t('progress.activeModulesDescription')}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('progress.recordedActivityTitle')}</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{recentActivityCount.toLocaleString(locale)}</div>
+            <p className="text-xs text-muted-foreground">{t('progress.recordedActivityDescription')}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('progress.moduleOpensTitle')}</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{moduleOpenCount.toLocaleString(locale)}</div>
+            <p className="text-xs text-muted-foreground">{t('progress.moduleOpensDescription')}</p>
+          </CardContent>
+        </Card>
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-xl font-semibold">{t('progress.sections.activityTitle')}</h2>
+          <p className="text-sm text-muted-foreground">{t('progress.sections.activityDescription')}</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{t('progress.recordedActivityTitle')}</CardTitle>
+              <Activity className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{recentActivityCount.toLocaleString(locale)}</div>
+              <p className="text-xs text-muted-foreground">{t('progress.recordedActivityDescription')}</p>
+              <div className="mt-3 rounded-lg bg-muted/50 p-3 text-sm">
+                {t('progress.weeklySummary', {
+                  events: weeklyMeaningfulActivityEvents.length,
+                  modules: weeklyActiveModuleCount,
+                })}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('progress.recentModuleActivityTitle')}</CardTitle>
+              <CardDescription>{t('progress.recentModuleActivityDescription')}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {meaningfulActivityEvents.length === 0 ? (
+                <p className="text-sm text-muted-foreground">{t('progress.noMeaningfulActivityYet')}</p>
+              ) : (
+                meaningfulActivityEvents.slice(0, 8).map((event) => (
+                  <div key={event.id} className="rounded-lg border p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-medium">{moduleLabel(event.module)}</p>
+                      <Badge variant="outline">{activityLabel(event)}</Badge>
+                    </div>
+                    {event.detail ? <p className="mt-2 text-sm text-muted-foreground">{event.detail}</p> : null}
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {toDate(event.createdAt)?.toLocaleString(locale) ?? t('progress.unknownDate')}
+                    </p>
+                  </div>
+                ))
+              )}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('progress.moduleCoverageTitle')}</CardTitle>
+              <CardDescription>{t('progress.moduleCoverageDescription')}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {Object.keys(moduleCounts).length === 0 ? (
+                <p className="text-sm text-muted-foreground">{t('progress.noMeaningfulActivityYet')}</p>
+              ) : (
+                (Object.entries(moduleCounts) as Array<[ProgressModuleKey, number]>)
+                  .sort((a, b) => b[1] - a[1])
+                  .map(([module, count]) => (
+                    <div key={module} className="flex items-center justify-between rounded-lg border p-3 text-sm">
+                      <span>{moduleLabel(module)}</span>
+                      <Badge variant="secondary">{count.toLocaleString(locale)}</Badge>
+                    </div>
+                  ))
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </section>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
@@ -161,15 +513,27 @@ export default function ProgressPage() {
             <CardDescription>{t('progress.checkInTrendDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-64">
-              <ComposedChart data={trendData}>
-                <CartesianGrid vertical={false} />
-                <XAxis dataKey="day" tickLine={false} axisLine={false} />
-                <YAxis width={20} tickLine={false} axisLine={false} />
-                <ChartTooltip content={<CustomTooltip />} />
-                <Line type="monotone" dataKey="score" stroke={chartConfig.score.color} strokeWidth={2} dot name={t('progress.checkInScore')} />
-              </ComposedChart>
-            </ChartContainer>
+            {trendData.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t('progress.noCheckInsYet')}</p>
+            ) : !hasEnoughCheckInTrendData ? (
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>{t('progress.realDataChartNeedsMorePoints')}</p>
+                <p>{t('progress.chartSourceCheckIns')}</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <ChartContainer config={chartConfig} className="h-64">
+                  <ComposedChart data={trendData}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                    <YAxis width={20} tickLine={false} axisLine={false} />
+                    <ChartTooltip content={<CustomTooltip />} />
+                    <Line type="monotone" dataKey="score" stroke={chartConfig.score.color} strokeWidth={2} dot name={t('progress.checkInScore')} />
+                  </ComposedChart>
+                </ChartContainer>
+                <p className="text-xs text-muted-foreground">{t('progress.chartSourceCheckIns')}</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -179,11 +543,11 @@ export default function ProgressPage() {
             <CardDescription>{t('progress.latestCheckInsDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            {latestFive.length === 0 ? (
+            {metrics.latestFive.length === 0 ? (
               <p className="text-sm text-muted-foreground">{t('progress.noCheckInsYet')}</p>
             ) : null}
 
-            {latestFive.map((checkup) => (
+            {metrics.latestFive.map((checkup) => (
               <div key={checkup.id} className="rounded-lg border p-3">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-sm font-medium">{checkup.resultTitle}</p>
@@ -191,12 +555,73 @@ export default function ProgressPage() {
                     {t(`checkIn.results.${checkup.level}.category`)}
                   </Badge>
                 </div>
-                <p className="mt-2 text-sm font-semibold">{t('progress.checkInScore')}: {checkup.score}/{checkup.maxScore}</p>
+                <p className="mt-2 text-sm font-semibold">
+                  {t('progress.checkInScore')}: {checkup.score}/{checkup.maxScore || '—'}
+                </p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {toDate(checkup.createdAt)?.toLocaleString(locale) ?? t('progress.unknownDate')}
+                  {checkup.createdAt?.toLocaleString(locale) ?? t('progress.unknownDate')}
                 </p>
               </div>
             ))}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('progress.observerChartTitle')}</CardTitle>
+            <CardDescription>{t('progress.observerChartDescription')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {thoughtTrendData.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t('observer.noThoughts')}</p>
+            ) : !hasEnoughThoughtTrendData ? (
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>{t('progress.realDataChartNeedsMorePoints')}</p>
+                <p>{t('progress.chartSourceThoughts')}</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <ChartContainer config={chartConfig} className="h-64">
+                  <ComposedChart data={thoughtTrendData}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                    <YAxis width={20} tickLine={false} axisLine={false} domain={[0, 10]} />
+                    <ChartTooltip content={<CustomTooltip />} />
+                    <Line type="monotone" dataKey="intensity" stroke={chartConfig.intensity.color} strokeWidth={2} dot name={t('observer.intensity')} />
+                  </ComposedChart>
+                </ChartContainer>
+                <p className="text-xs text-muted-foreground">{t('progress.chartSourceThoughts')}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('progress.latestMissionsTitle')}</CardTitle>
+            <CardDescription>{t('progress.latestMissionsDescription')}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {sortedMissions.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t('progress.noMissionsYet')}</p>
+            ) : (
+              sortedMissions.slice(0, 5).map((mission) => (
+                <div key={mission.id} className="rounded-lg border p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-medium">{mission.title}</p>
+                    <Badge variant={mission.status === 'completed' ? 'secondary' : 'outline'}>
+                      {t(`progress.${mission.status}`)}
+                    </Badge>
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">{mission.description}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {toDate(mission.completionDate ?? mission.createdAt)?.toLocaleString(locale) ?? t('progress.unknownDate')}
+                  </p>
+                </div>
+              ))
+            )}
           </CardContent>
         </Card>
       </div>
@@ -214,17 +639,23 @@ export default function ProgressPage() {
               <p><span className="font-medium">{t('progress.reportGeneratedAtLabel')}:</span> {generatedAt.toLocaleString(locale)}</p>
             </div>
           </div>
+          <div className="rounded-lg border p-4">
+            <p className="font-medium">{t('progress.reportClinicalSummaryTitle')}</p>
+            <p className="mt-2">{reportClinicalSummary}</p>
+          </div>
           <p>
             <span className="font-medium">{t('progress.averageScoreTitle')}:</span>{' '}
-            {latestAverage.toLocaleString(locale)}
+            {metrics.latestAverage !== null ? metrics.latestAverage.toLocaleString(locale) : t('progress.noCheckInsYet')}
           </p>
           <p>
             <span className="font-medium">{t('progress.trendTitle')}:</span>{' '}
-            {t(`progress.trendStates.${trendDirection}`)} ({trendDelta.toLocaleString(locale)})
+            {metrics.trendDirection && metrics.trendDelta !== null
+              ? `${t(`progress.trendStates.${metrics.trendDirection}`)} (${metrics.trendDelta.toLocaleString(locale)})`
+              : t('progress.trendUnavailableDescription')}
           </p>
           <p>
             <span className="font-medium">{t('progress.latestLevelTitle')}:</span>{' '}
-            {latestCheckup ? t(`checkIn.results.${latestCheckup.level}.category`) : t('progress.noCheckInsYet')}
+            {metrics.latestLevel ? t(`checkIn.results.${metrics.latestLevel}.category`) : t('progress.noCheckInsYet')}
           </p>
           <p>
             <span className="font-medium">{t('progress.reportCheckInCount')}:</span>{' '}
@@ -232,16 +663,44 @@ export default function ProgressPage() {
           </p>
           <div className="rounded-lg border p-4">
             <p className="font-medium">{t('progress.reportRecentHistoryTitle')}</p>
-            {latestFive.length === 0 ? (
+            {metrics.latestFive.length === 0 ? (
               <p className="mt-2 text-muted-foreground">{t('progress.noCheckInsYet')}</p>
             ) : (
               <div className="mt-3 space-y-2">
-                {latestFive.map((checkup) => (
+                {metrics.latestFive.map((checkup) => (
                   <div key={`report-${checkup.id}`} className="grid gap-1 border-b pb-2 last:border-b-0 last:pb-0 md:grid-cols-[1.2fr_0.8fr_1fr]">
-                    <p>{toDate(checkup.createdAt)?.toLocaleString(locale) ?? t('progress.unknownDate')}</p>
-                    <p>{checkup.score}/{checkup.maxScore}</p>
+                    <p>{checkup.createdAt?.toLocaleString(locale) ?? t('progress.unknownDate')}</p>
+                    <p>{checkup.score}/{checkup.maxScore || '—'}</p>
                     <p>{t(`checkIn.results.${checkup.level}.category`)}</p>
                   </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="rounded-lg border p-4">
+            <p className="font-medium">{t('progress.reportObserverTitle')}</p>
+            {sortedThoughts.length === 0 ? (
+              <p className="mt-2 text-muted-foreground">{t('observer.noThoughts')}</p>
+            ) : (
+              <div className="mt-3 space-y-2">
+                {sortedThoughts.slice(0, 5).map((thought) => (
+                  <p key={`report-thought-${thought.id}`}>
+                    {toDate(thought.recordedAt)?.toLocaleString(locale) ?? t('progress.unknownDate')} · {thought.thoughtText} · {t('observer.intensity')}: {thought.intensity}/10
+                  </p>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="rounded-lg border p-4">
+            <p className="font-medium">{t('progress.reportMissionsTitle')}</p>
+            {sortedMissions.length === 0 ? (
+              <p className="mt-2 text-muted-foreground">{t('progress.noMissionsYet')}</p>
+            ) : (
+              <div className="mt-3 space-y-2">
+                {sortedMissions.slice(0, 5).map((mission) => (
+                  <p key={`report-mission-${mission.id}`}>
+                    {mission.title} · {t(`progress.${mission.status}`)} · XP {mission.xpReward}
+                  </p>
                 ))}
               </div>
             )}
