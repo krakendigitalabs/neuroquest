@@ -75,7 +75,7 @@ function GuestSignInButton({ requestedRole }: { requestedRole: UserRole }) {
 }
 
 export default function LoginPage() {
-  const { user, isUserLoading } = useFirebase();
+  const { user, isUserLoading, sessionSynced } = useFirebase();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useTranslation();
@@ -106,10 +106,10 @@ export default function LoginPage() {
   );
 
   useEffect(() => {
-    if (!isUserLoading && user) {
+    if (!isUserLoading && user && sessionSynced) {
       router.push(user.isAnonymous ? '/check-in' : '/dashboard');
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading, sessionSynced, router]);
 
   useEffect(() => {
     const roleFromQuery = parseRequestedRole(searchParams.get('role'));
