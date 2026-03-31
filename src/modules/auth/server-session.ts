@@ -6,23 +6,31 @@ export const AUTH_COOKIE_NAME = 'nq_id_token';
 
 export async function readServerIdTokenCookie() {
   const cookieStore = await cookies();
-  return cookieStore.get(AUTH_COOKIE_NAME)?.value ?? null;
+  const token = cookieStore.get(AUTH_COOKIE_NAME)?.value ?? null;
+  console.info(`[server-session] read cookie present=${Boolean(token)}`);
+  return token;
 }
 
 export async function verifyServerIdToken(idToken: string): Promise<DecodedIdToken> {
-  return getAdminAuth().verifyIdToken(idToken, true);
+  const decoded = await getAdminAuth().verifyIdToken(idToken, true);
+  console.info(`[server-session] verified token uid=${decoded.uid} email=${decoded.email ?? 'n/a'}`);
+  return decoded;
 }
 
 export async function getOptionalServerUser(): Promise<DecodedIdToken | null> {
   const idToken = await readServerIdTokenCookie();
 
   if (!idToken) {
+    console.info('[server-session] no id token present');
     return null;
   }
 
   try {
     return await verifyServerIdToken(idToken);
-  } catch {
+  } catch (error) {
+    console.warn('[server-session] failed to verify id token', {
+      message: error instanceof Error ? error.message : 'unknown error',
+    });
     return null;
   }
 }
@@ -31,6 +39,7 @@ export async function requireServerUser(): Promise<DecodedIdToken> {
   const idToken = await readServerIdTokenCookie();
 
   if (!idToken) {
+    console.warn('[server-session] requireServerUser missing token');
     throw new Error('unauthenticated');
   }
 
