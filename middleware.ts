@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AUTH_COOKIE_NAME } from '@/modules/auth/server-session';
-import { pathnameMatches, WORKSPACE_ADMIN_PATHS } from '@/modules/auth/permissions';
+import {
+  pathnameMatches,
+  WORKSPACE_ADMIN_PATHS,
+  SUPERADMIN_COOKIE_GATED_PATHS,
+} from '@/modules/auth/permissions';
+import { SUPERADMIN_COOKIE_NAME, isValidSuperadminUnlockToken } from '@/lib/superadmin-config';
 
 const AUTH_PROTECTED_PATHS = [
   '/dashboard',
@@ -24,6 +29,18 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isPublicException = pathnameMatches(pathname, PUBLIC_PATH_EXCEPTIONS);
   const requiresAuthCookie = !isPublicException && pathnameMatches(pathname, AUTH_PROTECTED_PATHS);
+  const requiresSuperadminGate = pathnameMatches(pathname, SUPERADMIN_COOKIE_GATED_PATHS);
+
+  if (requiresSuperadminGate) {
+    const superadminToken = request.cookies.get(SUPERADMIN_COOKIE_NAME)?.value;
+
+    if (!isValidSuperadminUnlockToken(superadminToken)) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/superadmin';
+      url.searchParams.set('next', pathname);
+      return NextResponse.redirect(url);
+    }
+  }
 
   if (!requiresAuthCookie) {
     return NextResponse.next();

@@ -23,13 +23,13 @@ vi.mock('@/hooks/use-user-profile', () => ({
 
 vi.mock('@/hooks/use-access-me', () => ({
   useAccessMe: () => ({
-    access: {
-      role: 'patient',
-      visibleModules: ['check-in', 'observer', 'progress', 'medical-support', 'medication'],
-      routeAccess: ['/check-in', '/observer', '/progress', '/medical-support', '/medication'],
-      actions: { canCreateModules: false },
-    },
-    isLoading: false,
+      access: {
+        role: 'patient',
+        visibleModules: ['check-in', 'observer', 'progress', 'medical-support', 'medication'],
+        routeAccess: ['/check-in', '/observer', '/progress', '/medical-support', '/medication'],
+        actions: { canCreateModules: false, canManageWorkspaceUsers: false },
+      },
+      isLoading: false,
   }),
 }));
 

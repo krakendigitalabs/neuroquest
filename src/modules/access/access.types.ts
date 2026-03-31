@@ -58,6 +58,7 @@ export type ResolvedAccess = {
   routeAccess: string[];
   actions: {
     canCreateModules: boolean;
+    canManageWorkspaceUsers: boolean;
   };
   resolvedAt: string;
 };

@@ -23,8 +23,7 @@ export async function GET() {
         },
       }
     );
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'unauthenticated';
+  } catch {
     return NextResponse.json({ error: 'unauthenticated' }, { status: 401 });
   }
 }

@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminAuth, getAdminDb } from '@/lib/firebase-admin';
-import { isAllowedSuperadminEmail } from '@/lib/superadmin-config';
+import {
+  SUPERADMIN_COOKIE_NAME,
+  isAllowedSuperadminEmail,
+  isValidSuperadminUnlockToken,
+} from '@/lib/superadmin-config';
 
 export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
+  const unlockToken = request.cookies.get(SUPERADMIN_COOKIE_NAME)?.value;
+
+  if (!isValidSuperadminUnlockToken(unlockToken)) {
+    return NextResponse.json({ error: 'unlock-required' }, { status: 401 });
+  }
+
   try {
     const { token } = await request.json();
 

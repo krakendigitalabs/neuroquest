@@ -84,14 +84,14 @@ vi.mock('@/hooks/use-user-profile', () => ({
 
 vi.mock('@/hooks/use-access-me', () => ({
   useAccessMe: () => ({
-    access: {
-      role: 'patient',
-      visibleModules: ['check-in', 'observer', 'progress', 'medication'],
-      routeAccess: ['/check-in', '/observer', '/progress', '/medication'],
-      actions: { canCreateModules: false },
-    },
-    isLoading: false,
-  }),
+      access: {
+        role: 'patient',
+        visibleModules: ['check-in', 'observer', 'progress', 'medication'],
+        routeAccess: ['/check-in', '/observer', '/progress', '/medication'],
+        actions: { canCreateModules: false, canManageWorkspaceUsers: false },
+      },
+      isLoading: false,
+    }),
 }));
 
 vi.mock('./logo', () => ({

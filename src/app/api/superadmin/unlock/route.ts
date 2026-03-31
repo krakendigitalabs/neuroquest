@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { SUPERADMIN_COOKIE_NAME } from '@/lib/superadmin-config';
+import {
+  SUPERADMIN_COOKIE_NAME,
+  SUPERADMIN_UNLOCK_TTL_SECONDS,
+  createSuperadminUnlockToken,
+} from '@/lib/superadmin-config';
 
 export async function POST(request: NextRequest) {
   const { pin } = await request.json();
@@ -14,14 +18,17 @@ export async function POST(request: NextRequest) {
   }
 
   const response = NextResponse.json({ ok: true });
-
-  response.cookies.set(SUPERADMIN_COOKIE_NAME, '1', {
+  const host = request.nextUrl.hostname;
+  const useSecureCookie =
+    process.env.NODE_ENV === 'production' && host !== 'localhost' && host !== '127.0.0.1';
+  response.cookies.set(SUPERADMIN_COOKIE_NAME, createSuperadminUnlockToken(), {
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    secure: useSecureCookie,
     path: '/',
-    maxAge: 60 * 60 * 8,
+    maxAge: SUPERADMIN_UNLOCK_TTL_SECONDS,
   });
+  response.headers.set('Cache-Control', 'no-store');
 
   return response;
 }

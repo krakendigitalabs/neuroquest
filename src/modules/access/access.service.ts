@@ -2,6 +2,7 @@ import { getAdminAuth, getAdminDb } from '@/lib/firebase-admin';
 import { getFallbackRolePolicy, getSortedModuleCatalog, MODULE_CATALOG_FALLBACK } from '@/modules/access/module-catalog';
 import { resolveAccess } from '@/modules/access/access.resolver';
 import type { AccessRule, ModuleCatalogEntry, ResolvedAccess, RolePolicy, UserModuleOverrides } from '@/modules/access/access.types';
+import type { AccountRole } from '@/lib/account-role';
 import type { UserProfile } from '@/models/user';
 
 function resolveUserRole(rawUser: Partial<UserProfile>) {
@@ -26,11 +27,13 @@ function resolveUserRole(rawUser: Partial<UserProfile>) {
 
 function normalizeUserProfile(userId: string, rawUser: Partial<UserProfile>): UserProfile {
   const role = resolveUserRole(rawUser);
+  const accountRole = (rawUser.accountRole ?? 'viewer') as AccountRole;
 
   return {
     ...rawUser,
     id: userId,
     role,
+    accountRole,
     pinnedPatientModules: rawUser.pinnedPatientModules ?? [],
   } as UserProfile;
 }

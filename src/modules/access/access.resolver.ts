@@ -1,3 +1,4 @@
+import { canManageWorkspaceUsers as canManageWorkspaceUsersRole } from '@/lib/account-role';
 import type { ModuleCatalogEntry, ModuleKey, ResolveAccessInput, ResolvedAccess } from '@/modules/access/access.types';
 
 function getFallbackPatientModules(allowedModules: ModuleKey[], maxModules: number) {
@@ -73,26 +74,31 @@ function buildResolvedAccess(
   role: ResolveAccessInput['user']['role'],
   enabledCatalog: ModuleCatalogEntry[],
   visibleModules: ModuleKey[],
-  canCreateModules: boolean
+  canCreateModules: boolean,
+  canManageWorkspaceUsers: boolean
 ): ResolvedAccess {
   return {
     userId,
     role,
     visibleModules,
     routeAccess: getRouteAccess(enabledCatalog, visibleModules),
-    actions: { canCreateModules },
+    actions: { canCreateModules, canManageWorkspaceUsers },
     resolvedAt: new Date().toISOString(),
   };
 }
 
 export function resolveAccess(input: ResolveAccessInput): ResolvedAccess {
+  const canCreateModules = input.rolePolicy.canCreateModules;
+  const hasWorkspaceAdminAccess = canManageWorkspaceUsersRole(input.user.accountRole);
+
   if (input.user.role === 'guest') {
     return buildResolvedAccess(
       input.user.id,
       'guest',
       [{ key: 'check-in', name: 'Chequeo Mental', route: '/check-in', enabled: true, audience: ['guest'], supportsAutoRules: false, order: 1 }],
       ['check-in'],
-      false
+      canCreateModules,
+      hasWorkspaceAdminAccess
     );
   }
 
@@ -101,7 +107,14 @@ export function resolveAccess(input: ResolveAccessInput): ResolvedAccess {
 
   if (input.user.role === 'patient') {
     const visibleModules = resolvePatientModules(input, enabledCatalog, allowed);
-    return buildResolvedAccess(input.user.id, input.user.role, enabledCatalog, visibleModules, false);
+    return buildResolvedAccess(
+      input.user.id,
+      input.user.role,
+      enabledCatalog,
+      visibleModules,
+      canCreateModules,
+      hasWorkspaceAdminAccess
+    );
   }
 
   const visibleModules = enabledCatalog
@@ -113,6 +126,7 @@ export function resolveAccess(input: ResolveAccessInput): ResolvedAccess {
     input.user.role,
     enabledCatalog,
     visibleModules,
-    input.user.role === 'clinic'
+    canCreateModules,
+    hasWorkspaceAdminAccess
   );
 }

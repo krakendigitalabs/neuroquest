@@ -39,7 +39,7 @@ export async function requireNonGuestAppAccess() {
 export async function requireWorkspaceAdminAccess() {
   const resolvedAccess = await getCurrentResolvedAccess();
 
-  if (!resolvedAccess.actions.canCreateModules) {
+  if (!resolvedAccess.actions.canManageWorkspaceUsers) {
     redirect(getFallbackRoute(resolvedAccess));
   }
 
