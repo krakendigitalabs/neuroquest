@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import type { Firestore } from 'firebase/firestore';
 import type { ProgressModuleKey } from '@/models/progress-event';
 import { logProgressEventNonBlocking } from '@/lib/progress-events';
+import { trackClientEvent } from '@/lib/vercel-analytics';
 
 type Input = {
   firestore: Firestore | null | undefined;
@@ -23,6 +24,7 @@ export function useTrackModuleActivity({ firestore, userId, module }: Input) {
     }
 
     window.sessionStorage.setItem(storageKey, '1');
+    trackClientEvent('module_used', { module });
     logProgressEventNonBlocking(firestore, {
       userId,
       module,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useFirebase } from '@/firebase';
@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { UserRole } from '@/models/user';
 import { parseRequestedRole, persistPendingRequestedRole, readPendingRequestedRole } from '@/lib/onboarding-role';
+import { trackClientEvent } from '@/lib/vercel-analytics';
 
 type LoginRoleCard = {
   role: UserRole;
@@ -80,6 +81,7 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const { t } = useTranslation();
   const [selectedRole, setSelectedRole] = useState<UserRole>('patient');
+  const hasTrackedLoginSuccess = useRef(false);
 
   const roleCards = useMemo<LoginRoleCard[]>(
     () => [
@@ -107,6 +109,11 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!isUserLoading && user && sessionSynced) {
+      if (!hasTrackedLoginSuccess.current) {
+        trackClientEvent('login_success');
+        hasTrackedLoginSuccess.current = true;
+      }
+
       router.push(user.isAnonymous ? '/check-in' : '/dashboard');
     }
   }, [user, isUserLoading, sessionSynced, router]);

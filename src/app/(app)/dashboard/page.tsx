@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { Activity, Award, ShieldAlert, Star, Target } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CHECK_IN_MAX_SCORE } from '@/lib/mental-check-in';
 import { getLatestActiveMission } from '@/lib/dashboard';
+import { trackClientEvent } from '@/lib/vercel-analytics';
 
 function toDate(value: unknown): Date | null {
   if (!value) return null;
@@ -35,6 +36,14 @@ export default function DashboardPage() {
   const { firestore, user } = useFirebase();
   const { userProfile, isLoading: isProfileLoading } = useUserProfile();
   const { access, isLoading: isAccessLoading } = useAccessMe();
+  const hasTrackedDashboardView = useRef(false);
+
+  useEffect(() => {
+    if (hasTrackedDashboardView.current) return;
+
+    trackClientEvent('dashboard_view');
+    hasTrackedDashboardView.current = true;
+  }, []);
 
   const missionsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;

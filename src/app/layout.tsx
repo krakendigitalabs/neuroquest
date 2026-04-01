@@ -1,5 +1,6 @@
 'use client';
 
+import { Analytics } from '@vercel/analytics/next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
@@ -45,6 +46,7 @@ function AppBody({ children }: { children: React.ReactNode }) {
       <body className={cn('font-body antialiased', inter.variable)}>
         {children}
         <Toaster />
+        <Analytics />
       </body>
     </html>
   );
