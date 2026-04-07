@@ -10,10 +10,11 @@ export function getAnswerValue(answers: CheckupAnswer[], questionId: number) {
 
 export function deriveRiskFlags(answers: CheckupAnswer[], level: MentalCheckInLevel): RiskFlags {
   const selfHarmAnswer = getAnswerValue(answers, SELF_HARM_QUESTION_ID);
+  const severeLevel = level === 'severe';
 
   return {
     selfHarmRisk: selfHarmAnswer >= 2,
-    needsProfessionalSupport: level === 'moderate' || level === 'severe' || selfHarmAnswer >= 2,
-    urgentSupportRecommended: selfHarmAnswer >= 3,
+    needsProfessionalSupport: level === 'moderate' || severeLevel || selfHarmAnswer >= 2,
+    urgentSupportRecommended: selfHarmAnswer >= 3 || severeLevel,
   };
 }

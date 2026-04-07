@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calculateMentalCheckInScore, getMentalCheckInLevel } from '@/lib/mental-check-in';
+import { calculateMentalCheckInScore, getMentalCheckInLevel, validateMentalCheckInAnswers } from '@/lib/mental-check-in';
 
 describe('mental check-in clinical logic', () => {
   it('calculates the total score from 10 real answers with values from 0 to 4', () => {
@@ -21,5 +21,21 @@ describe('mental check-in clinical logic', () => {
     expect(getMentalCheckInLevel(27)).toBe('moderate');
     expect(getMentalCheckInLevel(28)).toBe('severe');
     expect(getMentalCheckInLevel(40)).toBe('severe');
+  });
+
+  it('validates exactly 10 answers with integer values from 0 to 4', () => {
+    const validAnswers = Array.from({ length: 10 }, (_, index) => ({
+      questionId: index + 1,
+      question: `Question ${index + 1}`,
+      value: index % 5,
+    }));
+
+    const missingOneAnswer = validAnswers.slice(0, 9);
+    const outOfRangeAnswers = [...validAnswers];
+    outOfRangeAnswers[3] = { ...outOfRangeAnswers[3], value: 5 };
+
+    expect(validateMentalCheckInAnswers(validAnswers)).toBe(true);
+    expect(validateMentalCheckInAnswers(missingOneAnswer)).toBe(false);
+    expect(validateMentalCheckInAnswers(outOfRangeAnswers)).toBe(false);
   });
 });

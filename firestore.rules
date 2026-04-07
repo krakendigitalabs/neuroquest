@@ -99,6 +99,32 @@ service cloud.firestore {
         (!('latestThoughtIsIntrusive' in request.resource.data) || request.resource.data.latestThoughtIsIntrusive is bool);
     }
 
+    function hasValidModuleVisibilityLimitField() {
+      return !('moduleVisibilityLimit' in request.resource.data) ||
+        request.resource.data.moduleVisibilityLimit in [1, 2, 3, 'all'];
+    }
+
+    function isPrimarySuperadminEmail() {
+      return isSignedIn() &&
+        request.auth.token.email is string &&
+        request.auth.token.email == 'krakendigitalabs@gmail.com';
+    }
+
+    function moduleVisibilityLimitWriteAllowedOnCreate() {
+      return !('moduleVisibilityLimit' in request.resource.data) ||
+        request.resource.data.moduleVisibilityLimit == 'all' ||
+        isPrimarySuperadminEmail();
+    }
+
+    function moduleVisibilityLimitWriteAllowedOnUpdate() {
+      return !('moduleVisibilityLimit' in request.resource.data) ||
+        (
+          resource != null &&
+          request.resource.data.moduleVisibilityLimit == resource.data.moduleVisibilityLimit
+        ) ||
+        isPrimarySuperadminEmail();
+    }
+
     function ownerSafeProfileCreate(userId) {
       return isOwner(userId) &&
         request.resource.data.id == userId &&
@@ -138,6 +164,8 @@ service cloud.firestore {
         hasValidPinnedPatientModulesField() &&
         hasValidLatestCheckInSummary() &&
         hasValidLatestThoughtSummary() &&
+        hasValidModuleVisibilityLimitField() &&
+        moduleVisibilityLimitWriteAllowedOnCreate() &&
         (
           ownerSafeProfileCreate(userId) ||
           (isAdmin() &&
@@ -150,6 +178,8 @@ service cloud.firestore {
         hasValidPinnedPatientModulesField() &&
         hasValidLatestCheckInSummary() &&
         hasValidLatestThoughtSummary() &&
+        hasValidModuleVisibilityLimitField() &&
+        moduleVisibilityLimitWriteAllowedOnUpdate() &&
         (
           (isOwner(userId) && ownerSafeProfileUpdate()) ||
           (canManageWorkspaceUsers() && privilegedProfileFieldsAllowedByRequester())

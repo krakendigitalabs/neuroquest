@@ -8,7 +8,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useTranslation } from '@/context/language-provider';
 import { useFirebase } from '@/firebase';
 import { useUserProfile } from '@/hooks/use-user-profile';
-import { calculateMentalCheckInScore, CHECK_IN_MAX_SCORE, getMentalCheckInLevel, type MentalCheckInLevel } from '@/lib/mental-check-in';
+import {
+  calculateMentalCheckInScore,
+  CHECK_IN_MAX_SCORE,
+  CHECK_IN_QUESTION_COUNT,
+  getMentalCheckInLevel,
+  type MentalCheckInLevel,
+  validateMentalCheckInAnswers,
+} from '@/lib/mental-check-in';
 import { deriveRiskFlags } from '@/lib/clinical-triage';
 import type { CheckupAnswer, Recommendations, RiskFlags } from '@/models/mental-checkup';
 import { persistMentalCheckIn } from '@/lib/check-in-records';
@@ -68,18 +75,23 @@ export default function CheckInPage() {
     riskFlags: RiskFlags;
     generatedAt: Date;
   } | null>(null);
+  const guardrailLines = useMemo<string[]>(() => tm<string[]>('checkIn.clinicalGuardrailsItems'), [tm]);
 
-  const answeredAllQuestions = questions.every((question) => typeof answers[question.id] === 'number');
-  const draftAnswers = useMemo<CheckupAnswer[]>(() => (
-    questions.map((question) => ({
+  const answeredAnswers = useMemo<CheckupAnswer[]>(() => (
+    questions
+      .filter((question) => typeof answers[question.id] === 'number')
+      .map((question) => ({
       questionId: question.id,
       question: question.text,
-      value: answers[question.id] ?? 0,
+      value: answers[question.id] as number,
     }))
   ), [answers, questions]);
+  const hasValidAnswerSet = useMemo(() => (
+    validateMentalCheckInAnswers(answeredAnswers, { expectedQuestionCount: CHECK_IN_QUESTION_COUNT })
+  ), [answeredAnswers]);
 
-  const computedScore = answeredAllQuestions ? calculateMentalCheckInScore(draftAnswers) : 0;
-  const computedSeverity = answeredAllQuestions ? getMentalCheckInLevel(computedScore) : null;
+  const computedScore = hasValidAnswerSet ? calculateMentalCheckInScore(answeredAnswers) : 0;
+  const computedSeverity = hasValidAnswerSet ? getMentalCheckInLevel(computedScore) : null;
 
   const currentMission = useMemo<MissionResult | null>(() => {
     if (!computedSeverity) return null;
@@ -131,8 +143,8 @@ export default function CheckInPage() {
       };
     }
 
-    return deriveRiskFlags(draftAnswers, computedSeverity);
-  }, [computedSeverity, draftAnswers]);
+    return deriveRiskFlags(answeredAnswers, computedSeverity);
+  }, [answeredAnswers, computedSeverity]);
 
   const handleAnswerChange = (questionId: number, value: number) => {
     setAnswers((current) => ({ ...current, [questionId]: value }));
@@ -144,7 +156,7 @@ export default function CheckInPage() {
     setSaved(false);
     setResult(null);
 
-    if (!answeredAllQuestions || !computedSeverity || !currentMission) {
+    if (!hasValidAnswerSet || !computedSeverity || !currentMission) {
       setError(t('checkIn.validationError'));
       return;
     }
@@ -173,7 +185,7 @@ export default function CheckInPage() {
         resultTitle: currentMission.category,
         mission: currentMission.mission,
         summary: currentMission.description,
-        answers: draftAnswers,
+        answers: answeredAnswers,
         recommendations,
         riskFlags,
         professionalNote,
@@ -222,11 +234,19 @@ export default function CheckInPage() {
           title: t('checkIn.reportNotesTitle'),
           lines: [result.note],
         },
+        {
+          title: t('checkIn.reportGuardrailsTitle'),
+          lines: guardrailLines,
+        },
       ],
       patientSignatureLabel: t('checkIn.reportPatientSignature'),
       therapistSignatureLabel: t('checkIn.reportTherapistSignature'),
     });
-  }, [locale, reportPatient, result, t]);
+  }, [guardrailLines, locale, reportPatient, result, t]);
+
+  const shouldShowUrgentEscalation = result
+    ? result.severity === 'severe' || result.riskFlags.urgentSupportRecommended
+    : false;
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -249,6 +269,15 @@ export default function CheckInPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+              <p className="font-semibold">{t('checkIn.clinicalGuardrailsTitle')}</p>
+              <ul className="mt-2 list-disc space-y-1 pl-5">
+                {guardrailLines.map((line, index) => (
+                  <li key={`${line}-${index}`}>{line}</li>
+                ))}
+              </ul>
+            </div>
+
             <div className="space-y-4">
               {questions.map((question) => (
                 <div key={question.id} className="rounded-lg border p-4">
@@ -300,7 +329,7 @@ export default function CheckInPage() {
               </p>
             </div>
 
-            <Button type="submit" disabled={saving || !answeredAllQuestions}>
+            <Button type="submit" disabled={saving || !hasValidAnswerSet}>
               {saving ? t('checkIn.saving') : t('checkIn.saveButton')}
             </Button>
 
@@ -376,7 +405,7 @@ export default function CheckInPage() {
               <p className="mt-2 text-muted-foreground">{result.note}</p>
             </div>
 
-            {result.riskFlags.urgentSupportRecommended ? (
+            {shouldShowUrgentEscalation ? (
               <div className="rounded-lg border border-red-400 bg-red-50 p-4">
                 <p className="font-semibold text-red-700">{t('checkIn.alertTitle')}</p>
                 <p className="mt-1 text-red-700">{t('checkIn.alertText')}</p>

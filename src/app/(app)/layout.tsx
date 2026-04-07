@@ -108,6 +108,7 @@ function UserProfileInitializer({ user, onReady }: { user: User; onReady: () => 
           latestThoughtLabel: existingData?.latestThoughtLabel ?? '',
           latestThoughtPreview: existingData?.latestThoughtPreview ?? '',
           latestThoughtIsIntrusive: existingData?.latestThoughtIsIntrusive ?? false,
+          moduleVisibilityLimit: existingData?.moduleVisibilityLimit ?? 'all',
         };
 
         if (!userDoc.exists()) {

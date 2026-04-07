@@ -32,6 +32,7 @@ function normalizeUserProfile(userId: string, rawUser: Partial<UserProfile>): Us
     id: userId,
     role,
     pinnedPatientModules: rawUser.pinnedPatientModules ?? [],
+    moduleVisibilityLimit: rawUser.moduleVisibilityLimit ?? 'all',
   } as UserProfile;
 }
 
@@ -67,6 +68,7 @@ async function bootstrapMissingUserProfile(userId: string) {
     latestThoughtLabel: '',
     latestThoughtPreview: '',
     latestThoughtIsIntrusive: false,
+    moduleVisibilityLimit: 'all',
   };
 
   await db.collection('users').doc(userId).set(fallbackProfile, { merge: true });

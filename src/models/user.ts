@@ -3,6 +3,7 @@ import { AccountRole } from '@/lib/account-role';
 
 export type AppAccessRole = 'guest' | 'patient' | 'professional' | 'clinic';
 export type UserRole = 'clinic' | 'professional' | 'patient';
+export type ModuleVisibilityLimit = 1 | 2 | 3 | 'all';
 
 export interface UserProfile {
   id: string;
@@ -34,4 +35,5 @@ export interface UserProfile {
   latestThoughtLabel?: string;
   latestThoughtPreview?: string;
   latestThoughtIsIntrusive?: boolean;
+  moduleVisibilityLimit?: ModuleVisibilityLimit;
 }

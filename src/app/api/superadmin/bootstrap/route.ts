@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
         latestThoughtLabel: existingData?.latestThoughtLabel ?? '',
         latestThoughtPreview: existingData?.latestThoughtPreview ?? '',
         latestThoughtIsIntrusive: existingData?.latestThoughtIsIntrusive ?? false,
+        moduleVisibilityLimit: existingData?.moduleVisibilityLimit ?? 'all',
         createdAt: existingData?.createdAt ?? FieldValue.serverTimestamp(),
       },
       { merge: true }

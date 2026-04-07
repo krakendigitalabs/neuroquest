@@ -25,6 +25,24 @@ function getRouteAccess(enabledCatalog: ModuleCatalogEntry[], visibleModules: Mo
     .map((module) => module.route);
 }
 
+function applyModuleVisibilityLimit(
+  visibleModules: ModuleKey[],
+  enabledCatalog: ModuleCatalogEntry[],
+  rawLimit: ResolveAccessInput['user']['moduleVisibilityLimit'],
+) {
+  if (!rawLimit || rawLimit === 'all') {
+    return visibleModules;
+  }
+
+  const normalizedLimit = Math.max(1, Math.min(3, rawLimit));
+  const visibleModuleSet = new Set(visibleModules);
+
+  return enabledCatalog
+    .map((entry) => entry.key)
+    .filter((key) => visibleModuleSet.has(key))
+    .slice(0, normalizedLimit);
+}
+
 function getAllowedModules(input: ResolveAccessInput, enabledCatalog: ModuleCatalogEntry[]) {
   const allowed = new Set<ModuleKey>();
 
@@ -100,13 +118,15 @@ export function resolveAccess(input: ResolveAccessInput): ResolvedAccess {
   const allowed = getAllowedModules(input, enabledCatalog);
 
   if (input.user.role === 'patient') {
-    const visibleModules = resolvePatientModules(input, enabledCatalog, allowed);
+    const patientModules = resolvePatientModules(input, enabledCatalog, allowed);
+    const visibleModules = applyModuleVisibilityLimit(patientModules, enabledCatalog, input.user.moduleVisibilityLimit);
     return buildResolvedAccess(input.user.id, input.user.role, enabledCatalog, visibleModules, false);
   }
 
-  const visibleModules = enabledCatalog
+  const roleVisibleModules = enabledCatalog
     .map((module) => module.key)
     .filter((module) => allowed.has(module));
+  const visibleModules = applyModuleVisibilityLimit(roleVisibleModules, enabledCatalog, input.user.moduleVisibilityLimit);
 
   return buildResolvedAccess(
     input.user.id,

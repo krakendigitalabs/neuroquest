@@ -15,20 +15,23 @@ import { updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { useAccountAccess } from '@/hooks/use-account-access';
 import { useWorkspaceSettings } from '@/hooks/use-workspace-settings';
 import { AccountRole, getAssignableAccountRoles } from '@/lib/account-role';
+import { isPrimarySuperadminEmail } from '@/lib/superadmin-config';
 import { requireAccountRole } from '@/modules/auth/guards';
-import type { UserProfile, UserRole } from '@/models/user';
+import type { ModuleVisibilityLimit, UserProfile, UserRole } from '@/models/user';
 
 type DraftRow = {
   accountRole: AccountRole;
   userRole: UserRole;
+  moduleVisibilityLimit: ModuleVisibilityLimit;
 };
 
 export default function WorkspaceUsersPage() {
   const { t } = useTranslation();
-  const { firestore } = useFirebase();
+  const { firestore, user } = useFirebase();
   const { accountRole, canManageWorkspaceUsers, isLoading } = useAccountAccess();
   const router = useRouter();
   const [drafts, setDrafts] = useState<Record<string, DraftRow>>({});
+  const canManageModuleVisibility = isPrimarySuperadminEmail(user?.email);
 
   const usersQuery = useMemoFirebase(() => {
     if (!firestore || !canManageWorkspaceUsers) return null;
@@ -53,7 +56,7 @@ export default function WorkspaceUsersPage() {
 
   const sortedUsers = useMemo(() => [...(users ?? [])], [users]);
 
-  const setDraftField = (userId: string, field: keyof DraftRow, value: string) => {
+  const setDraftField = <K extends keyof DraftRow>(userId: string, field: K, value: DraftRow[K]) => {
     const currentUser = sortedUsers.find((entry) => entry.id === userId);
     if (!currentUser) return;
 
@@ -62,10 +65,18 @@ export default function WorkspaceUsersPage() {
       [userId]: {
         accountRole: current[userId]?.accountRole ?? currentUser.accountRole,
         userRole: current[userId]?.userRole ?? currentUser.userRole,
+        moduleVisibilityLimit: current[userId]?.moduleVisibilityLimit ?? currentUser.moduleVisibilityLimit ?? 'all',
         [field]: value,
       } as DraftRow,
     }));
   };
+
+  const moduleVisibilityLimitOptions: Array<{ value: ModuleVisibilityLimit; label: string }> = [
+    { value: 1, label: '1 módulo' },
+    { value: 2, label: '2 módulos' },
+    { value: 3, label: '3 módulos' },
+    { value: 'all', label: 'Todos los módulos' },
+  ];
 
   const workspaceStats = useMemo(() => {
     const totalUsers = sortedUsers.length;
@@ -165,13 +176,15 @@ export default function WorkspaceUsersPage() {
             const draftRow = drafts[entry.id];
             const currentAccountRole = draftRow?.accountRole ?? entry.accountRole;
             const currentUserRole = draftRow?.userRole ?? entry.userRole;
+            const currentModuleVisibilityLimit = draftRow?.moduleVisibilityLimit ?? entry.moduleVisibilityLimit ?? 'all';
             const hasChanges =
               currentAccountRole !== entry.accountRole ||
-              currentUserRole !== entry.userRole;
+              currentUserRole !== entry.userRole ||
+              (canManageModuleVisibility && currentModuleVisibilityLimit !== (entry.moduleVisibilityLimit ?? 'all'));
 
             return (
               <div key={entry.id} className="rounded-2xl border border-border/60 bg-card p-4">
-                <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr_0.8fr_auto] xl:items-center">
+                <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr_0.8fr_0.9fr_auto] xl:items-center">
                   <div className="space-y-1">
                     <p className="font-medium">{entry.displayName || entry.email || entry.id}</p>
                     <p className="text-sm text-muted-foreground">{entry.email || entry.id}</p>
@@ -181,13 +194,20 @@ export default function WorkspaceUsersPage() {
                         userRole: t(`userRoles.${entry.userRole}`),
                       })}
                     </p>
+                    <p className="text-xs text-muted-foreground">
+                      {`Módulos visibles: ${
+                        entry.moduleVisibilityLimit === 'all' || !entry.moduleVisibilityLimit
+                          ? 'todos'
+                          : entry.moduleVisibilityLimit
+                      }`}
+                    </p>
                   </div>
 
                   <label className="space-y-2 text-sm">
                     <span className="font-medium">{t('workspaceUsers.accountRoleLabel')}</span>
                     <Select
                       value={currentAccountRole}
-                      onValueChange={(value) => setDraftField(entry.id, 'accountRole', value)}
+                      onValueChange={(value) => setDraftField(entry.id, 'accountRole', value as AccountRole)}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -206,7 +226,7 @@ export default function WorkspaceUsersPage() {
                     <span className="font-medium">{t('workspaceUsers.userRoleLabel')}</span>
                     <Select
                       value={currentUserRole}
-                      onValueChange={(value) => setDraftField(entry.id, 'userRole', value)}
+                      onValueChange={(value) => setDraftField(entry.id, 'userRole', value as UserRole)}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -219,6 +239,36 @@ export default function WorkspaceUsersPage() {
                     </Select>
                   </label>
 
+                  <label className="space-y-2 text-sm">
+                    <span className="font-medium">Límite de módulos</span>
+                    <Select
+                      value={String(currentModuleVisibilityLimit)}
+                      onValueChange={(value) => {
+                        const nextValue = value === 'all' ? 'all' : Number(value);
+                        if (nextValue === 'all' || nextValue === 1 || nextValue === 2 || nextValue === 3) {
+                          setDraftField(entry.id, 'moduleVisibilityLimit', nextValue);
+                        }
+                      }}
+                      disabled={!canManageModuleVisibility}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {moduleVisibilityLimitOptions.map((option) => (
+                          <SelectItem key={option.value} value={String(option.value)}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {!canManageModuleVisibility ? (
+                      <p className="text-xs text-muted-foreground">
+                        Solo {`krakendigitalabs@gmail.com`} puede modificar este control.
+                      </p>
+                    ) : null}
+                  </label>
+
                   <div className="flex flex-col gap-2">
                     <Button
                       type="button"
@@ -227,10 +277,16 @@ export default function WorkspaceUsersPage() {
                         if (!firestore) return;
 
                         const docRef = doc(firestore, 'users', entry.id);
-                        updateDocumentNonBlocking(docRef, {
+                        const payload: Partial<UserProfile> = {
                           accountRole: currentAccountRole,
                           userRole: currentUserRole,
-                        });
+                        };
+
+                        if (canManageModuleVisibility) {
+                          payload.moduleVisibilityLimit = currentModuleVisibilityLimit;
+                        }
+
+                        updateDocumentNonBlocking(docRef, payload);
                         setDrafts((current) => {
                           const next = { ...current };
                           delete next[entry.id];

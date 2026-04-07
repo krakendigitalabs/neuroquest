@@ -43,4 +43,18 @@ describe('clinical triage', () => {
       urgentSupportRecommended: false,
     });
   });
+
+  it('escalates to urgent support when the total severity level is severe even if self-harm answer is low', () => {
+    const answers = Array.from({ length: 10 }, (_, index) => ({
+      questionId: index + 1,
+      question: `Question ${index + 1}`,
+      value: index === 9 ? 1 : 0,
+    }));
+
+    expect(deriveRiskFlags(answers, 'severe')).toEqual({
+      selfHarmRisk: false,
+      needsProfessionalSupport: true,
+      urgentSupportRecommended: true,
+    });
+  });
 });

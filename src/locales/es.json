@@ -1422,6 +1422,7 @@
   "reportClinicalSummary": "Resultado actual: {category}. Puntaje registrado: {score}/{maxScore}. Misión sugerida: {mission}.",
   "reportTasksTitle": "Tareas sugeridas",
   "reportNotesTitle": "Nota registrada",
+  "reportGuardrailsTitle": "Límites clínicos",
   "reportPatientSignature": "Firma del paciente",
   "reportTherapistSignature": "Firma del terapeuta",
   "pendingAnswers": "Pendiente",
@@ -1450,6 +1451,12 @@
   "openCrisisSupport": "Abrir apoyo en crisis",
   "disclaimerTitle": "Orientación",
   "disclaimerText": "Esta herramienta ofrece orientación general basada en síntomas autoinformados. No sustituye un diagnóstico médico, psiquiátrico o psicológico profesional.",
+  "clinicalGuardrailsTitle": "Límites clínicos explícitos",
+  "clinicalGuardrailsItems": [
+    "Este chequeo no realiza diagnósticos.",
+    "Este chequeo no prescribe medicamentos ni dosis.",
+    "Este chequeo no reemplaza atención médica, psiquiátrica o psicológica profesional."
+  ],
   "defaultProfessionalNote": "El usuario completó un chequeo mental autoguiado.",
   "familySupportRecommendation": "Comparte tu estado emocional actual con un familiar de confianza.",
   "partnerSupportRecommendation": "Pide a tu pareja o red de apoyo ayuda emocional práctica esta semana.",

@@ -1418,6 +1418,12 @@
     "openCrisisSupport": "Open crisis support",
     "disclaimerTitle": "Guideline",
     "disclaimerText": "This tool provides general guidance based on self-reported symptoms. It does not substitute for a professional medical, psychiatric, or psychological diagnosis.",
+    "clinicalGuardrailsTitle": "Clinical guardrails",
+    "clinicalGuardrailsItems": [
+      "This check-in does not provide a diagnosis.",
+      "This check-in does not prescribe medication or dosing.",
+      "This check-in does not replace professional medical, psychiatric, or psychological care."
+    ],
     "defaultProfessionalNote": "User completed a self-guided mental check-in.",
     "familySupportRecommendation": "Share your current emotional state with a trusted family member.",
     "partnerSupportRecommendation": "Ask your partner or support person for practical emotional support this week.",
@@ -1449,6 +1455,7 @@
     "reportClinicalSummary": "Current result: {category}. Recorded score: {score}/{maxScore}. Suggested mission: {mission}.",
     "reportTasksTitle": "Suggested tasks",
     "reportNotesTitle": "Recorded note",
+    "reportGuardrailsTitle": "Clinical guardrails",
     "reportPatientSignature": "Patient signature",
     "reportTherapistSignature": "Therapist signature",
     "pendingAnswers": "Pending",

@@ -113,7 +113,7 @@ vi.mock('@/context/language-provider', () => ({
 
 describe('WorkspaceUsersPage', () => {
   it('renders the management panel for privileged workspace roles', () => {
-    useFirebaseMock.mockReturnValue({ firestore: {}, user: { uid: 'owner-1' } });
+    useFirebaseMock.mockReturnValue({ firestore: {}, user: { uid: 'owner-1', email: 'manager@example.com' } });
     useAccountAccessMock.mockReturnValue({
       accountRole: 'owner',
       canManageWorkspaceUsers: true,
@@ -127,6 +127,7 @@ describe('WorkspaceUsersPage', () => {
           email: 'pat@example.com',
           accountRole: 'viewer',
           userRole: 'patient',
+          moduleVisibilityLimit: 'all',
         },
       ],
       isLoading: false,
@@ -166,5 +167,34 @@ describe('WorkspaceUsersPage', () => {
     render(<WorkspaceUsersPage />);
 
     expect(pushMock).toHaveBeenCalledWith('/dashboard');
+  });
+
+  it('shows module-limit guardrail message for non-primary superadmin emails', () => {
+    useFirebaseMock.mockReturnValue({ firestore: {}, user: { uid: 'admin-1', email: 'admin@example.com' } });
+    useAccountAccessMock.mockReturnValue({
+      accountRole: 'owner',
+      canManageWorkspaceUsers: true,
+      isLoading: false,
+    });
+    useCollectionMock.mockReturnValue({
+      data: [
+        {
+          id: 'user-1',
+          displayName: 'Pat Doe',
+          email: 'pat@example.com',
+          accountRole: 'viewer',
+          userRole: 'patient',
+          moduleVisibilityLimit: 2,
+        },
+      ],
+      isLoading: false,
+    });
+    useDocMock.mockReturnValue({ data: null, isLoading: false });
+
+    render(<WorkspaceUsersPage />);
+
+    expect(
+      screen.getAllByText('Solo krakendigitalabs@gmail.com puede modificar este control.').length,
+    ).toBeGreaterThan(0);
   });
 });
