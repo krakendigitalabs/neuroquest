@@ -195,11 +195,12 @@ vi.mock('@/context/language-provider', () => ({
 }));
 
 describe('HomeLanding activation funnel', () => {
-  it('exposes role-specific login entry points for the demo funnel', () => {
+  it('exposes a single system access entry point in the header', () => {
     render(<HomeLanding />);
 
-    expect(screen.getByRole('link', { name: 'Enter as patient' })).toHaveAttribute('href', '/login?role=patient');
-    expect(screen.getByRole('link', { name: 'Enter as professional' })).toHaveAttribute('href', '/login?role=professional');
-    expect(screen.getByRole('link', { name: 'Enter as clinic' })).toHaveAttribute('href', '/login?role=clinic');
+    expect(screen.getByRole('link', { name: 'Comenzar tu viaje' })).toHaveAttribute('href', '/login');
+    expect(screen.queryByRole('link', { name: 'Enter as patient' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Enter as professional' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Enter as clinic' })).not.toBeInTheDocument();
   });
 });
