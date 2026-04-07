@@ -9,20 +9,29 @@ export async function POST(request: NextRequest) {
   try {
     const unlockedCookie = request.cookies.get(SUPERADMIN_COOKIE_NAME)?.value ?? null;
     if (unlockedCookie !== '1') {
-      return NextResponse.json({ error: 'superadmin-gate-required' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'superadmin-gate-required' },
+        { status: 403, headers: { 'Cache-Control': 'no-store' } },
+      );
     }
 
     const { token } = await request.json();
 
     if (!token) {
-      return NextResponse.json({ error: 'missing-token' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'missing-token' },
+        { status: 400, headers: { 'Cache-Control': 'no-store' } },
+      );
     }
 
     const decodedToken = await getAdminAuth().verifyIdToken(token, true);
     const email = decodedToken.email?.toLowerCase() ?? '';
 
     if (!isAllowedSuperadminEmail(email)) {
-      return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'forbidden' },
+        { status: 403, headers: { 'Cache-Control': 'no-store' } },
+      );
     }
 
     const db = getAdminDb();
@@ -68,8 +77,11 @@ export async function POST(request: NextRequest) {
       { merge: true }
     );
 
-    return NextResponse.json({ ok: true }, { status: 200 });
+    return NextResponse.json({ ok: true }, { status: 200, headers: { 'Cache-Control': 'no-store' } });
   } catch {
-    return NextResponse.json({ error: 'bootstrap-failed' }, { status: 401 });
+    return NextResponse.json(
+      { error: 'bootstrap-failed' },
+      { status: 401, headers: { 'Cache-Control': 'no-store' } },
+    );
   }
 }

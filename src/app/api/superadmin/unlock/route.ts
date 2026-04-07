@@ -6,11 +6,17 @@ export async function POST(request: NextRequest) {
   const expectedPin = process.env.SUPERADMIN_PIN?.trim();
 
   if (!expectedPin || expectedPin.length !== 3) {
-    return NextResponse.json({ error: 'superadmin-pin-not-configured' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'superadmin-pin-not-configured' },
+      { status: 500, headers: { 'Cache-Control': 'no-store' } },
+    );
   }
 
   if (pin !== expectedPin) {
-    return NextResponse.json({ error: 'invalid-pin' }, { status: 401 });
+    return NextResponse.json(
+      { error: 'invalid-pin' },
+      { status: 401, headers: { 'Cache-Control': 'no-store' } },
+    );
   }
 
   const response = NextResponse.json({ ok: true });
@@ -22,6 +28,7 @@ export async function POST(request: NextRequest) {
     path: '/',
     maxAge: 60 * 60 * 8,
   });
+  response.headers.set('Cache-Control', 'no-store');
 
   return response;
 }

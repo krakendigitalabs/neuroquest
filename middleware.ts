@@ -15,7 +15,6 @@ const AUTH_PROTECTED_PATHS = [
   '/grounding',
   '/progress',
   '/medical-support',
-  '/superadmin',
   ...WORKSPACE_ADMIN_PATHS,
 ];
 

@@ -51,12 +51,18 @@ export async function POST(request: NextRequest) {
   const unlockedCookie = request.cookies.get(SUPERADMIN_COOKIE_NAME)?.value ?? null;
 
   if (unlockedCookie !== '1') {
-    return NextResponse.json({ error: 'superadmin-gate-required' }, { status: 403 });
+    return NextResponse.json(
+      { error: 'superadmin-gate-required' },
+      { status: 403, headers: { 'Cache-Control': 'no-store' } },
+    );
   }
 
   const token = await extractToken(request);
   if (!token) {
-    return NextResponse.json({ error: 'missing-token' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'missing-token' },
+      { status: 400, headers: { 'Cache-Control': 'no-store' } },
+    );
   }
 
   try {
@@ -66,15 +72,18 @@ export async function POST(request: NextRequest) {
     if (!isAllowedSuperadminEmail(email)) {
       const forbidden = NextResponse.json({ error: 'forbidden' }, { status: 403 });
       forbidden.cookies.set(SUPERADMIN_SESSION_COOKIE_NAME, '', buildCookieOptions(0, secure));
+      forbidden.headers.set('Cache-Control', 'no-store');
       return forbidden;
     }
 
     const response = NextResponse.json({ ok: true }, { status: 200 });
     response.cookies.set(SUPERADMIN_SESSION_COOKIE_NAME, token, buildCookieOptions(SESSION_MAX_AGE_SECONDS, secure));
+    response.headers.set('Cache-Control', 'no-store');
     return response;
   } catch {
     const response = NextResponse.json({ error: 'invalid-token' }, { status: 401 });
     response.cookies.set(SUPERADMIN_SESSION_COOKIE_NAME, '', buildCookieOptions(0, secure));
+    response.headers.set('Cache-Control', 'no-store');
     return response;
   }
 }
@@ -84,5 +93,6 @@ export async function DELETE(request: NextRequest) {
   const response = NextResponse.json({ ok: true });
   response.cookies.set(SUPERADMIN_SESSION_COOKIE_NAME, '', buildCookieOptions(0, secure));
   response.cookies.set(SUPERADMIN_COOKIE_NAME, '', buildCookieOptions(0, secure));
+  response.headers.set('Cache-Control', 'no-store');
   return response;
 }
