@@ -59,4 +59,48 @@ describe('resolveAccess module visibility limit', () => {
 
     expect(resolved.visibleModules).toEqual(['check-in', 'observer', 'progress', 'medical-support']);
   });
+
+  it('removes guest check-in when check-in is disabled in module catalog', () => {
+    const resolved = resolveAccess(
+      buildInput({
+        user: {
+          ...buildInput({}).user,
+          role: 'guest',
+        },
+        rolePolicy: {
+          role: 'guest',
+          baseModules: ['check-in'],
+          canCreateModules: false,
+        },
+        moduleCatalog: [
+          { key: 'check-in', name: 'Check-In', route: '/check-in', enabled: false, audience: ['guest'], supportsAutoRules: false, order: 1 },
+        ],
+      }),
+    );
+
+    expect(resolved.visibleModules).toEqual([]);
+    expect(resolved.routeAccess).toEqual([]);
+  });
+
+  it('keeps guest check-in when check-in is enabled in module catalog', () => {
+    const resolved = resolveAccess(
+      buildInput({
+        user: {
+          ...buildInput({}).user,
+          role: 'guest',
+        },
+        rolePolicy: {
+          role: 'guest',
+          baseModules: ['check-in'],
+          canCreateModules: false,
+        },
+        moduleCatalog: [
+          { key: 'check-in', name: 'Check-In', route: '/check-in', enabled: true, audience: ['guest'], supportsAutoRules: false, order: 1 },
+        ],
+      }),
+    );
+
+    expect(resolved.visibleModules).toEqual(['check-in']);
+    expect(resolved.routeAccess).toEqual(['/check-in']);
+  });
 });

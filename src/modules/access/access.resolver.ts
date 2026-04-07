@@ -105,11 +105,14 @@ function buildResolvedAccess(
 
 export function resolveAccess(input: ResolveAccessInput): ResolvedAccess {
   if (input.user.role === 'guest') {
+    const enabledGuestCatalog = getEnabledCatalog(input.moduleCatalog, 'guest');
+    const hasGuestCheckInEnabled = enabledGuestCatalog.some((entry) => entry.key === 'check-in');
+
     return buildResolvedAccess(
       input.user.id,
       'guest',
-      [{ key: 'check-in', name: 'Chequeo Mental', route: '/check-in', enabled: true, audience: ['guest'], supportsAutoRules: false, order: 1 }],
-      ['check-in'],
+      enabledGuestCatalog,
+      hasGuestCheckInEnabled ? ['check-in'] : [],
       false
     );
   }
