@@ -155,6 +155,11 @@ describe('ProgressPage', () => {
   });
 
   it('keeps opened events out of progress totals while still showing them as engagement', () => {
+    const now = new Date();
+    const recentOpenedAt = new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString();
+    const recentSavedAt = new Date(now.getTime() - 60 * 60 * 1000).toISOString();
+    const recentSavedAt2 = new Date(now.getTime() - 30 * 60 * 1000).toISOString();
+
     useFirebaseMock.mockReturnValue({
       firestore: {},
       user: { uid: 'user-1', displayName: 'Pat Doe', email: 'pat@example.com' },
@@ -174,7 +179,7 @@ describe('ProgressPage', () => {
             module: 'grounding',
             type: 'opened',
             detail: '',
-            createdAt: '2026-03-28T09:00:00.000Z',
+            createdAt: recentOpenedAt,
           },
           {
             id: 'event-2',
@@ -182,7 +187,7 @@ describe('ProgressPage', () => {
             module: 'regulation',
             type: 'saved',
             detail: 'Box Breathing',
-            createdAt: '2026-03-28T10:00:00.000Z',
+            createdAt: recentSavedAt,
           },
           {
             id: 'event-3',
@@ -190,7 +195,7 @@ describe('ProgressPage', () => {
             module: 'reprogram',
             type: 'saved',
             detail: 'Thought reframed',
-            createdAt: '2026-03-28T11:00:00.000Z',
+            createdAt: recentSavedAt2,
           },
         ],
       });

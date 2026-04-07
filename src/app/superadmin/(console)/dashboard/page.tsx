@@ -4,6 +4,9 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSuperadminDashboardSummary } from '@/modules/superadmin/dashboard';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 function formatDate(value: Date | null) {
   if (!value) return 'Sin fecha';
   return new Intl.DateTimeFormat('es-CO', {

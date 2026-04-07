@@ -17,23 +17,23 @@ export default function Home() {
   const features = [
     {
       icon: <BrainCircuit className="h-8 w-8 text-primary" />,
-      title: t('landing.feature1Title'),
-      description: t('landing.feature1Description'),
+      title: t('landing.modules.cards.0.1'),
+      description: t('landing.modules.cards.0.2'),
     },
     {
       icon: <Award className="h-8 w-8 text-primary" />,
-      title: t('landing.feature2Title'),
-      description: t('landing.feature2Description'),
+      title: t('landing.modules.cards.1.1'),
+      description: t('landing.modules.cards.1.2'),
     },
     {
       icon: <Target className="h-8 w-8 text-primary" />,
-      title: t('landing.feature3Title'),
-      description: t('landing.feature3Description'),
+      title: t('landing.modules.cards.2.1'),
+      description: t('landing.modules.cards.2.2'),
     },
     {
       icon: <ShieldCheck className="h-8 w-8 text-primary" />,
-      title: t('landing.feature4Title'),
-      description: t('landing.feature4Description'),
+      title: t('landing.modules.cards.3.1'),
+      description: t('landing.modules.cards.3.2'),
     },
   ];
 
@@ -51,11 +51,11 @@ export default function Home() {
               className="text-sm font-medium hover:underline underline-offset-4"
               prefetch={false}
             >
-              {t('landing.therapistPortal')}
+              {t('landing.nav.therapist')}
             </Link>
           )}
           <Button asChild>
-            <Link href={user ? "/dashboard" : "/login"}>{t('landing.launchApp')}</Link>
+            <Link href={user ? "/dashboard" : "/login"}>{t('landing.nav.cta')}</Link>
           </Button>
         </nav>
       </header>
@@ -66,10 +66,10 @@ export default function Home() {
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
                   <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
-                    {t('landing.headline')}
+                    {t('landing.hero.title')}
                   </h1>
                   <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                    {t('landing.subheadline')}
+                    {t('landing.hero.description')}
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
@@ -92,10 +92,10 @@ export default function Home() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-secondary px-3 py-1 text-sm">{t('landing.keyFeatures')}</div>
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">{t('landing.approachTitle')}</h2>
+                <div className="inline-block rounded-lg bg-secondary px-3 py-1 text-sm">{t('landing.modules.badge')}</div>
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">{t('landing.modules.title')}</h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  {t('landing.approachDescription')}
+                  {t('landing.modules.description')}
                 </p>
               </div>
             </div>
@@ -116,9 +116,9 @@ export default function Home() {
         </section>
       </main>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-muted-foreground">{t('landing.footerRights')}</p>
+        <p className="text-xs text-muted-foreground">{`${t('landing.footer.rightsPrefix')} ${t('landing.footer.ownerName')}`}</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <p className="text-xs text-muted-foreground">{t('landing.footerDisclaimer')}</p>
+          <p className="text-xs text-muted-foreground">{t('landing.footer.disclaimer')}</p>
         </nav>
       </footer>
     </div>
