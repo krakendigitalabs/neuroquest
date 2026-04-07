@@ -485,28 +485,28 @@
     },
     "activation": {
       "badge": "Role-guided entry",
-      "title": "Each type of user starts from a clearer flow.",
-      "description": "The landing page and login now prepare activation based on account intent, without inventing clinical permissions or mixing onboarding states.",
+      "title": "Each person starts from a clear, friendly, and professional flow.",
+      "description": "You can start with a base experience or a premium path depending on your context. Clinical permissions stay real and controlled, with no shortcuts.",
       "cards": [
         {
           "role": "patient",
           "title": "Patient",
-          "description": "Start with check-in, observer, grounding, and personal follow-up from the first access.",
-          "helper": "You can try the personal flow as a guest if you only need to explore it.",
+          "description": "Start with check-in, observer, grounding, and personal follow-up from first access, with a premium option for deeper continuity.",
+          "helper": "If you only want to explore first, you can enter as guest and upgrade to premium later.",
           "cta": "Enter as patient"
         },
         {
           "role": "professional",
           "title": "Professional",
-          "description": "Enter through a flow oriented to patient follow-up, clinical support, and supervised documentation.",
-          "helper": "Professional intent is captured in onboarding, but real clinical access still requires validation.",
+          "description": "Enter a flow focused on patient follow-up, clinical support, and supervised documentation, with premium tools for case prioritization.",
+          "helper": "Professional intent is captured in onboarding, and clinical access still requires formal validation for patient safety.",
           "cta": "Enter as professional"
         },
         {
           "role": "clinic",
           "title": "Clinic",
-          "description": "Prepare access for clinical operations, cross-patient follow-up, and broader team workflows.",
-          "helper": "Clinic setup is not enabled automatically from login; it remains subject to internal review.",
+          "description": "Prepare access for clinical operations, cross-patient follow-up, and team workflows, with premium capabilities for multi-professional coordination.",
+          "helper": "Clinic setup is not enabled automatically from login; it remains subject to internal review for maximum safety.",
           "cta": "Enter as clinic"
         }
       ]

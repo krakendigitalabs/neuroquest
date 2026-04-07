@@ -484,28 +484,28 @@
     },
     "activation": {
       "badge": "Entrada guiada por rol",
-      "title": "Cada tipo de usuario entra por un flujo más claro.",
-      "description": "La landing y el login ya preparan la activación según la intención de cuenta, sin inventar permisos clínicos ni mezclar el onboarding.",
+      "title": "Cada persona entra por un flujo claro, cálido y profesional.",
+      "description": "Puedes iniciar con una experiencia base o una ruta premium según tu contexto. Siempre mantenemos permisos clínicos reales, sin atajos ni mezclas de onboarding.",
       "cards": [
         {
           "role": "patient",
           "title": "Paciente",
-          "description": "Empieza con check-in, observer, grounding y seguimiento personal desde el primer acceso.",
-          "helper": "Puedes probar como invitado si solo necesitas explorar el flujo personal.",
+          "description": "Empieza con check-in, observer, grounding y seguimiento personal desde el primer acceso, con versión premium para acompañamiento más continuo.",
+          "helper": "Si solo quieres explorar primero, puedes iniciar como invitado y luego subir a premium cuando estés listo.",
           "cta": "Entrar como paciente"
         },
         {
           "role": "professional",
           "title": "Profesional",
-          "description": "Entra con un flujo orientado a seguimiento de pacientes, soporte clínico y documentación supervisada.",
-          "helper": "La intención profesional se registra en onboarding, pero el acceso clínico sigue requiriendo validación.",
+          "description": "Accede a un flujo orientado a seguimiento de pacientes, soporte clínico y documentación supervisada, con herramientas premium para priorización de casos.",
+          "helper": "La intención profesional se registra en onboarding, y el acceso clínico mantiene validación formal para proteger a los pacientes.",
           "cta": "Entrar como profesional"
         },
         {
           "role": "clinic",
           "title": "Clínica",
-          "description": "Prepara el acceso para operación clínica, seguimiento transversal y trabajo con varios pacientes.",
-          "helper": "La configuración clínica no se habilita automáticamente desde el login; queda sujeta a revisión interna.",
+          "description": "Prepara operación clínica, seguimiento transversal y coordinación de equipos con capacidades premium para múltiples profesionales.",
+          "helper": "La configuración clínica no se activa automáticamente desde login; queda sujeta a revisión interna para máxima seguridad.",
           "cta": "Entrar como clínica"
         }
       ]
