@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminAuth, getAdminDb } from '@/lib/firebase-admin';
-import { isAllowedSuperadminEmail } from '@/lib/superadmin-config';
+import { isAllowedSuperadminEmail, SUPERADMIN_COOKIE_NAME } from '@/lib/superadmin-config';
 
 export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
   try {
+    const unlockedCookie = request.cookies.get(SUPERADMIN_COOKIE_NAME)?.value ?? null;
+    if (unlockedCookie !== '1') {
+      return NextResponse.json({ error: 'superadmin-gate-required' }, { status: 403 });
+    }
+
     const { token } = await request.json();
 
     if (!token) {

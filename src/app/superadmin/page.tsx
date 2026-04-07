@@ -14,7 +14,16 @@ export default function SuperadminGatePage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  const nextPath = useMemo(() => searchParams.get('next') || '/superadmin/login', [searchParams]);
+  const nextPath = useMemo(() => {
+    const rawNext = searchParams.get('next') ?? '';
+    const safeNext = rawNext.startsWith('/superadmin/') ? rawNext : '/superadmin/dashboard';
+
+    if (safeNext === '/superadmin/login') {
+      return '/superadmin/login';
+    }
+
+    return `/superadmin/login?next=${encodeURIComponent(safeNext)}`;
+  }, [searchParams]);
 
   const handleDigit = (digit: string) => {
     setError('');

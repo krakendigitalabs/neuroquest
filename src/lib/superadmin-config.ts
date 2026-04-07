@@ -1,4 +1,5 @@
 export const SUPERADMIN_COOKIE_NAME = 'nq-superadmin-unlocked';
+export const SUPERADMIN_SESSION_COOKIE_NAME = 'nq-superadmin-session';
 export const PRIMARY_SUPERADMIN_EMAIL = 'krakendigitalabs@gmail.com';
 
 const DEFAULT_SUPERADMIN_EMAILS = [PRIMARY_SUPERADMIN_EMAIL];

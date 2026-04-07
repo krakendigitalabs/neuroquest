@@ -1,23 +1,35 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useFirebase } from '@/firebase';
-import { useAccountAccess } from '@/hooks/use-account-access';
 import { isAllowedSuperadminEmail } from '@/lib/superadmin-config';
 
 export default function SuperadminLoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { auth, user, isUserLoading } = useFirebase();
-  const { canManageWorkspaceUsers, isLoading } = useAccountAccess();
   const [error, setError] = useState('');
   const [signingIn, setSigningIn] = useState(false);
   const [initializingProfile, setInitializingProfile] = useState(false);
+  const hasAutoBootstrapStartedRef = useRef(false);
 
   const email = useMemo(() => user?.email?.toLowerCase() ?? '', [user?.email]);
+  const nextPath = useMemo(() => {
+    const rawNext = searchParams.get('next') ?? '';
+    if (!rawNext.startsWith('/superadmin/')) {
+      return '/superadmin/dashboard';
+    }
+
+    if (rawNext === '/superadmin/login' || rawNext === '/superadmin') {
+      return '/superadmin/dashboard';
+    }
+
+    return rawNext;
+  }, [searchParams]);
 
   const ensureSuperadminProfile = async (signedInUser: NonNullable<typeof user>) => {
     const token = await signedInUser.getIdToken(true);
@@ -33,15 +45,23 @@ export default function SuperadminLoginPage() {
     if (!response.ok) {
       throw new Error('superadmin-bootstrap-failed');
     }
+
+    const sessionResponse = await fetch('/api/superadmin/session', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token }),
+    });
+
+    if (!sessionResponse.ok) {
+      throw new Error('superadmin-session-failed');
+    }
   };
 
   useEffect(() => {
-    if (isUserLoading || isLoading || !user) return;
-
-    if (isAllowedSuperadminEmail(email) && canManageWorkspaceUsers) {
-      router.push('/workspace-users');
-      return;
-    }
+    if (isUserLoading || !user) return;
 
     if (email && !isAllowedSuperadminEmail(email)) {
       setError('Este correo no está autorizado para superadministración.');
@@ -49,21 +69,27 @@ export default function SuperadminLoginPage() {
       return;
     }
 
-    if (email && isAllowedSuperadminEmail(email) && !canManageWorkspaceUsers) {
+    if (email && isAllowedSuperadminEmail(email)) {
+      if (hasAutoBootstrapStartedRef.current) {
+        return;
+      }
+
+      hasAutoBootstrapStartedRef.current = true;
       void (async () => {
         try {
           setInitializingProfile(true);
           setError('');
           await ensureSuperadminProfile(user);
-          router.push('/workspace-users');
+          router.push(nextPath);
         } catch {
+          hasAutoBootstrapStartedRef.current = false;
           setError('No se pudo preparar el perfil de superadministración.');
         } finally {
           setInitializingProfile(false);
         }
       })();
     }
-  }, [auth, canManageWorkspaceUsers, email, isLoading, isUserLoading, router, user]);
+  }, [auth, email, isUserLoading, nextPath, router, user]);
 
   const handleGoogleAccess = async () => {
     if (!auth) return;
@@ -82,7 +108,7 @@ export default function SuperadminLoginPage() {
       }
 
       await ensureSuperadminProfile(result.user);
-      router.push('/workspace-users');
+      router.push(nextPath);
     } catch {
       setError('No se pudo completar el acceso con Google.');
     } finally {
