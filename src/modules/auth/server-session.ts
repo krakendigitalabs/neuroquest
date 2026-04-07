@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { cookies, headers } from 'next/headers';
 import type { DecodedIdToken } from 'firebase-admin/auth';
 import { getAdminAuth } from '@/lib/firebase-admin';
